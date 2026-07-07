@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- 모바일 화면에서 글자가 너무 작아지지 않도록 viewport를 설정합니다. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>🌿 나의 Green Attitude 알아보기</title>
+
+  <style>
+    /* 모바일 안전을 위한 최소 CSS입니다. */
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      word-break: keep-all;
+    }
+
+    img, video {
+      max-width: 100%;
+    }
+
+    /* 결과 이모지는 문제 조건에 맞게 크게 보여 줍니다. */
+    .result-emoji {
+      font-size: 70px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 제목과 설명 영역입니다. -->
+  <header>
+    <h1>🌿 나의 Green Attitude 알아보기</h1>
+    <p>
+      내가 생각하는 가장 중요한 환경 가치와 태도는 무엇일까요?
+      아래의 질문에 답하고 나의 환경 실천 성향을 알아보아요!
+    </p>
+  </header>
+
+  <main>
+    <!-- 
+      form 태그는 여러 입력 요소를 하나로 묶을 때 사용합니다.
+      여기서는 Q1~Q5의 라디오 버튼을 묶는 역할을 합니다.
+    -->
+    <form id="quizForm">
+
+      <section>
+        <h2>Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?</h2>
+
+        <!-- 같은 질문의 라디오 버튼은 name을 같게 해야 하나만 선택됩니다. -->
+        <label><input type="radio" name="q1" value="1"> ① 일회용품 사용을 줄이는 생활 실천 캠페인</label><br>
+        <label><input type="radio" name="q1" value="2"> ② 학생들과 함께 교내 환경 규칙을 만들고 실천하기</label><br>
+        <label><input type="radio" name="q1" value="3"> ③ AI 기술을 활용한 친환경 관리 시스템 도입</label><br>
+        <label><input type="radio" name="q1" value="4"> ④ 학교 주변 자연 생태를 보전하고 복원하는 활동</label>
+      </section>
+
+      <section>
+        <h2>Q2. 기후 변화 뉴스를 봤을 때 가장 먼저 드는 생각은?</h2>
+
+        <label><input type="radio" name="q2" value="1"> ① 나부터 생활 습관을 바꿔야겠다</label><br>
+        <label><input type="radio" name="q2" value="2"> ② 사회 전체의 협력과 책임이 중요하다</label><br>
+        <label><input type="radio" name="q2" value="3"> ③ 새로운 친환경 기술 개발이 필요하다</label><br>
+        <label><input type="radio" name="q2" value="4"> ④ 자연과 생태계가 더 이상 훼손되지 않아야 한다</label>
+      </section>
+
+      <section>
+        <h2>Q3. 물건이나 제품을 고를 때 가장 중요하게 보는 것은?</h2>
+
+        <label><input type="radio" name="q3" value="1"> ① 실제로 꾸준히 사용할 수 있는가</label><br>
+        <label><input type="radio" name="q3" value="2"> ② 사회적으로 환경 보호에 노력하는 기업인가</label><br>
+        <label><input type="radio" name="q3" value="3"> ③ 최신 친환경 기술이 적용되었는가</label><br>
+        <label><input type="radio" name="q3" value="4"> ④ 자연과 환경에 미치는 영향이 적은 방식으로 만들어졌는가</label>
+      </section>
+
+      <section>
+        <h2>Q4. 우리 지역에 가장 필요하다고 생각하는 환경 정책은?</h2>
+
+        <label><input type="radio" name="q4" value="1"> ① 시민 참여형 분리배출 보상 제도</label><br>
+        <label><input type="radio" name="q4" value="2"> ② 플라스틱 사용 줄이기, 차량 제한 등 공동체 환경 규칙</label><br>
+        <label><input type="radio" name="q4" value="3"> ③ 스마트 친환경 도시 시스템 구축 및 확대</label><br>
+        <label><input type="radio" name="q4" value="4"> ④ 도심 숲, 하천 등 생태 공간 확대</label>
+      </section>
+
+      <section>
+        <h2>Q5. 미래 환경 문제 해결의 핵심은 무엇이라고 생각하는가?</h2>
+
+        <label><input type="radio" name="q5" value="1"> ① 개인의 꾸준한 실천</label><br>
+        <label><input type="radio" name="q5" value="2"> ② 사회 전체의 협력과 제도적 변화</label><br>
+        <label><input type="radio" name="q5" value="3"> ③ 과학기술 혁신과 새로운 발명</label><br>
+        <label><input type="radio" name="q5" value="4"> ④ 자연과 공존하려는 태도와 철학</label>
+      </section>
+
+      <br>
+
+      <!-- type="button"은 버튼을 눌렀을 때 새로고침이 되지 않게 해 줍니다. -->
+      <button type="button" id="resultButton">📊 나의 환경 실천 성향 알아보기</button>
+    </form>
+
+    <!-- 결과가 표시될 영역입니다. 처음에는 비워 둡니다. -->
+    <section id="resultArea"></section>
+  </main>
+
+  <footer>
+    <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
+  </footer>
+
+  <script>
+    /*
+      SUGGESTIONS는 객체입니다.
+      객체는 이름표가 붙은 여러 값을 저장할 수 있습니다.
+
+      여기서는 SUGGESTIONS 객체 안에 A, B, C, D라는 이름표가 있고,
+      각 이름표 안에는 배열이 들어 있습니다.
+
+      배열은 여러 개의 값을 순서대로 저장하는 자료입니다.
+      학생이 직접 새 실천제안을 추가하고 싶다면,
+      원하는 유형의 배열 안에 문자열을 하나 더 넣어 보면 됩니다.
+    */
+    const SUGGESTIONS = {
+      "A": [
+        "등하굣길에 보이는 작은 쓰레기를 줍는 '플로깅'에 도전해 보세요!",
+        "일주일에 하루는 '플라스틱 없는 날'을 정해 실천해 보세요!",
+        "장바구니와 텀블러를 가방에 항상 챙겨 다니는 습관을 만들어 보세요!",
+        "우리 집에서 가장 많이 버리는 쓰레기 1가지를 줄이는 도전을 시작해 보세요!",
+        "사용하지 않는 콘센트는 뽑고, 안 쓰는 불은 끄는 '에너지 절약 챔피언'이 되어 보세요!",
+      ],
+      "B": [
+        "교내 환경 규칙 만들기나 캠페인 조직 등 공동체의 규칙을 바꾸는 환경 리더로 성장해 보세요!",
+        "친구들과 함께 '교내 환경 동아리'를 만들어 정기 활동을 기획해 보세요!",
+        "학교에 필요한 환경 정책을 제안하는 학생회 캠페인에 참여해 보세요!",
+        "SNS로 환경 이슈를 알리는 '디지털 환경 운동가'에 도전해 보세요!",
+        "우리 학교의 일회용품 사용 규칙을 함께 만들어 학생회에 제안해 보세요!",
+      ],
+      "C": [
+        "AI로 우리 동네 미세먼지·소음 데이터를 분석하는 미니 프로젝트를 시도해 보세요!",
+        "친환경 발명 아이디어 공모전이나 메이커 페어에 도전해 보세요!",
+        "스마트 식물 키트나 IoT 환경 센서를 만들어 보는 메이커 활동에 도전해 보세요!",
+        "친환경 신기술(전기차·태양광 등)을 조사해 친구들 앞에서 발표해 보세요!",
+        "환경 문제를 다루는 코딩 챌린지나 해커톤에 참여해 보세요!",
+      ],
+      "D": [
+        "자연을 주제로 한 글이나 그림을 SNS·블로그에 공유해 따뜻한 메시지를 전해 보세요!",
+        "학교 텃밭이나 베란다 정원을 가꾸며 작은 생명을 직접 길러 보세요!",
+        "환경 다큐멘터리를 본 후 친구들과 함께 이야기 나누는 '에코 토크 데이'를 열어 보세요!",
+        "멸종 위기 동물에 대해 깊이 조사하고 보호 캠페인에 동참해 보세요!",
+        "가까운 국립공원이나 생태 체험관을 방문해 자연을 직접 느껴 보세요!",
+      ],
+    };
+
+    /*
+      getRandomSuggestion 함수는 유형을 받아서
+      해당 유형의 실천제안 중 1개를 무작위로 돌려줍니다.
+
+      Math.random()은 0 이상 1 미만의 무작위 소수를 만듭니다.
+      Math.floor()는 소수점을 버려서 정수로 만듭니다.
+      그래서 Math.random() * list.length를 한 뒤 Math.floor()를 사용하면
+      배열에서 사용할 수 있는 무작위 번호를 만들 수 있습니다.
+
+      return은 함수가 계산한 값을 밖으로 보내는 명령어입니다.
+    */
+    function getRandomSuggestion(type) {
+      const list = SUGGESTIONS[type];
+      const idx = Math.floor(Math.random() * list.length);
+      return list[idx];
+    }
+
+    /*
+      TYPES 객체에는 각 유형의 이름, 이모지, 설명을 저장합니다.
+      결과 화면을 만들 때 이 정보를 꺼내서 사용합니다.
+    */
+    const TYPES = {
+      "A": {
+        name: "생활 실천형",
+        emoji: "🌱",
+        description: "지금 당장 할 수 있는 행동을 중요하게 생각하는 유형"
+      },
+      "B": {
+        name: "사회 변화형",
+        emoji: "🤝",
+        description: "법·제도·사회적 협력이 중요하다고 생각하는 유형"
+      },
+      "C": {
+        name: "기술 혁신형",
+        emoji: "💡",
+        description: "과학기술과 아이디어를 통해 환경 문제 해결 방법을 찾는 유형"
+      },
+      "D": {
+        name: "자연 공존형",
+        emoji: "🌳",
+        description: "인간과 자연이 함께 살아가는 방식을 중요하게 생각하는 유형"
+      }
+    };
+
+    /*
+      SCORE_MAP은 선택지 번호에 따라 어떤 유형에 점수를 줄지 정리한 객체입니다.
+
+      모든 문항 공통:
+      ① 선택 시: A 생활 실천형 +2점 / D 자연 공존형 +1점
+      ② 선택 시: B 사회 변화형 +2점 / A 생활 실천형 +1점
+      ③ 선택 시: C 기술 혁신형 +2점 / B 사회 변화형 +1점
+      ④ 선택 시: D 자연 공존형 +2점 / C 기술 혁신형 +1점
+    */
+    const SCORE_MAP = {
+      "1": [
+        { type: "A", point: 2 },
+        { type: "D", point: 1 }
+      ],
+      "2": [
+        { type: "B", point: 2 },
+        { type: "A", point: 1 }
+      ],
+      "3": [
+        { type: "C", point: 2 },
+        { type: "B", point: 1 }
+      ],
+      "4": [
+        { type: "D", point: 2 },
+        { type: "C", point: 1 }
+      ]
+    };
+
+    // 버튼과 결과 영역을 자바스크립트에서 사용할 수 있도록 가져옵니다.
+    const resultButton = document.getElementById("resultButton");
+    const resultArea = document.getElementById("resultArea");
+    const quizForm = document.getElementById("quizForm");
+
+    /*
+      addEventListener는 어떤 일이 일어났을 때 실행할 코드를 정하는 문법입니다.
+      여기서는 결과 버튼을 클릭했을 때 calculateResult 함수가 실행됩니다.
+    */
+    resultButton.addEventListener("click", calculateResult);
+
+    function calculateResult() {
+      /*
+        점수를 저장할 객체입니다.
+        처음에는 모든 유형의 점수를 0점으로 시작합니다.
+      */
+      const scores = {
+        "A": 0,
+        "B": 0,
+        "C": 0,
+        "D": 0
+      };
+
+      /*
+        scoreHistory는 점수가 올라간 순서를 저장합니다.
+        동점일 때 "먼저 최고 점수에 도달한 유형"을 찾기 위해 사용합니다.
+      */
+      const scoreHistory = [];
+
+      // Q1부터 Q5까지 사용자가 고른 답을 확인합니다.
+      for (let i = 1; i <= 5; i++) {
+        const selected = document.querySelector('input[name="q' + i + '"]:checked');
+
+        // 선택하지 않은 문항이 있으면 경고창을 보여 주고 함수 실행을 멈춥니다.
+        if (!selected) {
+          alert("답변을 선택해 주세요.");
+          return;
+        }
+
+        // 사용자가 고른 선택지 번호입니다. 예: "1", "2", "3", "4"
+        const choice = selected.value;
+
+        // 선택지 번호에 맞는 점수 규칙을 가져옵니다.
+        const pointList = SCORE_MAP[choice];
+
+        /*
+          forEach는 배열 안의 값을 하나씩 꺼내서 실행하는 반복문입니다.
+          예를 들어 ①을 선택하면 A에 2점, D에 1점을 차례로 더합니다.
+        */
+        pointList.forEach(function(item) {
+          scores[item.type] = scores[item.type] + item.point;
+
+          scoreHistory.push({
+            type: item.type,
+            score: scores[item.type]
+          });
+        });
+      }
+
+      // 최고 점수를 구합니다.
+      const maxScore = Math.max(scores.A, scores.B, scores.C, scores.D);
+
+      // 최고 점수를 받은 유형들을 배열에 모읍니다.
+      const topTypes = [];
+
+      if (scores.A === maxScore) {
+        topTypes.push("A");
+      }
+
+      if (scores.B === maxScore) {
+        topTypes.push("B");
+      }
+
+      if (scores.C === maxScore) {
+        topTypes.push("C");
+      }
+
+      if (scores.D === maxScore) {
+        topTypes.push("D");
+      }
+
+      let finalType = topTypes[0];
+
+      /*
+        동점이 있다면, 먼저 최고 점수에 도달한 유형을 고릅니다.
+        scoreHistory를 처음부터 확인하면서,
+        최고 점수에 먼저 도달한 유형을 finalType으로 정합니다.
+      */
+      if (topTypes.length > 1) {
+        for (let i = 0; i < scoreHistory.length; i++) {
+          const record = scoreHistory[i];
+
+          if (topTypes.includes(record.type) && record.score === maxScore) {
+            finalType = record.type;
+            break;
+          }
+        }
+      }
+
+      // 최종 유형의 정보와 무작위 실천제안을 가져옵니다.
+      const resultType = TYPES[finalType];
+      const suggestion = getRandomSuggestion(finalType);
+
+      /*
+        innerHTML은 HTML 내용을 자바스크립트로 넣을 때 사용합니다.
+        버튼을 누르면 같은 페이지 아래쪽에 결과가 표시됩니다.
+      */
+      resultArea.innerHTML = `
+        <hr>
+        <h2>📊 나의 환경 실천 성향 결과</h2>
+        <div class="result-emoji">${resultType.emoji}</div>
+        <h3>${finalType}. ${resultType.name}</h3>
+        <p><strong>어떤 성향일까?</strong>: ${resultType.description}</p>
+        <p><strong>💡 실천제안</strong>: ${suggestion}</p>
+        <button type="button" id="resetButton">🔄 다시 하기</button>
+      `;
+
+      /*
+        결과 영역 안에 새로 만들어진 다시 하기 버튼을 가져옵니다.
+        다시 하기 버튼을 누르면 resetQuiz 함수가 실행됩니다.
+      */
+      const resetButton = document.getElementById("resetButton");
+      resetButton.addEventListener("click", resetQuiz);
+    }
+
+    function resetQuiz() {
+      /*
+        reset()은 form 안의 선택값을 처음 상태로 되돌립니다.
+        라디오 버튼 선택도 모두 해제됩니다.
+      */
+      quizForm.reset();
+
+      // 결과 영역을 비워서 점수와 결과를 초기화합니다.
+      resultArea.innerHTML = "";
+    }
+  </script>
+</body>
+</html>
