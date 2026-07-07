@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>교육 콘텐츠 링크 모음</title>
+  <title>교육 콘텐츠 HTML 모음</title>
 
   <style>
     * {
@@ -20,10 +20,7 @@
     body {
       margin: 0;
       font-family: Arial, "Noto Sans KR", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(95, 180, 120, 0.18), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(255, 180, 90, 0.18), transparent 36%),
-        #f6f8f5;
+      background: #f6f8f5;
       color: #1f2a24;
       word-break: keep-all;
     }
@@ -40,9 +37,8 @@
       margin-bottom: 34px;
       padding: 30px 18px;
       border-radius: 28px;
-      background: rgba(255, 255, 255, 0.82);
+      background: #ffffff;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.9);
     }
 
     h1 {
@@ -110,12 +106,6 @@
       background: #ffffff;
       box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
       border: 1px solid #edf0ed;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .subject-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
     }
 
     .subject-card h3 {
@@ -196,42 +186,20 @@
         min-height: auto;
       }
     }
-
-    @media (max-width: 420px) {
-      .page {
-        padding: 24px 14px 48px;
-      }
-
-      header {
-        padding: 24px 16px;
-      }
-
-      h1 {
-        font-size: 25px;
-      }
-
-      .intro {
-        font-size: 15px;
-      }
-
-      .subject-card {
-        padding: 18px;
-      }
-    }
   </style>
 </head>
 
 <body>
   <div class="page">
     <header>
-      <h1>📚 교육 콘텐츠 링크 모음</h1>
+      <h1>📚 교육 콘텐츠 HTML 모음</h1>
       <p class="intro">
-        초등·중등 학생을 위한 인터랙티브 HTML 콘텐츠입니다.<br>
-        학년군, 주제, 레벨을 선택해 페이지로 이동하세요.
+        초등·중등 학생을 위한 주제별 학습 페이지입니다.<br>
+        원하는 주제와 레벨을 선택해 바로 열어보세요.
       </p>
 
       <div class="notice">
-        현재 업로드된 파일 기준으로 구성했습니다.<br>
+        현재 GitHub에 올라간 파일명을 기준으로 연결했습니다.<br>
         초등 영역에는 환경·역사·여행, 중등 영역에는 환경·역사·K-콘텐츠가 연결되어 있습니다.
       </div>
     </header>
@@ -243,27 +211,27 @@
         <article class="subject-card">
           <h3>🌿 환경</h3>
           <div class="level-list">
-            <a class="level-link" href="env_elementary_level1.html">환경_초등_레벨 1</a>
-            <a class="level-link" href="env_elementary_level2.html">환경_초등_레벨 2</a>
-            <a class="level-link" href="env_elementary_level3.html">환경_초등_레벨 3</a>
+            <a class="level-link" href="env_ele_level1.html">환경_초등_레벨 1</a>
+            <a class="level-link" href="env_ele_level2.html">환경_초등_레벨 2</a>
+            <a class="level-link" href="env_ele_level3.html">환경_초등_레벨 3</a>
           </div>
         </article>
 
         <article class="subject-card">
           <h3>🏺 역사</h3>
           <div class="level-list">
-            <a class="level-link" href="history_elementary_level1.html">역사_초등_레벨 1</a>
-            <a class="level-link" href="history_elementary_level2.html">역사_초등_레벨 2</a>
-            <a class="level-link" href="history_elementary_level3.html">역사_초등_레벨 3</a>
+            <a class="level-link" href="history_ele_level1.html">역사_초등_레벨 1</a>
+            <a class="level-link" href="history_ele_level2.html">역사_초등_레벨 2</a>
+            <a class="level-link" href="history_ele_level3.html">역사_초등_레벨 3</a>
           </div>
         </article>
 
         <article class="subject-card">
           <h3>✈️ 여행</h3>
           <div class="level-list">
-            <a class="level-link" href="travel_elementary_level1.html">여행_초등_레벨 1</a>
-            <a class="level-link" href="travel_elementary_level2.html">여행_초등_레벨 2</a>
-            <a class="level-link" href="travel_elementary_level3.html">여행_초등_레벨 3</a>
+            <a class="level-link" href="travel_ele_level1.html">여행_초등_레벨 1</a>
+            <a class="level-link" href="travel_ele_level2.html">여행_초등_레벨 2</a>
+            <a class="level-link" href="travel_ele_level3.html">여행_초등_레벨 3</a>
           </div>
         </article>
       </div>
@@ -303,7 +271,7 @@
     </section>
 
     <footer>
-      <p>AI의 도움을 받아 제작된 교육 콘텐츠입니다.</p>
+      <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
     </footer>
   </div>
 </body>
