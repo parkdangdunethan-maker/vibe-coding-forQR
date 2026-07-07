@@ -1,880 +1,666 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏺 내가 끌리는 역사 감성 찾기</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 기본 리셋 및 모바일 안전 규칙 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f5f6f7;
+            font-family: 'Gowun Dodum', sans-serif;
+            line-height: 1.6;
+            letter-spacing: -0.2px;
+            word-break: keep-all;
+            max-width: 100%;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  <!-- 모바일 안전 1: 화면 크기에 맞게 페이지가 보이도록 설정합니다. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        /* 🚨 [절대 고정 규칙] 카드 박스 스타일 규격 준수 */
+        .app-card {
+            width: 100%;
+            max-width: 420px;
+            height: 580px;                  /* 모든 화면 동일 고정 */
+            padding: 24px 20px;             /* 모든 화면 동일 고정 */
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            background: #ffffff;
+            position: relative;             /* 좌상단 이전 버튼 위치 기준 */
+            overflow-x: hidden;             /* 가로 스크롤 무조건 차단 */
+            overflow-y: auto;               /* 세로 스크롤 가능, 스크롤바 숨김 */
+            scrollbar-width: none;          /* Firefox 스크롤바 숨김 */
+            -ms-overflow-style: none;       /* IE/Edge 스크롤바 숨김 */
+            display: flex;                  /* 내부 화면 정렬용 */
+            flex-direction: column;
+        }
+        .app-card::-webkit-scrollbar {
+            display: none;                  /* Chrome/Safari/Edge 스크롤바 숨김 */
+            width: 0;
+            height: 0;
+        }
 
-  <title>🏺 내가 끌리는 역사 감성 찾기</title>
+        /* 화면 레이아웃 공통 베이스 (flex) */
+        #start-screen, #question-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+            justify-content: flex-start;
+        }
 
-  <!-- Google Fonts는 허용됩니다. 외부 라이브러리는 사용하지 않습니다. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+        /* 결과 화면 레이아웃 (gap 12px 조절, 스크롤바 대책 적용) */
+        #result-screen {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        #result-screen::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
 
-  <style>
-    /*
-      [학생 커스터마이징 슬롯]
-      분위기: 따뜻한 역사 박물관 느낌
-      색감: 베이지, 갈색, 금빛 포인트
-      폰트: Gowun Dodum, Jua
-      추가 요청: 카드 박스 크기 고정, 한 화면씩 전환되는 SPA
-    */
+        /* 🚨 [버튼 뭉개짐 방지 규칙] 메인 버튼 스타일 */
+        .main-btn {
+            width: 100%;
+            min-height: 52px;               /* height 대신 min-height 사용 */
+            flex-shrink: 0;                 /* 절대 줄어들지 않게 설정 */
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;               /* 카드 하단에 자연스럽게 정착 */
+            border: none;
+            background-color: #4f46e5;
+            color: #ffffff;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .main-btn:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);    /* 미세 효과만 허용, 카드 이탈 방지 */
+        }
 
-    /* 모바일 안전 2: 모든 요소의 크기 계산을 쉽게 만들어 줍니다. */
-    * {
-      box-sizing: border-box;
-    }
+        /* 이전 버튼 (좌상단 원형 화살표) */
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            border-radius: 50%;
+            border: 1px solid #e5e5e5;
+            background-color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
 
-    /* 모바일 안전 2: 화면이 옆으로 밀리지 않도록 합니다. */
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-      word-break: keep-all;
-    }
+        /* 진행률 표시 영역 */
+        .progress-container {
+            margin-top: 24px; /* 이전 버튼 공간 확보 */
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .progress-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 20%;
+            background-color: #4f46e5;
+            border-radius: 4px;
+            transition: width 0.25s ease;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Gowun Dodum", sans-serif;
-      line-height: 1.6;
-      letter-spacing: -0.2px;
-      background: linear-gradient(180deg, #f8efe2 0%, #fdf9f2 100%);
-      color: #2f241b;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 18px 14px;
-    }
+        /* 질문 텍스트 */
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 10px 0;
+        }
 
-    img {
-      max-width: 100%;
-    }
+        /* 선택지 그룹 및 개별 카드 */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;                      /* 다닥다닥 붙지 않도록 gap 필수 설정 */
+        }
+        .option-card {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #e5e5e5;
+            flex-shrink: 0;
+            background-color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-card:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .option-card input[type="radio"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #4f46e5;
+        }
+        .option-card.selected {
+            border-color: #4f46e5;
+            background-color: #f5f3ff;
+        }
 
-    .app-wrap {
-      width: 100%;
-      max-width: 420px;
-    }
+        /* 시작화면 타이틀 및 디자인 스타일 */
+        .title-area {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .title-area h1 {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+        .title-area p {
+            font-size: 15px;
+            color: #4b5563;
+        }
+        .main-emoji {
+            font-size: 70px;
+            margin: 20px 0;
+        }
 
-    .app-card {
-      width: 100%;
-      max-width: 420px;
-      height: 580px;
-      padding: 24px 20px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      margin: 0 auto;
-      background: #ffffff;
-      position: relative;
-      overflow-x: hidden;
-      overflow-y: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      display: flex;
-      flex-direction: column;
-    }
+        /* 결과 화면 내부 요소 및 박스 구분 스타일 */
+        .result-title {
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            color: #1f2937;
+            margin-top: 10px;
+        }
+        .result-emoji-box {
+            text-align: center;
+        }
+        .result-type-name {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+        .gray-box {
+            padding: 12px 14px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #374151;
+        }
+        .feature-box {
+            padding: 10px 14px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+        .heritage-box {
+            border-left: 4px solid #b08968;
+            padding: 10px 14px;
+            background-color: #faf3e7;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .keyword-chip {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+        .suggestion-box {
+            background-color: #f4fbe8;
+            border: 2px solid #d4e8b0;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #3f6212;
+        }
 
-    .app-card::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
+        /* 화면 슬라이드 효과 처리를 위한 기본 트랜지션 클래스 */
+        .fade-in-slide {
+            animation: fadeInSlide 0.25s ease-out forwards;
+        }
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-    #start-screen,
-    #question-screen {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 14px;
-      justify-content: flex-start;
-    }
-
-    #result-screen {
-      width: 100%;
-      height: 100%;
-      display: none;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-      justify-content: flex-start;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-
-    #result-screen::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-    .title-area {
-      text-align: center;
-      padding-top: 32px;
-    }
-
-    .title-area h1 {
-      margin: 0 0 18px;
-      font-family: "Jua", sans-serif;
-      font-size: 34px;
-      line-height: 1.25;
-      color: #4b2e1e;
-    }
-
-    .title-area p {
-      margin: 0;
-      font-size: 17px;
-      color: #6b5747;
-    }
-
-    .start-icon {
-      margin: 32px auto 0;
-      width: 150px;
-      height: 150px;
-      border-radius: 999px;
-      background: #fff5d9;
-      border: 2px solid #efd38c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 76px;
-      flex-shrink: 0;
-    }
-
-    .main-btn {
-      width: 100%;
-      min-height: 52px;
-      flex-shrink: 0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: auto;
-      border: none;
-      background: #7a4e2d;
-      color: #ffffff;
-      font-family: "Gowun Dodum", sans-serif;
-      transition: background-color 0.2s ease, transform 0.2s ease;
-    }
-
-    .main-btn:hover {
-      background: #633e24;
-      transform: translateY(-1px);
-    }
-
-    .back-btn {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      border: 1px solid #ead8c3;
-      background: #fffaf2;
-      color: #5d3a24;
-      font-size: 20px;
-      cursor: pointer;
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 3;
-    }
-
-    .progress-area {
-      padding-top: 26px;
-    }
-
-    .progress-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: bold;
-      color: #5d3a24;
-      margin-bottom: 8px;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: #f0e3d5;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      width: 20%;
-      height: 100%;
-      background: #d9a441;
-      border-radius: 999px;
-      transition: width 0.25s ease;
-    }
-
-    .question-slide {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: transform 0.25s ease, opacity 0.25s ease;
-    }
-
-    .question-slide.slide-out-left {
-      transform: translateX(-24px);
-      opacity: 0;
-    }
-
-    .question-slide.slide-out-right {
-      transform: translateX(24px);
-      opacity: 0;
-    }
-
-    .question-slide.slide-in {
-      transform: translateX(0);
-      opacity: 1;
-    }
-
-    .question-text {
-      font-family: "Jua", sans-serif;
-      font-size: 23px;
-      line-height: 1.35;
-      color: #3f2819;
-      margin: 2px 0 0;
-    }
-
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .option-card {
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 2px solid #e5e5e5;
-      flex-shrink: 0;
-      cursor: pointer;
-      background: #ffffff;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-      font-size: 15px;
-      line-height: 1.45;
-    }
-
-    .option-card:hover {
-      background-color: #fff7e8;
-      border-color: #e0bb71;
-    }
-
-    .option-card.selected {
-      background-color: #fff2cf;
-      border-color: #d9a441;
-    }
-
-    .option-card input {
-      margin-right: 8px;
-    }
-
-    .emoji-result {
-      font-size: 90px;
-      line-height: 1;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .result-title {
-      margin: 0;
-      text-align: center;
-      font-family: "Jua", sans-serif;
-      font-size: 22px;
-      color: #4b2e1e;
-      flex-shrink: 0;
-    }
-
-    .result-type {
-      margin: 0;
-      text-align: center;
-      font-family: "Jua", sans-serif;
-      font-size: 28px;
-      font-weight: bold;
-      color: #3f2819;
-      flex-shrink: 0;
-    }
-
-    .result-box {
-      background: #f6f6f6;
-      border: 1px solid #e7e7e7;
-      border-radius: 14px;
-      padding: 12px 14px;
-      flex-shrink: 0;
-    }
-
-    .suggestion-box {
-      background: #f7ffd9;
-      border: 2px solid #d7e88a;
-      border-radius: 14px;
-      padding: 12px 14px;
-      flex-shrink: 0;
-    }
-
-    .result-box h4,
-    .suggestion-box h4 {
-      margin: 0 0 6px;
-      font-size: 16px;
-      color: #4b2e1e;
-    }
-
-    .result-box p,
-    .suggestion-box p {
-      margin: 0;
-      font-size: 14px;
-      color: #554538;
-    }
-
-    footer {
-      width: 100%;
-      max-width: 420px;
-      margin: 12px auto 0;
-      text-align: center;
-      font-size: 12px;
-      color: #7b6b5e;
-    }
-
-    @media (max-width: 360px) {
-      body {
-        padding: 10px;
-      }
-
-      .app-card {
-        height: 580px;
-        padding: 24px 20px;
-      }
-
-      .title-area h1 {
-        font-size: 30px;
-      }
-
-      .question-text {
-        font-size: 21px;
-      }
-
-      .option-card {
-        font-size: 14px;
-        padding: 12px 13px;
-      }
-    }
-  </style>
+        /* 푸터 스타일 */
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #9ca3af;
+            text-align: center;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="app-wrap">
-    <main class="app-card">
-      <!-- 시작 화면 -->
-      <section id="start-screen">
-        <div class="title-area">
-          <h1>🏺 내가 끌리는 역사 감성 찾기</h1>
-          <p>내가 가장 끌리는 역사 감성은 무엇일까요? 아래의 질문에 답하고 나의 역사 감성을 알아보아요!</p>
+
+    <div class="app-card">
+        
+        <div id="start-screen">
+            <div class="title-area">
+                <div class="main-emoji">🏺</div>
+                <h1>내가 끌리는 역사 감성 찾기</h1>
+                <p>내가 가장 끌리는 역사 감성은 무엇일까요? 아래의 질문에 답하고 나의 역사 감성을 알아보아요!</p>
+            </div>
+            <button class="main-btn" onclick="startQuiz()">🚀 나의 역사 감성 알아보기</button>
         </div>
 
-        <div class="start-icon">🏺</div>
+        <div id="question-screen" style="display: none;">
+            <button type="button" class="back-btn" id="prev-btn" onclick="prevQuestion()">⬅️</button>
+            
+            <div class="progress-container">
+                <div class="progress-text" id="progress-text">Q1/5</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
 
-        <button class="main-btn" type="button" onclick="startQuiz()">🚀 나의 역사 감성 알아보기</button>
-      </section>
+            <div class="question-text" id="question-title"></div>
 
-      <!-- 질문 화면 -->
-      <section id="question-screen" style="display: none;">
-        <button id="backButton" class="back-btn" type="button" onclick="goPrevQuestion()">←</button>
+            <div class="options" id="options-container">
+                </div>
 
-        <div class="progress-area">
-          <div class="progress-top">
-            <span id="progressText">Q1/5</span>
-            <span>🏺</span>
-          </div>
-          <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
-          </div>
+            <button class="main-btn" id="next-btn" onclick="nextQuestion()"></button>
         </div>
 
-        <!-- 
-          form 태그는 여러 입력 요소를 묶을 때 사용합니다.
-          여기서는 현재 질문의 라디오 버튼을 묶어 줍니다.
-        -->
-        <form id="historyForm">
-          <div id="questionSlide" class="question-slide slide-in">
-            <h2 id="questionText" class="question-text">Q1. 더 끌리는 역사 유물의 특징은?</h2>
-
-            <!-- 
-              같은 질문의 라디오 버튼은 name 속성을 같게 해야 합니다.
-              그래야 4개 중 1개만 선택됩니다.
-            -->
-            <div id="options" class="options"></div>
-          </div>
-        </form>
-
-        <button id="nextButton" class="main-btn" type="button" onclick="handleNextButton()">다음 질문으로 ➡️</button>
-      </section>
-
-      <!-- 결과 화면 -->
-      <section id="result-screen">
-        <h2 class="result-title">📊 나의 역사 감성 결과</h2>
-
-        <div id="resultEmoji" class="emoji-result">👑</div>
-        <h3 id="resultType" class="result-type">신라 화려형</h3>
-
-        <div class="result-box">
-          <h4>어떤 역사 감성일까?</h4>
-          <p id="resultDescription">금관과 장신구처럼 화려하고 정교한 아름다움에 끌리는 타입입니다.</p>
+        <div id="result-screen" style="display: none;">
+            <div class="result-title">📊 나의 역사 감성 결과</div>
+            
+            <div class="result-emoji-box" id="result-emoji" style="font-size: 90px; line-height: 1;"></div>
+            
+            <div class="result-type-name" id="result-type"></div>
+            
+            <div class="gray-box" id="result-description"></div>
+            
+            <div class="feature-box" id="result-feature"></div>
+            <div class="heritage-box" id="result-heritage"></div>
+            
+            <div class="keywords-container" id="result-keywords"></div>
+            
+            <div class="suggestion-box" id="result-suggestion"></div>
+            
+            <button class="main-btn" onclick="resetQuiz()">🔄 다시 하기</button>
         </div>
 
-        <div class="suggestion-box">
-          <h4>💡 실천제안</h4>
-          <p id="resultSuggestion">경주 박물관의 금관·금제 허리띠를 골라 굿즈 디자인 아이디어를 그려 보세요!</p>
-        </div>
+    </div>
 
-        <button class="main-btn" type="button" onclick="resetQuiz()">🔄 다시 하기</button>
-      </section>
+    <footer>
+        <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
+    </footer>
 
-      <!-- 1단계 코드의 결과 영역 id를 보존하기 위한 영역입니다. 화면에는 표시하지 않습니다. -->
-      <div id="resultArea" style="display: none;"></div>
-    </main>
-  </div>
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // [질문 데이터 데이터셋 — 한 글자도 수정 금지 사양 준수]
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const QUESTIONS = [
+            {
+                num: 1,
+                title: "Q1. 더 끌리는 역사 유물의 특징은?",
+                options: [
+                    { text: "① 금빛 장신구처럼 화려하고 정교한 유물 👑", type: "신라 화려형" },
+                    { text: "② 고분 벽화처럼 힘차고 역동적인 표현 ⚔️", type: "고구려 역동형" },
+                    { text: "③ 금동대향로처럼 섬세하고 우아한 공예 🍃", type: "백제 우아형" },
+                    { text: "④ 백자처럼 절제되고 실용적인 아름다움 🌿", type: "조선 절제형" }
+                ]
+            },
+            {
+                num: 2,
+                title: "Q2. 박물관에서 가장 오래 보고 싶은 전시는?",
+                options: [
+                    { text: "① 금관, 금제 허리띠 등 반짝이는 장신구 전시 ✨", type: "신라 화려형" },
+                    { text: "② 수렵도, 사신도처럼 움직임이 느껴지는 고분 벽화 전시 🐎", type: "고구려 역동형" },
+                    { text: "③ 향로, 관식, 석수처럼 섬세하고 우아한 공예품 전시 🎨", type: "백제 우아형" }, // 1단계 사양 텍스트 보존
+                    { text: "④ 백자, 기록유산, 과학기구처럼 쓰임이 분명한 유물 전시 📚", type: "조선 절제형" }
+                ]
+            },
+            {
+                num: 3,
+                title: "Q3. 내가 더 가지고 싶은 굿즈는?",
+                options: [
+                    { text: "① 금관 무늬를 활용한 화려한 액세서리 💎", type: "신라 화려형" },
+                    { text: "② 고구려 벽화 속 말과 인물을 활용한 다이내믹 굿즈 🛡️", type: "고구려 역동형" },
+                    { text: "③ 백제 문양을 활용한 우아한 향낭이나 공예 소품 🍶", type: "백제 우아형" },
+                    { text: "④ 백자와 한글을 활용한 깔끔한 문구류 ✍️", type: "조선 절제형" }
+                ]
+            },
+            {
+                num: 4,
+                title: "Q4. 더 가보고 싶은 역사 공간은?",
+                options: [
+                    { text: "① 신라 금관과 왕릉 문화를 볼 수 있는 경주 🏺", type: "신라 화려형" },
+                    { text: "② 고구려 고분 벽화와 광개토대왕릉비를 떠올릴 수 있는 전시관 🐎", type: "고구려 역동형" },
+                    { text: "③ 백제 문화유산과 공예의 아름다움을 볼 수 있는 공주·부여 🏛️", type: "백제 우아형" },
+                    { text: "④ 궁궐, 서원, 기록문화를 함께 볼 수 있는 조선 역사 공간 🌿", type: "조선 절제형" }
+                ]
+            },
+            {
+                num: 5,
+                title: "Q5. 내가 더 좋아하는 활동은?",
+                options: [
+                    { text: "① 눈에 띄는 문양과 색으로 꾸미기 ✨", type: "신라 화려형" },
+                    { text: "② 넓은 무대에서 힘차게 움직이며 탐험하기 🚀", type: "고구려 역동형" },
+                    { text: "③ 섬세한 문양을 관찰하고 직접 만들어 보기 🎨", type: "백제 우아형" },
+                    { text: "④ 내용을 기록하고 의미를 차분히 정리하기 📖", type: "조선 절제형" }
+                ]
+            }
+        ];
 
-  <footer>
-    <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
-  </footer>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // [20개 실천제안 풀 — JS 배열 고대로 유지]
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const SUGGESTIONS = {
+          "신라 화려형": [
+            "경주 박물관의 금관·금제 허리띠를 골라 굿즈 디자인 아이디어를 그려 보세요!",
+            "신라 황금 문화를 주제로 친구들과 짧은 소개 영상을 만들어 보세요!",
+            "신라 왕릉(천마총·황남대총)을 한 곳 골라 미니 여행 코스를 만들어 보세요!",
+            "신라 장신구 패턴을 활용해 나만의 디자인 카드를 만들어 보세요!",
+            "신라의 화려한 공예 문화를 친구에게 추천하는 한 줄 큐레이션을 작성해 보세요!",
+          ],
+          "고구려 역동형": [
+            "고구려 고분 벽화(수렵도·사신도)를 비교해 좋아하는 장면을 골라 그려 보세요!",
+            "광개토대왕릉비 이야기를 친구들에게 설명하는 미니 발표에 도전해 보세요!",
+            "고구려의 기마 문화를 다이내믹한 굿즈 아이디어로 정리해 보세요!",
+            "고구려 무사·기마 이야기를 짧은 웹툰이나 만화로 그려 보세요!",
+            "고구려 유물 중 가장 인상 깊은 1점을 골라 SNS 큐레이션 카드를 만들어 보세요!",
+          ],
+          "백제 우아형": [
+            "백제 금동대향로의 무늬를 따라 그려 나만의 향낭 디자인을 만들어 보세요!",
+            "공주·부여 백제 문화유적지를 골라 미니 여행 코스를 짜 보세요!",
+            "백제 공예(반가사유상·관식)의 곡선미를 분석한 감상문을 써 보세요!",
+            "백제 유물 굿즈 아이디어 3가지를 정리해 친구에게 제안해 보세요!",
+            "백제 문화를 한 줄로 표현하는 큐레이션 문구를 만들어 보세요!",
+          ],
+          "조선 절제형": [
+            "백자 달항아리의 곡선을 따라 그리며 절제미 감상문을 써 보세요!",
+            "훈민정음 해례본을 직접 따라 써 보는 손글씨 챌린지에 도전해 보세요!",
+            "조선의 과학기구(앙부일구·측우기)를 조사해 작동 원리를 정리해 보세요!",
+            "백자·기록유산을 활용한 깔끔한 문구류 굿즈 아이디어를 그려 보세요!",
+            "조선 기록문화를 활용해 '나의 하루 기록 일지'를 만들어 보세요!",
+          ],
+        };
 
-  <script>
-    /*
-      QUESTIONS 배열은 질문과 선택지를 저장합니다.
-      배열은 여러 데이터를 순서대로 담는 상자입니다.
-      currentQuestion 값이 0이면 Q1, 1이면 Q2처럼 사용할 수 있습니다.
-    */
-    const QUESTIONS = [
-      {
-        question: "Q1. 더 끌리는 역사 유물의 특징은?",
-        options: [
-          { text: "① 금빛 장신구처럼 화려하고 정교한 유물 👑", value: "신라 화려형" },
-          { text: "② 고분 벽화처럼 힘차고 역동적인 표현 ⚔️", value: "고구려 역동형" },
-          { text: "③ 금동대향로처럼 섬세하고 우아한 공예 🍃", value: "백제 우아형" },
-          { text: "④ 백자처럼 절제되고 실용적인 아름다움 🌿", value: "조선 절제형" }
-        ]
-      },
-      {
-        question: "Q2. 박물관에서 가장 오래 보고 싶은 전시는?",
-        options: [
-          { text: "① 금관, 금제 허리띠 등 반짝이는 장신구 전시 ✨", value: "신라 화려형" },
-          { text: "② 수렵도, 사신도처럼 움직임이 느껴지는 고분 벽화 전시 🐎", value: "고구려 역동형" },
-          { text: "③ 향로, 관식, 석수처럼 섬세한 공예품 전시 🎨", value: "백제 우아형" },
-          { text: "④ 백자, 기록유산, 과학기구처럼 쓰임이 분명한 유물 전시 📚", value: "조선 절제형" }
-        ]
-      },
-      {
-        question: "Q3. 내가 더 가지고 싶은 굿즈는?",
-        options: [
-          { text: "① 금관 무늬를 활용한 화려한 액세서리 💎", value: "신라 화려형" },
-          { text: "② 고구려 벽화 속 말과 인물을 활용한 다이내믹 굿즈 🛡️", value: "고구려 역동형" },
-          { text: "③ 백제 문양을 활용한 우아한 향낭이나 공예 소품 🍶", value: "백제 우아형" },
-          { text: "④ 백자와 한글을 활용한 깔끔한 문구류 ✍️", value: "조선 절제형" }
-        ]
-      },
-      {
-        question: "Q4. 더 가보고 싶은 역사 공간은?",
-        options: [
-          { text: "① 신라 금관과 왕릉 문화를 볼 수 있는 경주 🏺", value: "신라 화려형" },
-          { text: "② 고구려 고분 벽화와 광개토대왕릉비를 떠올릴 수 있는 전시관 🐎", value: "고구려 역동형" },
-          { text: "③ 백제 문화유산과 공예의 아름다움을 볼 수 있는 공주·부여 🏛️", value: "백제 우아형" },
-          { text: "④ 궁궐, 서원, 기록문화를 함께 볼 수 있는 조선 역사 공간 🌿", value: "조선 절제형" }
-        ]
-      },
-      {
-        question: "Q5. 내가 더 좋아하는 활동은?",
-        options: [
-          { text: "① 눈에 띄는 문양과 색으로 꾸미기 ✨", value: "신라 화려형" },
-          { text: "② 넓은 무대에서 힘차게 움직이며 탐험하기 🚀", value: "고구려 역동형" },
-          { text: "③ 섬세한 문양을 관찰하고 직접 만들어 보기 🎨", value: "백제 우아형" },
-          { text: "④ 내용을 기록하고 의미를 차분히 정리하기 📖", value: "조선 절제형" }
-        ]
-      }
-    ];
-
-    /*
-      SUGGESTIONS는 객체입니다.
-      객체는 이름표가 붙은 여러 데이터를 묶어 저장할 수 있습니다.
-
-      아래 객체 안에는 4개의 배열이 들어 있습니다.
-      배열은 여러 문장을 순서대로 저장하는 상자입니다.
-
-      예시:
-      SUGGESTIONS["신라 화려형"]은 신라 화려형 실천제안 5개가 들어 있는 배열입니다.
-
-      학생 활동:
-      각 배열 안에 새로운 실천제안 문장을 추가해 볼 수 있습니다.
-      단, 문장을 추가할 때는 쉼표(,)를 잊지 않도록 주의하세요.
-    */
-    const SUGGESTIONS = {
-      "신라 화려형": [
-        "경주 박물관의 금관·금제 허리띠를 골라 굿즈 디자인 아이디어를 그려 보세요!",
-        "신라 황금 문화를 주제로 친구들과 짧은 소개 영상을 만들어 보세요!",
-        "신라 왕릉(천마총·황남대총)을 한 곳 골라 미니 여행 코스를 만들어 보세요!",
-        "신라 장신구 패턴을 활용해 나만의 디자인 카드를 만들어 보세요!",
-        "신라의 화려한 공예 문화를 친구에게 추천하는 한 줄 큐레이션을 작성해 보세요!",
-      ],
-      "고구려 역동형": [
-        "고구려 고분 벽화(수렵도·사신도)를 비교해 좋아하는 장면을 골라 그려 보세요!",
-        "광개토대왕릉비 이야기를 친구들에게 설명하는 미니 발표에 도전해 보세요!",
-        "고구려의 기마 문화를 다이내믹한 굿즈 아이디어로 정리해 보세요!",
-        "고구려 무사·기마 이야기를 짧은 웹툰이나 만화로 그려 보세요!",
-        "고구려 유물 중 가장 인상 깊은 1점을 골라 SNS 큐레이션 카드를 만들어 보세요!",
-      ],
-      "백제 우아형": [
-        "백제 금동대향로의 무늬를 따라 그려 나만의 향낭 디자인을 만들어 보세요!",
-        "공주·부여 백제 문화유적지를 골라 미니 여행 코스를 짜 보세요!",
-        "백제 공예(반가사유상·관식)의 곡선미를 분석한 감상문을 써 보세요!",
-        "백제 유물 굿즈 아이디어 3가지를 정리해 친구에게 제안해 보세요!",
-        "백제 문화를 한 줄로 표현하는 큐레이션 문구를 만들어 보세요!",
-      ],
-      "조선 절제형": [
-        "백자 달항아리의 곡선을 따라 그리며 절제미 감상문을 써 보세요!",
-        "훈민정음 해례본을 직접 따라 써 보는 손글씨 챌린지에 도전해 보세요!",
-        "조선의 과학기구(앙부일구·측우기)를 조사해 작동 원리를 정리해 보세요!",
-        "백자·기록유산을 활용한 깔끔한 문구류 굿즈 아이디어를 그려 보세요!",
-        "조선 기록문화를 활용해 '나의 하루 기록 일지'를 만들어 보세요!",
-      ],
-    };
-
-    /*
-      getRandomSuggestion 함수는 유형 이름을 받아서
-      해당 유형의 실천제안 중 1개를 무작위로 골라 반환합니다.
-
-      Math.random()은 0 이상 1 미만의 무작위 숫자를 만듭니다.
-      Math.floor()는 소수점을 버리고 정수로 만듭니다.
-
-      예를 들어 배열의 길이가 5라면,
-      Math.random() * 5는 0 이상 5 미만의 숫자가 됩니다.
-      Math.floor()를 사용하면 0, 1, 2, 3, 4 중 하나가 됩니다.
-      배열의 번호는 0부터 시작하므로 이 번호로 제안을 고를 수 있습니다.
-    */
-    function getRandomSuggestion(type) {
-      const list = SUGGESTIONS[type];
-      const idx = Math.floor(Math.random() * list.length);
-      return list[idx];
-    }
-
-    /*
-      RESULT_DATA 객체에는 결과 화면에 보여 줄 정보가 들어 있습니다.
-      유형명으로 데이터를 찾을 수 있게 만들었습니다.
-    */
-    const RESULT_DATA = {
-      "신라 화려형": {
-        emoji: "👑",
-        title: "신라 화려형",
-        description: "금관과 장신구처럼 화려하고 정교한 아름다움에 끌리는 타입입니다.",
-        feature: "황금 문화, 불교문화, 왕릉 문화, 정교한 금속 공예",
-        heritage: "금관총 금관, 천마총 금관, 천마총 금제 허리띠, 경주 황오동 금귀걸이",
-        keywords: "#화려함 #황금문화 #왕릉문화 #정교함"
-      },
-      "고구려 역동형": {
-        emoji: "⚔️",
-        title: "고구려 역동형",
-        description: "힘 있고 활동적인 분위기와 도전적인 이야기에 끌리는 타입입니다.",
-        feature: "기마 문화, 고분 벽화, 강한 국방 문화, 역동적인 표현",
-        heritage: "수렵도, 고구려 고분 벽화, 장군총, 광개토대왕릉비",
-        keywords: "#역동성 #기상 #도전 #벽화"
-      },
-      "백제 우아형": {
-        emoji: "🍃",
-        title: "백제 우아형",
-        description: "섬세하고 세련된 공예와 조화로운 아름다움에 끌리는 타입입니다.",
-        feature: "세련된 공예 문화, 불교 예술, 부드럽고 우아한 조형미",
-        heritage: "백제 금동대향로, 무령왕릉 석수, 무령왕 금제 관식, 부여 정림사지 오층석탑",
-        keywords: "#우아함 #세련미 #공예 #조화"
-      },
-      "조선 절제형": {
-        emoji: "🌿",
-        title: "조선 절제형",
-        description: "단정하고 실용적이며 오래 보아도 질리지 않는 아름다움에 끌리는 타입입니다.",
-        feature: "유교 문화, 기록 문화, 과학기술, 절제된 생활미",
-        heritage: "백자 달항아리, 훈민정음 해례본, 앙부일구, 측우기",
-        keywords: "#절제미 #기록문화 #실용성 #단정함"
-      }
-    };
-
-    /*
-      PRIORITY 배열은 동점일 때 우선순위를 정하기 위해 사용합니다.
-      신라 → 고구려 → 백제 → 조선 순서입니다.
-    */
-    const PRIORITY = [
-      "신라 화려형",
-      "고구려 역동형",
-      "백제 우아형",
-      "조선 절제형"
-    ];
-
-    /*
-      현재 몇 번째 질문을 보고 있는지 저장합니다.
-      배열은 0부터 시작하므로 currentQuestion이 0이면 Q1입니다.
-    */
-    let currentQuestion = 0;
-
-    /*
-      학생이 선택한 답을 저장하는 배열입니다.
-      selectedAnswers[0]은 Q1의 답, selectedAnswers[1]은 Q2의 답입니다.
-    */
-    let selectedAnswers = [null, null, null, null, null];
-
-    /*
-      startQuiz 함수는 시작 화면에서 질문 화면으로 이동할 때 사용합니다.
-    */
-    function startQuiz() {
-      document.getElementById("start-screen").style.display = "none";
-      document.getElementById("question-screen").style.display = "flex";
-      document.getElementById("result-screen").style.display = "none";
-
-      currentQuestion = 0;
-      renderQuestion("next");
-    }
-
-    /*
-      renderQuestion 함수는 현재 질문 번호에 맞는 질문과 선택지를 화면에 보여 줍니다.
-      direction 값은 슬라이드 방향을 정할 때 사용합니다.
-    */
-    function renderQuestion(direction) {
-      const questionData = QUESTIONS[currentQuestion];
-      const questionSlide = document.getElementById("questionSlide");
-      const questionText = document.getElementById("questionText");
-      const options = document.getElementById("options");
-      const progressText = document.getElementById("progressText");
-      const progressFill = document.getElementById("progressFill");
-      const backButton = document.getElementById("backButton");
-      const nextButton = document.getElementById("nextButton");
-
-      questionSlide.classList.remove("slide-in", "slide-out-left", "slide-out-right");
-
-      if (direction === "prev") {
-        questionSlide.classList.add("slide-out-right");
-      } else {
-        questionSlide.classList.add("slide-out-left");
-      }
-
-      setTimeout(function () {
-        questionText.textContent = questionData.question;
-        options.innerHTML = "";
-
-        /*
-          forEach는 배열 안의 요소를 하나씩 꺼내서 사용할 때 편리합니다.
-          여기서는 선택지 4개를 화면에 만듭니다.
-        */
-        questionData.options.forEach(function (option) {
-          const label = document.createElement("label");
-          label.className = "option-card";
-
-          const input = document.createElement("input");
-          input.type = "radio";
-          input.name = "q" + (currentQuestion + 1);
-          input.value = option.value;
-
-          if (selectedAnswers[currentQuestion] === option.value) {
-            input.checked = true;
-            label.classList.add("selected");
-          }
-
-          input.addEventListener("change", function () {
-            selectedAnswers[currentQuestion] = input.value;
-            updateOptionStyle();
-          });
-
-          label.appendChild(input);
-          label.appendChild(document.createTextNode(option.text));
-          options.appendChild(label);
-        });
-
-        progressText.textContent = "Q" + (currentQuestion + 1) + "/5";
-        progressFill.style.width = ((currentQuestion + 1) / QUESTIONS.length * 100) + "%";
-
-        if (currentQuestion === 0) {
-          backButton.style.visibility = "hidden";
-        } else {
-          backButton.style.visibility = "visible";
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           [학습 포인트 주석]
+           - 객체와 배열의 차이: SUGGESTIONS는 중괄호 {} 형태의 객체이며 유형명을 Key값으로 가집니다. 각 유형 내부에는 대괄호 [] 형태의 문자열 배열이 위치합니다.
+           - Math.random()과 Math.floor() 조합: 0 이상 1 미만의 소수점 값을 도출하는 무작위 난수에 배열 길이를 곱해, 내림 처리로 유효 인덱스 번호를 무작위 선정합니다.
+           - 학생들은 이 배열 안에 본인만의 아이디어를 추가하여 커스텀 확장을 시도해볼 수 있습니다.
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        function getRandomSuggestion(type) {
+          const list = SUGGESTIONS[type];
+          const idx = Math.floor(Math.random() * list.length);
+          return list[idx];
         }
 
-        if (currentQuestion === QUESTIONS.length - 1) {
-          nextButton.textContent = "📊 나의 역사 감성 알아보기";
-        } else {
-          nextButton.textContent = "다음 질문으로 ➡️";
+        // 결과 유형별 원형 데이터 셋 (1단계 정밀 보존)
+        const RESULT_DATA = {
+            "신라 화려형": {
+                emoji: "👑",
+                desc: "금관과 장신구처럼 화려하고 정교한 아름다움에 끌리는 타입입니다.",
+                feature: "황금 문화, 불교문화, 왕릉 문화, 정교한 금속 공예",
+                heritage: "금관총 금관, 천마총 금관, 천마총 금제 허리띠, 경주 황오동 금귀걸이",
+                keywords: ["#화려함", "#황금문화", "#왕릉문화", "#정교함"]
+            },
+            "고구려 역동형": {
+                emoji: "⚔️",
+                desc: "힘 있고 활동적인 분위기와 도전적인 이야기에 끌리는 타입입니다.",
+                feature: "기마 문화, 고분 벽화, 강한 국방 문화, 역동적인 표현",
+                heritage: "수렵도, 고구려 고분 벽화, 장군총, 광개토대왕릉비",
+                keywords: ["#역동성", "#기상", "#도전", "#벽화"]
+            },
+            "백제 우아형": {
+                emoji: "🍃",
+                desc: "섬세하고 세련된 공예와 조화로운 아름다움에 끌리는 타입입니다.",
+                feature: "세련된 공예 문화, 불교 예술, 부드럽고 우아한 조형미",
+                heritage: "백제 금동대향로, 무령왕릉 석수, 무령왕 금제 관식, 부여 정림사지 오층석탑",
+                keywords: ["#우아함", "#세련미", "#공예", "#조화"]
+            },
+            "조선 절제형": {
+                emoji: "🌿",
+                desc: "단정하고 실용적이며 오래 보아도 질리지 않는 아름다움에 끌리는 타입입니다.",
+                feature: "유교 문화, 기록 문화, 과학기술, 절제된 생활미",
+                heritage: "백자 달항아리, 훈민정음 해례본, 앙부일구, 측우기",
+                keywords: ["#절제미", "#기록문화", "#실용성", "#단정함"]
+            }
+        };
+
+        // 앱 구동 전역 상태 변수
+        let currentIdx = 0;
+        let userResponses = {}; // 각 문항 번호별 선택된 유형 저장 객체
+
+        // 퀴즈 시작 함수
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('question-screen').style.display = 'flex';
+            currentIdx = 0;
+            userResponses = {};
+            renderQuestion();
         }
 
-        questionSlide.classList.remove("slide-out-left", "slide-out-right");
-        questionSlide.classList.add("slide-in");
-      }, 120);
-    }
+        // 질문 화면 렌더링 함수
+        function renderQuestion() {
+            const screen = document.getElementById('question-screen');
+            screen.classList.remove('fade-in-slide');
+            void screen.offsetWidth; // 리플로우 강제 발생으로 애니메이션 리셋
+            screen.classList.add('fade-in-slide');
 
-    /*
-      updateOptionStyle 함수는 선택된 보기 카드의 색을 바꿉니다.
-      transform: scale()은 사용하지 않아 카드 밖으로 튀어나오지 않습니다.
-    */
-    function updateOptionStyle() {
-      const cards = document.querySelectorAll(".option-card");
+            const currentQuestion = QUESTIONS[currentIdx];
+            
+            // 상단 진행률 정보 업데이트
+            document.getElementById('progress-text').innerText = `Q${currentIdx + 1}/5`;
+            document.getElementById('progress-bar-fill').style.width = `${(currentIdx + 1) * 20}%`;
 
-      cards.forEach(function (card) {
-        const input = card.querySelector("input");
+            // 이전 버튼 처리 (Q1일 경우 visibility hidden 처리)
+            const prevBtn = document.getElementById('prev-btn');
+            if (currentIdx === 0) {
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                prevBtn.style.visibility = 'visible';
+            }
 
-        if (input.checked) {
-          card.classList.add("selected");
-        } else {
-          card.classList.remove("selected");
-        }
-      });
-    }
+            // 질문 내용 주입
+            document.getElementById('question-title').innerText = currentQuestion.title;
 
-    /*
-      handleNextButton 함수는 질문 화면의 메인 버튼을 눌렀을 때 실행됩니다.
-      마지막 질문이 아니면 다음 질문으로 이동하고,
-      마지막 질문이면 결과를 계산합니다.
-    */
-    function handleNextButton() {
-      const selected = document.querySelector('input[name="q' + (currentQuestion + 1) + '"]:checked');
+            // 4지선다 컨테이너 초기화 및 동적 생성
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
 
-      if (!selected) {
-        alert("답변을 선택해 주세요.");
-        return;
-      }
+            currentQuestion.options.forEach((opt, index) => {
+                const labelCard = document.createElement('label');
+                labelCard.className = 'option-card';
+                
+                // 기존 선택값 있는 경우 하이라이팅 연동
+                if (userResponses[currentIdx] === opt.type) {
+                    labelCard.classList.add('selected');
+                }
 
-      selectedAnswers[currentQuestion] = selected.value;
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `q${currentIdx + 1}`;
+                radio.value = opt.type;
+                if (userResponses[currentIdx] === opt.type) {
+                    radio.checked = true;
+                }
 
-      if (currentQuestion < QUESTIONS.length - 1) {
-        currentQuestion = currentQuestion + 1;
-        renderQuestion("next");
-      } else {
-        showResult();
-      }
-    }
+                // 무조건 동일 name 그룹핑 하에 클릭 이벤트 매핑 처리
+                radio.addEventListener('change', () => {
+                    // 동적 클래스 변경 단선 처리
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    labelCard.classList.add('selected');
+                    userResponses[currentIdx] = opt.type;
+                });
 
-    /*
-      goPrevQuestion 함수는 좌상단 이전 버튼을 눌렀을 때 실행됩니다.
-    */
-    function goPrevQuestion() {
-      if (currentQuestion > 0) {
-        currentQuestion = currentQuestion - 1;
-        renderQuestion("prev");
-      }
-    }
+                labelCard.appendChild(radio);
+                
+                const textSpan = document.createElement('span');
+                textSpan.innerText = opt.text;
+                labelCard.appendChild(textSpan);
 
-    /*
-      showResult 함수는 버튼을 클릭했을 때 실행됩니다.
-      1. 모든 문항에 답했는지 확인합니다.
-      2. 점수를 계산합니다.
-      3. 최고 점수 유형을 찾습니다.
-      4. 결과를 화면에 출력합니다.
-    */
-    function showResult() {
-      const scores = {
-        "신라 화려형": 0,
-        "고구려 역동형": 0,
-        "백제 우아형": 0,
-        "조선 절제형": 0
-      };
+                container.appendChild(labelCard);
+            });
 
-      /*
-        for 반복문은 같은 일을 여러 번 할 때 사용합니다.
-        여기서는 q1부터 q5까지 차례대로 확인합니다.
-      */
-      for (let i = 1; i <= 5; i++) {
-        const answer = selectedAnswers[i - 1];
-
-        /*
-          answer가 없다는 것은 해당 질문에 답하지 않았다는 뜻입니다.
-          하나라도 답하지 않으면 alert를 보여 주고 함수를 멈춥니다.
-        */
-        if (!answer) {
-          alert("답변을 선택해 주세요.");
-          return;
+            // 🚨 버튼 라벨 통일 규칙 적용
+            const nextBtn = document.getElementById('next-btn');
+            if (currentIdx === QUESTIONS.length - 1) {
+                nextBtn.innerText = "📊 나의 역사 감성 알아보기";
+            } else {
+                nextBtn.innerText = "다음 질문으로 ➡️";
+            }
         }
 
-        /*
-          선택한 보기의 value에는 유형명이 들어 있습니다.
-          선택된 유형의 점수를 1점 올립니다.
-        */
-        scores[answer] = scores[answer] + 1;
-      }
+        // 다음 단계 및 결과 연산 분기 함수
+        function nextQuestion() {
+            // 현재 문항 미선택 응답 방어 검사 사양 적용
+            if (!userResponses[currentIdx]) {
+                alert("답변을 선택해 주세요.");
+                return;
+            }
 
-      /*
-        최고 점수 유형을 찾습니다.
-        동점일 경우 PRIORITY 배열 순서대로 먼저 나온 유형이 선택됩니다.
-      */
-      let finalType = PRIORITY[0];
-      let highestScore = scores[finalType];
-
-      for (let i = 1; i < PRIORITY.length; i++) {
-        const type = PRIORITY[i];
-
-        if (scores[type] > highestScore) {
-          finalType = type;
-          highestScore = scores[type];
+            if (currentIdx < QUESTIONS.length - 1) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
         }
-      }
 
-      /*
-        최종 유형에 맞는 결과 데이터를 가져옵니다.
-      */
-      const result = RESULT_DATA[finalType];
+        // 이전 단계 이동 처리 함수
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
 
-      /*
-        함수 호출과 반환값 사용:
-        getRandomSuggestion(finalType)을 호출하면
-        최종 유형에 맞는 실천제안 1개가 돌아옵니다.
-      */
-      const suggestion = getRandomSuggestion(finalType);
+        // 점수 집계 및 최종 유형 산출 연산식
+        function calculateResult() {
+            const scores = {
+                "신라 화려형": 0,
+                "고구려 역동형": 0,
+                "백제 우아형": 0,
+                "조선 절제형": 0
+            };
 
-      document.getElementById("resultEmoji").textContent = result.emoji;
-      document.getElementById("resultType").textContent = result.title;
-      document.getElementById("resultDescription").textContent = result.description;
-      document.getElementById("resultSuggestion").textContent = suggestion;
+            // 선택 매핑 누적 연산
+            for (let idx in userResponses) {
+                const type = userResponses[idx];
+                scores[type]++;
+            }
 
-      /*
-        1단계 코드의 resultArea id를 보존하면서,
-        SPA 결과 화면과 같은 결과 정보를 저장합니다.
-      */
-      document.getElementById("resultArea").innerHTML = `
-        <hr>
-        <section>
-          <h2>📊 나의 역사 감성 결과</h2>
-          <div class="emoji-result">${result.emoji}</div>
-          <h3>${result.title}</h3>
+            // 동점 우선순위 처리 규칙: 신라 → 고구려 → 백제 → 조선 순서 적용
+            const priorityOrder = ["신라 화려형", "고구려 역동형", "백제 우아형", "조선 절제형"];
+            let highestType = priorityOrder[0];
+            let maxScore = scores[highestType];
 
-          <h4>어떤 역사 감성일까?</h4>
-          <p>${result.description}</p>
+            for (let i = 1; i < priorityOrder.length; i++) {
+                const currentType = priorityOrder[i];
+                if (scores[currentType] > maxScore) {
+                    maxScore = scores[currentType];
+                    highestType = currentType;
+                }
+            }
 
-          <h4>💡 실천제안</h4>
-          <p>${suggestion}</p>
+            // 결과 화면 데이터 연동 바인딩 (9단계 고정 순서 미누락 준수)
+            const data = RESULT_DATA[highestType];
 
-          <button type="button" onclick="resetQuiz()">🔄 다시 하기</button>
-        </section>
-      `;
+            // ② 유형 이모지 대입
+            document.getElementById('result-emoji').innerText = data.emoji;
+            // ③ 유형명 출력
+            document.getElementById('result-type').innerText = highestType;
+            // ⑤ 어떤 역사 감성일까? 출력
+            document.getElementById('result-description').innerText = `어떤 역사 감성일까?: ${data.desc}`;
+            
+            // ⑥ 역사 특징 & 대표 문화유산 분리 차별화 출력 (요약/등 축소 배제)
+            document.getElementById('result-feature').innerText = `📜 역사 특징: ${data.feature}`;
+            document.getElementById('result-heritage').innerText = `🏛️ 대표 문화유산: ${data.heritage}`;
+            
+            // ⑦ 강점 키워드 해시태그 칩 연동 출력
+            const kwContainer = document.getElementById('result-keywords');
+            kwContainer.innerHTML = '';
+            data.keywords.forEach(kw => {
+                const chip = document.createElement('span');
+                chip.className = 'keyword-chip';
+                chip.innerText = kw;
+                kwContainer.appendChild(chip);
+            });
 
-      document.getElementById("start-screen").style.display = "none";
-      document.getElementById("question-screen").style.display = "none";
-      document.getElementById("result-screen").style.display = "flex";
-    }
+            // ⑧ 💡 실천제안 (getRandomSuggestion 무작위 반환 바인딩)
+            const randomSuggestion = getRandomSuggestion(highestType);
+            document.getElementById('result-suggestion').innerText = `💡 실천제안: ${randomSuggestion}`;
 
-    /*
-      resetQuiz 함수는 다시 하기 버튼을 눌렀을 때 실행됩니다.
-      선택한 라디오 버튼과 결과 영역을 초기화합니다.
-      reload 없이 시작 화면으로 돌아갑니다.
-    */
-    function resetQuiz() {
-      currentQuestion = 0;
-      selectedAnswers = [null, null, null, null, null];
+            // 화면 가시성 교체식 전환
+            document.getElementById('question-screen').style.display = 'none';
+            
+            const resScreen = document.getElementById('result-screen');
+            resScreen.style.display = 'flex';
+            resScreen.scrollTop = 0; // 스크롤 상단 리셋
+        }
 
-      document.getElementById("historyForm").reset();
-      document.getElementById("resultArea").innerHTML = "";
-
-      document.getElementById("start-screen").style.display = "flex";
-      document.getElementById("question-screen").style.display = "none";
-      document.getElementById("result-screen").style.display = "none";
-    }
-  </script>
+        // 다시 하기 내부 복귀 로직
+        function resetQuiz() {
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+            currentIdx = 0;
+            userResponses = {};
+        }
+    </script>
 </body>
 </html>

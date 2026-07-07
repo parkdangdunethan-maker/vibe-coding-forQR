@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ 나와 닮은 역사 속 인물 알아보기</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+    /* ----------------------------------------------------------------------
+     * [디자인 안전 규칙 및 공통 스타일]
+     * ---------------------------------------------------------------------- */
+    * {
+        box-sizing: border-box;
+        font-family: 'Jua', 'Gowun Dodum', sans-serif;
+        letter-spacing: -0.2px;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        width: 100%;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 50%, #c79081 100%);
+        background-attachment: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+        word-break: keep-all;
+        line-height: 1.6;
+    }
+
+    /* ----------------------------------------------------------------------
+     * [🚨🚨 카드 박스 절대 고정 규칙 - 2단계 유지]
+     * ---------------------------------------------------------------------- */
+    .app-card {
+        width: 100%;
+        max-width: 420px;
+        height: 580px;
+        padding: 24px 20px;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(120, 80, 40, 0.25),
+                    0 4px 12px rgba(120, 80, 40, 0.1);
+        margin: 0 auto;
+        background: linear-gradient(180deg, #fffdf8 0%, #fdf6e9 100%);
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    /* ----------------------------------------------------------------------
+     * [시작 및 질문 화면 구조 레이아웃]
+     * ---------------------------------------------------------------------- */
+    #start-screen, #question-screen {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        justify-content: flex-start;
+    }
+
+    /* ----------------------------------------------------------------------
+     * [🚨 3단계 신규 화면 - 정중앙 배치 CSS]
+     * ---------------------------------------------------------------------- */
+    #loading-screen, #character-intro {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    /* ----------------------------------------------------------------------
+     * [Step 4 최종 결과 화면 - 스크롤 숨김 및 규격 최적화]
+     * ---------------------------------------------------------------------- */
+    #result-screen {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 12px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    #result-screen::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
+    /* ----------------------------------------------------------------------
+     * [🚨 모든 메인 버튼 규격 보존 및 축소 방지]
+     * ---------------------------------------------------------------------- */
+    .main-btn {
+        width: 100%;
+        min-height: 52px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: auto;
+        border: none;
+        background: linear-gradient(135deg, #b08968 0%, #8c633f 100%);
+        color: #ffffff;
+        font-family: 'Jua', 'Gowun Dodum', sans-serif;
+        letter-spacing: -0.3px;
+        box-shadow: 0 6px 16px rgba(140, 99, 63, 0.35);
+        transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.1s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .main-btn:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 8px 20px rgba(140, 99, 63, 0.45);
+    }
+
+    /* ----------------------------------------------------------------------
+     * [필수 인터랙션 및 애니메이션 정의]
+     * ---------------------------------------------------------------------- */
+    
+    /* ② 최종 캐릭터 idle 흔들림 애니메이션 */
+    @keyframes wobbleBig {
+        0%, 100% { transform: rotate(-10deg) scale(1); }
+        25%      { transform: rotate(8deg) scale(1.08); }
+        50%      { transform: rotate(-8deg) scale(0.96); }
+        75%      { transform: rotate(10deg) scale(1.08); }
+    }
+    .wobble-char {
+        animation: wobbleBig 1.8s ease-in-out infinite;
+        transform-origin: center bottom;
+        filter: drop-shadow(0 8px 16px rgba(120, 80, 40, 0.2));
+    }
+
+    /* ③ 💡 실천제안 박스 강조 등장 효과 */
+    .glow-box {
+        animation: glowAppear 0.5s ease-out forwards;
+    }
+    @keyframes glowAppear {
+        0% { transform: scale(0.9); box-shadow: 0 0 0 rgba(212,225,87,0); }
+        100% { transform: scale(1.0); box-shadow: 0 6px 20px rgba(212,225,87,0.5); }
+    }
+
+    /* ④ 정보 카드 스태거 등장용 기본 불투명 클래스 */
+    .stagger-item {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .stagger-item.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ⑤ 선택 카드 ripple 효과 전용 마크업 */
+    .option-card {
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 2px solid #e8dec8;
+        flex-shrink: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        color: #4a3825;
+        transition: all 0.25s ease;
+        background-color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(120, 80, 40, 0.05);
+    }
+    .option-card:hover { 
+        background-color: #fdf8ed; 
+        border-color: #d4b896;
+    }
+    .option-card.selected { 
+        border-color: #b08968; 
+        background: linear-gradient(135deg, #fff8e8 0%, #fdf0d5 100%);
+        box-shadow: 0 4px 12px rgba(176, 137, 104, 0.2);
+    }
+    .option-card input[type="radio"] {
+        accent-color: #b08968;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(176, 137, 104, 0.3);
+        transform: scale(0);
+        animation: rippleEffect 0.5s linear;
+        pointer-events: none;
+    }
+    @keyframes rippleEffect {
+        to { transform: scale(4); opacity: 0; }
+    }
+
+    /* ⑥ 진행률 바 transition 효과 */
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #b08968 0%, #d4a373 100%);
+        width: 0%;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 999px;
+        box-shadow: 0 2px 6px rgba(176, 137, 104, 0.4);
+    }
+
+    /* 로딩 도트 애니메이션 */
+    .loading-dots::after {
+        content: '';
+        animation: dots 1.5s infinite;
+    }
+    @keyframes dots {
+        0% { content: ''; }
+        33% { content: '.'; }
+        66% { content: '..'; }
+        100% { content: '...'; }
+    }
+
+    /* 기본 내부 디자인 요소 보존 */
+    .back-btn {
+        width: 38px; height: 38px; flex-shrink: 0;
+        position: absolute; top: 14px; left: 14px;
+        border-radius: 50%; border: 1px solid #e8dec8;
+        background: #ffffff; font-size: 14px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; z-index: 10;
+        box-shadow: 0 2px 6px rgba(120, 80, 40, 0.08);
+        transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+        background: #fdf6e9;
+        transform: translateX(-2px);
+    }
+    .progress-container { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .progress-text { font-size: 14px; color: #a18866; text-align: right; font-weight: bold; }
+    .progress-bar-bg { width: 100%; height: 10px; background-color: #f2e9d8; border-radius: 999px; overflow: hidden; }
+    .title-area { text-align: center; margin: auto 0; display: flex; flex-direction: column; gap: 18px; }
+    .title-area h1 { 
+        font-size: 27px; 
+        background: linear-gradient(135deg, #8c633f 0%, #b08968 50%, #c79081 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0; 
+        letter-spacing: -0.5px;
+    }
+    .title-area p { font-size: 15px; color: #7a5a3a; margin: 0; line-height: 1.7; padding: 0 6px; }
+    .question-text { 
+        font-size: 18px; 
+        font-weight: bold; 
+        color: #4a3825; 
+        margin-top: 10px; 
+        min-height: 54px; 
+        letter-spacing: -0.3px;
+    }
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .slide-container { width: 100%; height: 100%; transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out; }
+    .app-footer { 
+        margin-top: auto; 
+        padding-top: 10px; 
+        font-size: 11px; 
+        color: #b8a484; 
+        text-align: center; 
+        opacity: 0.85; 
+    }
+</style>
+
+</head>
+<body>
+
+    <div class="app-card">
+        <div id="start-screen">
+            <div class="title-area">
+                <h1>🏛️ 나와 닮은 역사 속 인물 알아보기</h1>
+                <p>내 안에는 어떤 역사 속 인물의 모습이 숨어 있을까요? 아래의 질문에 답하고 나와 닮은 역사 인물을 찾아보아요!</p>
+            </div>
+            <button class="main-btn" id="start-btn">🚀 나와 닮은 역사 인물 알아보기</button>
+            <div class="app-footer">AI의 도움을 받아 제작된 콘텐츠입니다.</div>
+        </div>
+
+        <div id="question-screen" style="display: none;">
+            <button type="button" class="back-btn" id="back-btn">⬅️</button>
+            <div class="progress-container">
+                <div class="progress-text" id="progress-text">Q1/5</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+            </div>
+            <div class="slide-container" id="quiz-slider">
+                <div class="question-text" id="question-title"></div>
+                <div class="options" id="options-container"></div>
+            </div>
+            <button class="main-btn" id="next-btn">다음 질문으로 ➡️</button>
+            <div class="app-footer">AI의 도움을 받아 제작된 콘텐츠입니다.</div>
+        </div>
+
+        <div id="loading-screen" style="display: none;">
+            <div class="loading-dots" style="font-size: 28px; font-weight: bold; color: #333333;">분석중</div>
+        </div>
+
+        <div id="character-intro" style="display: none; position: relative; text-align: center;">
+            <div id="intro-you" style="font-size: 18px; color: #666; opacity: 0; transition: opacity 0.4s;">당신은...</div>
+            <div id="intro-typename" style="font-size: 28px; font-weight: bold; color: #222; margin-bottom: 15px; opacity: 0; transform: translateY(-20px); transition: opacity 0.4s, transform 0.4s;"></div>
+            <div id="intro-img-container" style="width: 100%; display: flex; justify-content: center; align-items: center; opacity: 0; transform: scale(0.5); transition: opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                </div>
+        </div>
+
+        <div id="result-screen" style="display: none;">
+            </div>
+    </div>
+
+    <script>
+        /* ----------------------------------------------------------------------
+         * [🚨 절대 변경 금지 — 1·2단계 원본 데이터 기조 유지]
+         * ---------------------------------------------------------------------- */
+        const SUGGESTIONS = {
+          "A. 용기 있는 나라 지킴이형": [
+            "유관순·안중근·계백 장군 중 한 명을 골라 영웅 이야기를 친구에게 들려주는 발표에 도전해 보세요!",
+            "내가 가장 존경하는 역사 속 영웅 한 명을 골라 위인전을 만들어 보세요!",
+            "학교에서 '나라를 지킨 사람들' 주제로 미니 전시회를 기획해 보세요!",
+            "우리 반의 안전 지킴이가 되어 친구들을 돕는 미션에 도전해 보세요!",
+            "역사 속 명연설(예: 유관순)을 따라 읽고 친구들 앞에서 발표해 보세요!",
+          ],
+          "B. 배려하고 나누는 공존형": [
+            "방정환 선생님처럼 친구의 마음을 살피고 응원하는 한 줄 메시지를 전해 보세요!",
+            "허준 이야기를 읽고 '우리 반의 작은 도우미' 활동을 시작해 보세요!",
+            "친구의 어려움을 함께 해결한 경험을 일기로 정리해 보세요!",
+            "역사 속 협력 이야기를 골라 친구들과 역할극으로 표현해 보세요!",
+            "가족과 이웃을 돕는 '나의 배려 미션' 1가지를 실천해 보세요!",
+          ],
+          "C. 지혜로운 혁신형": [
+            "장영실의 발명품 한 가지를 골라 작동 원리를 그림으로 정리해 보세요!",
+            "정약용처럼 '우리 생활을 바꿀 아이디어'를 노트에 적어 보세요!",
+            "역사 속 발명품을 비교해 '내가 만들고 싶은 발명품'을 설계해 보세요!",
+            "학교나 동네에서 불편한 점을 찾아 해결 아이디어를 친구에게 제안해 보세요!",
+            "내가 만든 발명 아이디어를 미니 발표 자료로 정리해 보세요!",
+          ],
+          "D. 생각을 표현하는 예술형": [
+            "김홍도의 풍속화처럼 우리 반 친구들의 모습을 그림으로 그려 보세요!",
+            "허난설헌의 시를 따라 쓰고 나만의 짧은 시를 지어 보세요!",
+            "김정희(추사)처럼 나만의 글씨체로 마음을 담은 짧은 글을 써 보세요!",
+            "역사 속 예술가 한 명을 골라 작품 소개 카드를 만들어 보세요!",
+            "내가 좋아하는 역사 이야기를 만화나 짧은 글로 표현해 보세요!",
+          ],
+        };
+
+        function getRandomSuggestion(type) {
+          const list = SUGGESTIONS[type];
+          const idx = Math.floor(Math.random() * list.length);
+          return list[idx];
+        }
+
+        const QUESTIONS = [
+            { num: 1, title: "Q1. 아래 체험학습 장소 중 제일 가고 싶은 곳은?", options: [{ val: "A", text: "① 나라를 지킨 장군들의 전시관" }, { val: "B", text: "② 사람들의 생활 모습을 볼 수 있는 마을 체험관" }, { val: "C", text: "③ 발명품과 과학 기술을 체험하는 공간" }, { val: "D", text: "④ 그림과 작품을 전시한 예술관" }] },
+            { num: 2, title: "Q2. 모둠 활동 중 친구들이 의견을 정하지 못하고 있다면?", options: [{ val: "A", text: "① 먼저 방향을 제안하고 역할을 나눈다" }, { val: "B", text: "② 친구들의 의견을 하나씩 듣고 분위기를 조율한다" }, { val: "C", text: "③ 장단점을 비교해 가장 좋은 방법을 찾는다" }, { val: "D", text: "④ 새로운 아이디어를 내어 활동을 더 재미있게 만든다" }] },
+            { num: 3, title: "Q3. 학교 축제를 준비한다면 내가 가장 해보고 싶은 역할은?", options: [{ val: "A", text: "① 무대 진행이나 대표 발표 역할" }, { val: "B", text: "② 친구들을 돕고 함께 준비하는 역할" }, { val: "C", text: "③ 계획표를 만들고 준비 과정을 정리하는 역할" }, { val: "D", text: "④ 포스터, 글, 그림 등으로 축제를 표현하는 역할" }] },
+            { num: 4, title: "Q4. 내가 더 멋지다고 느끼는 사람은?", options: [{ val: "A", text: "① 어려운 상황에서도 책임감 있게 행동하는 사람" }, { val: "B", text: "② 다른 사람을 따뜻하게 도와주는 사람" }, { val: "C", text: "③ 새로운 방법으로 문제를 해결하는 사람" }, { val: "D", text: "④ 자신의 생각을 멋지게 표현하는 사람" }] },
+            { num: 5, title: "Q5. 역사 속 인물과 하루를 보낼 수 있다면?", options: [{ val: "A", text: "① 나라와 공동체를 위해 어떤 선택을 했는지 듣기" }, { val: "B", text: "② 사람들을 어떻게 도왔는지 배우기" }, { val: "C", text: "③ 새로운 발명과 아이디어를 함께 고민해 보기" }, { val: "D", text: "④ 글이나 그림으로 생각을 표현하는 방법 배우기" }] }
+        ];
+
+        const RESULT_DATA = {
+            "A": { typeKey: "A. 용기 있는 나라 지킴이형", emoji: "🔥", description: "어려운 상황에서도 용기를 내어 먼저 행동하는 타입이에요. 책임감을 가지고 친구들과 함께 목표를 향해 나아가는 힘이 있습니다.", characters: "유관순 · 안중근 · 계백 · 권율 · 최영장군", keywords: ["#용기", "#리더십", "#책임감", "#도전"], img: "https://vibe-coding-characters.vercel.app/img/history_e/hero.png", colors: ["#FF512F", "#DD2476"] },
+            "B": { typeKey: "B. 배려하고 나누는 공존형", emoji: "🌿", description: "주변 사람들의 마음을 잘 살피고 함께하는 것을 중요하게 생각하는 타입이에요. 친구들과 협력하며 따뜻한 분위기를 만드는 힘이 있습니다.", characters: "방정환 · 김만덕 · 허준", keywords: ["#배려", "#공감", "#협력", "#나눔"], img: "https://vibe-coding-characters.vercel.app/img/history_e/care.png", colors: ["#56AB2F", "#A8E063"] },
+            "C": { typeKey: "C. 지혜로운 혁신형", emoji: "🧠", description: "문제를 발견하면 이유를 살펴보고 새로운 해결 방법을 찾는 타입이에요. 관찰하고 탐구하며 더 좋은 아이디어를 만들어내는 힘이 있습니다.", characters: "장영실 · 최무선 · 정약용", keywords: ["#탐구", "#전략", "#발명", "#문제해결"], img: "https://vibe-coding-characters.vercel.app/img/history_e/wisdom.png", colors: ["#4776E6", "#8E54E9"] },
+            "D": { typeKey: "D. 생각을 표현하는 예술형", emoji: "🎨", description: "그림, 글쓰기, 꾸미기처럼 나만의 방식으로 생각과 느낌을 표현하는 타입이에요. 풍부한 상상력으로 사람들의 마음을 움직일 수 있습니다.", characters: "김홍도 · 허난설헌 · 김정희", keywords: ["#표현", "#상상력", "#감성", "#창작"], img: "https://vibe-coding-characters.vercel.app/img/history_e/art.png", colors: ["#F7971E", "#FFD200"] }
+        };
+
+        /* ----------------------------------------------------------------------
+         * 외부 라이브러리 연동 안전장치 (원문 지침 준수)
+         * ---------------------------------------------------------------------- */
+        function safeConfetti(opts) {
+            if (typeof confetti === 'undefined') return;
+            try { confetti(opts); } catch (e) {}
+        }
+
+        function fireEmojiConfetti(emoji, colors) {
+            if (typeof confetti === 'undefined') return;
+            try {
+                const shape = confetti.shapeFromText({ text: emoji, scalar: 4 });
+                const baseOption = {
+                    particleCount: 60, spread: 90, startVelocity: 55, ticks: 250,
+                    shapes: [shape], scalar: 4, colors: colors, gravity: 0.8, drift: 0.1
+                };
+                confetti({ ...baseOption, origin: { x: 0.1, y: 0.9 }, angle: 60 });
+                confetti({ ...baseOption, origin: { x: 0.9, y: 0.9 }, angle: 120 });
+                setTimeout(() => {
+                    confetti({ ...baseOption, particleCount: 40, origin: { x: 0.5, y: 0.8 }, angle: 90, spread: 120 });
+                }, 300);
+            } catch (e) {}
+        }
+
+        /* ----------------------------------------------------------------------
+         * 상태 제어 로직 구조체
+         * ---------------------------------------------------------------------- */
+        let currentIdx = 0;
+        let answers = {};
+
+        const startScreen = document.getElementById("start-screen");
+        const questionScreen = document.getElementById("question-screen");
+        const loadingScreen = document.getElementById("loading-screen");
+        const introScreen = document.getElementById("character-intro");
+        const resultScreen = document.getElementById("result-screen");
+        const slider = document.getElementById("quiz-slider");
+
+        document.getElementById("start-btn").addEventListener("click", () => {
+            startScreen.style.display = "none";
+            questionScreen.style.display = "flex";
+            renderQuestion();
+        });
+
+        function renderQuestion() {
+            const q = QUESTIONS[currentIdx];
+            const backBtn = document.getElementById("back-btn");
+            backBtn.style.visibility = (currentIdx === 0) ? "hidden" : "visible";
+
+            document.getElementById("progress-text").innerText = `Q${q.num}/5`;
+            document.getElementById("progress-fill").style.width = `${(q.num / 5) * 100}%`;
+            document.getElementById("question-title").innerText = q.title;
+
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+
+            q.options.forEach((opt) => {
+                const label = document.createElement("label");
+                label.className = "option-card";
+                if (answers[currentIdx] === opt.val) label.classList.add("selected");
+
+                label.innerHTML = `
+                    <input type="radio" name="q${q.num}" value="${opt.val}" ${answers[currentIdx] === opt.val ? 'checked' : ''}>
+                    <span>${opt.text}</span>
+                `;
+
+                // ⑤ 선택 카드 ripple 효과 삽입 구현
+                label.addEventListener("click", function(e) {
+                    const allCards = container.querySelectorAll(".option-card");
+                    allCards.forEach(c => c.classList.remove("selected"));
+                    label.classList.add("selected");
+                    answers[currentIdx] = opt.val;
+
+                    // Ripple 요소 동적 추가
+                    const circle = document.createElement("span");
+                    const rect = label.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size/2;
+                    const y = e.clientY - rect.top - size/2;
+
+                    circle.style.width = circle.style.height = `${size}px`;
+                    circle.style.left = `${x}px`;
+                    circle.style.top = `${y}px`;
+                    circle.className = "ripple";
+
+                    const prevRipple = label.querySelector(".ripple");
+                    if (prevRipple) prevRipple.remove();
+                    
+                    label.appendChild(circle);
+                });
+
+                container.appendChild(label);
+            });
+
+            const nextBtn = document.getElementById("next-btn");
+            nextBtn.innerText = (currentIdx === QUESTIONS.length - 1) ? "📊 나와 닮은 역사 인물 알아보기" : "다음 질문으로 ➡️";
+        }
+
+        document.getElementById("next-btn").addEventListener("click", () => {
+            if (!answers[currentIdx]) {
+                alert("답변을 선택해 주세요.");
+                return;
+            }
+
+            slider.style.transform = "translateX(-20px)";
+            slider.style.opacity = "0";
+
+            setTimeout(() => {
+                if (currentIdx < QUESTIONS.length - 1) {
+                    currentIdx++;
+                    renderQuestion();
+                    slider.style.transform = "translateX(0)";
+                    slider.style.opacity = "1";
+                } else {
+                    runSequence(); // 3단계 신규 타임라인 시퀀스 가동
+                }
+            }, 250);
+        });
+
+        document.getElementById("back-btn").addEventListener("click", () => {
+            if (currentIdx > 0) {
+                slider.style.transform = "translateX(20px)";
+                slider.style.opacity = "0";
+                setTimeout(() => {
+                    currentIdx--;
+                    renderQuestion();
+                    slider.style.transform = "translateX(0)";
+                    slider.style.opacity = "1";
+                }, 250);
+            }
+        });
+
+        /* ----------------------------------------------------------------------
+         * [🚨 3단계 핵심 전용 알고리즘 - 타임라인 시퀀스 연출]
+         * ---------------------------------------------------------------------- */
+        function runSequence() {
+            questionScreen.style.display = "none";
+            
+            // 0.0s : #loading-screen 기동
+            loadingScreen.style.display = "flex";
+
+            // 1.5s : 로딩 종료 후 캐릭터 인트로 디스플레이 진입
+            setTimeout(() => {
+                loadingScreen.style.display = "none";
+                introScreen.style.display = "flex";
+
+                // 점수 가공 연산 기조 분석 및 순서 배정 처리
+                const scores = { A: 0, B: 0, C: 0, D: 0 };
+                for (let idx in answers) { scores[answers[idx]]++; }
+
+                let finalType = "A";
+                let maxScore = scores["A"];
+                const typesOrder = ["A", "B", "C", "D"];
+                for (let i = 1; i < typesOrder.length; i++) {
+                    let currentType = typesOrder[i];
+                    if (scores[currentType] > maxScore) {
+                        maxScore = scores[currentType];
+                        finalType = currentType;
+                    }
+                }
+
+                // 동점 및 차이 기반 [분석 멘트] 추출 로직 산정
+                const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+                const top1 = sortedScores[0];
+                const top2 = sortedScores[1];
+                const diff = top1[1] - top2[1];
+
+                const targetData = RESULT_DATA[finalType];
+                let commentText = "";
+
+                if (diff >= 3) {
+                    commentText = `당신은 확실한 [${targetData.typeKey}]이에요!<br>이 성향이 강하게 나타났어요.`;
+                } else if (diff >= 1 && diff <= 2) {
+                    commentText = `당신은 [${targetData.typeKey}] 성향이 가장 두드러지지만,<br>다른 면도 함께 가지고 있어요.`;
+                } else {
+                    commentText = `당신은 여러 매력을 함께 가진 균형형이에요.<br>그중에서도 [${targetData.typeKey}] 성향이 살짝 더 강해요.`;
+                }
+
+                // 인트로 텍스트 및 기본 이미지 300px 주입 세팅
+                document.getElementById("intro-typename").innerText = targetData.typeKey + "!";
+                const imgContainer = document.getElementById("intro-img-container");
+                imgContainer.innerHTML = `
+                    <img src="${targetData.img}" alt="character" style="width: 300px; max-width: 100%; height: auto;" 
+                         onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\'font-size:90px; margin:20px 0;\'建设>${targetData.emoji}</div>';">
+                `;
+
+                // 1.5s : "당신은..." 페이드 인
+                setTimeout(() => {
+                    document.getElementById("intro-you").style.opacity = "1";
+                }, 0);
+
+                // 1.9s : 유형명 등장
+                setTimeout(() => {
+                    const tn = document.getElementById("intro-typename");
+                    tn.style.opacity = "1";
+                    tn.style.transform = "translateY(0)";
+                }, 400);
+
+                // 2.1s : 캐릭터 이미지 등장 (바운스 효과 적용)
+                setTimeout(() => {
+                    imgContainer.style.opacity = "1";
+                    imgContainer.style.transform = "scale(1.0)";
+                }, 600);
+
+                // 2.7s : 폭죽 터뜨리기 시퀀스
+                setTimeout(() => {
+                    fireEmojiConfetti(targetData.emoji, targetData.colors);
+                }, 1200);
+
+                // 3.5s : 페이드아웃 및 최종 결과 정착 스왑 처리
+                setTimeout(() => {
+                    introScreen.style.transition = "opacity 0.8s ease, transform 0.8s ease";
+                    introScreen.style.opacity = "0";
+                    introScreen.style.transform = "scale(0.9)";
+
+                    setTimeout(() => {
+                        introScreen.style.display = "none";
+                        // 스타일 원복 초기화
+                        introScreen.style.opacity = "1";
+                        introScreen.style.transform = "scale(1)";
+                        document.getElementById("intro-you").style.opacity = "0";
+                        document.getElementById("intro-typename").style.opacity = "0";
+                        document.getElementById("intro-typename").style.transform = "translateY(-20px)";
+                        imgContainer.style.opacity = "0";
+                        imgContainer.style.transform = "scale(0.5)";
+
+                        // 4.3s : 최종 결과 화면 구축 컴파일링 완료 후 렌더링 노출
+                        renderFinalResult(targetData, commentText);
+                    }, 800);
+                }, 2000);
+
+            }, 1500);
+        }
+
+        // ④ 정보 카드 스태거(Stagger) 모션 탑재용 배치 처리 함수
+        function applyStaggerEffect() {
+            const items = resultScreen.querySelectorAll(".stagger-item");
+            items.forEach((item, idx) => {
+                setTimeout(() => {
+                    item.classList.add("show");
+                }, idx * 150); // 0.15s 간격 배치
+            });
+        }
+
+        function renderFinalResult(res, commentText) {
+            resultScreen.style.display = "flex";
+            const randomSuggestion = getRandomSuggestion(res.typeKey);
+
+            /* ----------------------------------------------------------------------
+             * [🚨 결과 화면 표시 순서 — 한 항목도 빠짐없이 9단계 고정 주입]
+             * ---------------------------------------------------------------------- */
+            resultScreen.innerHTML = `
+                <div class="stagger-item" style="font-size: 22px; font-weight: 600; text-align: center; color: #333333; margin-top: 6px;">
+                    📊 나와 닮은 역사 인물 결과
+                </div>
+
+                <div class="stagger-item" style="display: flex; justify-content: center; align-items: center; min-height: 140px;">
+                    <div class="wobble-char" style="width: 130px; text-align: center;">
+                        <img src="${res.img}" alt="character" style="max-width: 130px; height: auto;" 
+                             onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\'font-size:80px; line-height:1;\'>${res.emoji}</div>';">
+                    </div>
+                </div>
+
+                <div class="stagger-item" style="font-size: 28px; font-weight: bold; text-align: center; color: #222222;">
+                    ${res.typeKey}
+                </div>
+
+                <div class="stagger-item" style="background-color: #f1f5f9; padding: 10px 14px; border-radius: 8px; text-align: center; font-size: 14px; color: #475569; border: 1px dashed #cbd5e1;">
+                    ${commentText}
+                </div>
+
+                <div class="stagger-item" style="background-color: #f8f9fa; padding: 10px 14px; border-radius: 10px; font-size: 14px; color: #555555;">
+                    <strong style="color:#333;">어떤 성향일까?:</strong> ${res.description}
+                </div>
+
+                <div class="stagger-item" style="background-color: #faf3e7; border-left: 4px solid #b08968; padding: 12px 14px; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #8c633f; font-size: 14px; margin-bottom: 6px;">🏛️ 나와 닮은 역사 인물</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 14.5px; color: #333333; justify-content:center">
+                        ${res.characters.split(' · ').map(char => `<span style="background: rgba(176,137,104,0.1); padding: 2px 8px; border-radius: 6px; font-weight:bold;">${char}</span>`).join('<span style="color:#b08968; align-self:center;">·</span>')}
+                    </div>
+                </div>
+
+                <div class="stagger-item" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content:center">
+                    ${res.keywords.map(kw => `
+                        <span style="background-color: #eef5fc; color: #4a90e2; padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: bold;">
+                            ${kw}
+                        </span>
+                    `).join('')}
+                </div>
+
+                <div class="stagger-item glow-box" style="background-color: #fbfde8; border: 1px solid #d4e157; padding: 12px 14px; border-radius: 10px; font-size: 14px; color: #4b6a13;">
+                    <strong style="font-size:15px; display:block; margin-bottom:4px;">💡 실천제안</strong>
+                    ${randomSuggestion}
+                </div>
+
+                <button class="main-btn stagger-item" id="reset-btn" style="background-color: #6c757d; margin-bottom: 4px;">🔄 다시 하기</button>
+                
+                <div class="app-footer stagger-item" style="padding-bottom: 6px;">AI의 도움을 받아 제작된 콘텐츠입니다.</div>
+            `;
+
+            // 스태거 효과 트리거 가동
+            applyStaggerEffect();
+
+            // 리셋 수치 복원 바인딩 초기화
+            document.getElementById("reset-btn").addEventListener("click", () => {
+                currentIdx = 0;
+                answers = {};
+                resultScreen.style.display = "none";
+                startScreen.style.display = "flex";
+            });
+        }
+    </script>
+</body>
+</html>

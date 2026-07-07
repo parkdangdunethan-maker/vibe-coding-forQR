@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 여행 스타일 알아보기</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <style>
+        /* [모바일 안전 세트 2 & 모바일 가독성] */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+            word-break: keep-all;
+            line-height: 1.6;
+            letter-spacing: -0.2px;
+            font-family: 'Jua', sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* [🚨🚨 카드 박스 절대 고정 규칙] 단 하나의 동일한 크기 유지 */
+        .app-card {
+            width: 100%;
+            max-width: 420px;
+            height: 580px;                  /* 🚨 모든 화면 동일 */
+            padding: 24px 20px;             /* 🚨 모든 화면 동일 */
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            background: #ffffff;
+            position: relative;             /* 좌상단 이전 버튼 위치 기준 */
+            overflow-x: hidden;             /* 🚨 가로 스크롤 무조건 차단 */
+            overflow-y: auto;               /* 🚨 세로 스크롤은 가능하되 스크롤바만 숨김 */
+            scrollbar-width: none;          /* Firefox: 스크롤바 숨김 */
+            -ms-overflow-style: none;       /* IE/Edge(구버전): 스크롤바 숨김 */
+            display: flex;                  /* 내부 화면 정렬용 */
+            flex-direction: column;
+        }
+
+        .app-card::-webkit-scrollbar {
+            display: none;                  /* Chrome / Safari / Edge: 스크롤바 숨김 */
+            width: 0;
+            height: 0;
+        }
+
+        /* [🚨 flex 레이아웃 — 화면별 공통 베이스] */
+        #start-screen, #question-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+            justify-content: flex-start;
+        }
+
+        /* 슬라이드 애니메이션용 컨테이너 */
+        .slide-container {
+            transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+        }
+
+        /* [시작 화면 디자인] */
+        .title-area {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .title-area h1 {
+            font-size: 28px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .title-area p {
+            font-size: 16px;
+            color: #666666;
+            padding: 0 10px;
+        }
+
+        /* [질문 화면 디자인] */
+        .progress-area {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 24px;
+        }
+        .progress-text {
+            font-size: 14px;
+            color: #888888;
+            text-align: right;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e5e5;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 16.6%;
+            background-color: #4a90e2;
+            transition: width 0.2s ease;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+            margin-top: 10px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;                      /* 🚨 선택지가 다닥다닥 붙지 않도록 gap 필수 */
+        }
+        .option-card {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #e5e5e5;
+            flex-shrink: 0;
+            background: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-card input[type="radio"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        .option-card.selected {
+            border-color: #4a90e2;
+            background-color: #f0f7ff;
+        }
+
+        /* [이전 버튼 디자인] 카드 좌상단 화살표 */
+        .prev-btn {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #e5e5e5;
+            background: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;                 /* 🚨 절대 줄어들지 않게 */
+            z-index: 10;
+        }
+
+        /* [🚨 버튼 뭉개짐 방지 규칙 & 메인 버튼] */
+        .main-btn {
+            width: 100%;
+            min-height: 52px;               /* 🚨 height 대신 min-height 사용 */
+            flex-shrink: 0;                 /* 🚨 절대 줄어들지 않게 */
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;               /* 🚨 카드 하단에 자연스럽게 정착 */
+            border: none;
+            background-color: #4a90e2;
+            color: #ffffff;
+            transition: transform 0.1s;
+        }
+        .main-btn:hover {
+            transform: translateY(-1px);    /* 🚨 미세 효과만 허용 (.app-card 영역 이탈 방지) */
+            background-color: #357abd;
+        }
+
+        /* [결과 화면 디자인] */
+        #result-screen {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;                      /* 🚨 결과 화면은 좁게 조절 */
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        #result-screen::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        
+        .result-title {
+            font-size: 22px;                /* ① 카드 상단 타이틀 22~24px */
+            font-weight: 600;
+            text-align: center;
+            color: #333333;
+            margin-top: 10px;
+        }
+        .type-emoji {
+            font-size: 80px;                /* ② 유형 이모지: 80~100px */
+            text-align: center;
+            margin: 5px 0;
+        }
+        .type-name {
+            font-size: 28px;                /* ③ 유형명: 28px bold */
+            font-weight: bold;
+            text-align: center;
+            color: #333333;
+            margin-bottom: 5px;
+        }
+        .style-box {
+            background-color: #f0f0f0;      /* ⑤ 어떤 스타일일까: 회색 박스 */
+            padding: 12px 14px;             /* padding 12px 14px 고정 */
+            border-radius: 8px;
+            font-size: 14px;
+            color: #444444;
+        }
+        .place-box {
+            background-color: #faf3e7;      /* ⑥ 추천 장소: 배경 #faf3e7 */
+            border-left: 4px solid #d4a373; /* border-left: 4px solid #d4a373 */
+            padding: 10px 14px;             /* padding 10px 14px */
+            border-radius: 8px;
+            font-size: 14px;
+            color: #5d4037;
+        }
+        .keyword-box {
+            display: flex;
+            flex-wrap: wrap;                /* ⑦ 강점 키워드: flex-wrap */
+            gap: 6px;
+        }
+        .keyword-chip {
+            background-color: #eef2f7;      /* 배경 연한 컬러 */
+            padding: 4px 10px;              /* padding 4px 10px */
+            border-radius: 12px;            /* border-radius 12px */
+            font-size: 13px;                /* font-size 13~14px */
+            color: #4a90e2;
+        }
+        .suggestion-box {
+            background-color: #f9fced;      /* ⑧ 💡 실천제안: 노란/연두 배경 */
+            border: 1px solid #d8e2b7;       /* 테두리 포함 */
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #556b2f;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-card">
+        
+        <button type="button" id="prev-btn" class="prev-btn" style="visibility: hidden;" onclick="goPrev()">⬅️</button>
+
+        <div id="start-screen">
+            <div class="title-area">
+                <h1>🧳 나의 여행 스타일 알아보기</h1>
+                <p>내가 가장 좋아하는 여행은 어떤 모습일까요? 아래의 질문에 답하고 나의 여행 스타일을 알아보아요!</p>
+            </div>
+            <button type="button" class="main-btn" onclick="startQuiz()">🚀 나의 여행 스타일 알아보기</button>
+        </div>
+
+        <div id="question-screen" style="display: none;" class="slide-container">
+            <div class="progress-area">
+                <div id="progress-text" class="progress-text">Q1/6</div>
+                <div class="progress-bar-bg">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+            
+            <form id="quiz-form" onsubmit="return false;">
+                <div id="dynamic-question-area"></div>
+            </form>
+
+            <button type="button" id="next-submit-btn" class="main-btn" onclick="goNext()">다음 질문으로 ➡️</button>
+        </div>
+
+        <div id="result-screen" style="display: none;">
+            <div class="result-title">📊 나의 여행 스타일 결과</div>
+            
+            <div id="result-emoji" class="type-emoji"></div>
+            
+            <div id="result-name" class="type-name"></div>
+            
+            <div id="result-desc" class="style-box"></div>
+            
+            <div id="result-places" class="place-box"></div>
+            
+            <div id="result-keywords" class="keyword-box"></div>
+            
+            <div id="result-suggestion" class="suggestion-box"></div>
+            
+            <button type="button" class="main-btn" onclick="resetQuiz()">🔄 다시 하기</button>
+        </div>
+
+    </div>
+
+    <footer>
+        <p style="font-size: 12px; color: gray;">AI의 도움을 받아 제작된 콘텐츠입니다.</p>
+    </footer>
+
+    <script>
+        // 현재 진행 중인 질문 번호 인덱스 (0부터 5까지)
+        let currentIdx = 0;
+        
+        // 각 질문별 학생의 선택 가치(유형명)를 임시 보관하는 유저 응답 배열
+        let userAnswers = [null, null, null, null, null, null];
+
+        /* [1단계 보존 — 20개 실천제안 풀 배열 객체] 한 글자도 변경 금지 */
+        const SUGGESTIONS = {
+            "맛집 탐험형": [
+                "여행 가기 전 지역 시장 맛집 지도를 직접 그려 보세요!",
+                "여행지에서 가장 기억에 남는 음식 사진과 한 줄 후기를 남겨 보세요!",
+                "친구·가족과 '오늘의 맛집 BEST 3' 미션을 만들어 보세요!",
+                "여행에서 새로 발견한 간식 5가지를 정리해 보세요!",
+                "여행 후 '나만의 맛집 지도'를 만들어 친구에게 추천해 보세요!",
+            ],
+            "감성 작가형": [
+                "여행지에서 '오늘의 인생샷' 한 장을 매일 남겨 보세요!",
+                "감성 카페나 포토존을 미리 조사해 사진 동선을 만들어 보세요!",
+                "여행 사진으로 작은 포토북이나 카드뉴스를 만들어 보세요!",
+                "해 질 무렵 하늘 색을 매일 사진으로 기록해 보세요!",
+                "여행지의 풍경을 짧은 글이나 시로 표현해 보세요!",
+            ],
+            "일정 마스터형": [
+                "여행 전 '나만의 동선표'를 시간 단위로 만들어 보세요!",
+                "이동·식사·관광 시간을 정리한 미니 가이드북을 만들어 보세요!",
+                "여행 중 예상 시간과 실제 시간을 비교해 기록해 보세요!",
+                "여행 짐 체크리스트를 만들어 가족에게 공유해 보세요!",
+                "다녀온 여행 일정을 정리해 친구에게 추천 코스로 알려 주세요!",
+            ],
+            "액티비티 러버형": [
+                "여행지에서 평소 안 해본 체험 활동 1가지에 꼭 도전해 보세요!",
+                "걷기·자전거 등 몸을 움직이는 여행 코스를 만들어 보세요!",
+                "체험 후 '오늘 가장 재미있었던 순간'을 일기로 써 보세요!",
+                "친구·가족과 함께 즐길 미션형 체험 코스를 만들어 보세요!",
+                "다음 여행에서 도전할 액티비티 위시리스트를 작성해 보세요!",
+            ],
+        };
+
+        /* [1단계 보존 — getRandomSuggestion 함수] 로직 그대로 보존 */
+        function getRandomSuggestion(type) {
+            const list = SUGGESTIONS[type];
+            const idx = Math.floor(Math.random() * list.length);
+            return list[idx];
+        }
+
+        /* [1단계 보존 — 질문 데이터 일절 수정 금지] */
+        const QUIZ_QUESTIONS = [
+            {
+                q: "Q1. 여행 가기 전 나는?",
+                options: [
+                    { text: "① 맛집과 간식 정보를 먼저 찾아본다 🍜", type: "맛집 탐험형" },
+                    { text: "② 예쁜 장소와 사진을 먼저 모은다 📸", type: "감성 작가형" },
+                    { text: "③ 이동 경로와 일정을 먼저 정리한다 📖", type: "일정 마스터형" },
+                    { text: "④ 재미있는 체험 활동을 먼저 찾아본다 🎡", type: "액티비티 러버형" }
+                ]
+            },
+            {
+                q: "Q2. 여행에서 더 중요한 것은?",
+                options: [
+                    { text: "① 맛집으로 소문난 식당 방문하기 🍢", type: "맛집 탐험형" },
+                    { text: "② 예쁜 풍경과 사진 ✨", type: "감성 작가형" },
+                    { text: "③ 효율적인 동선 🚆", type: "일정 마스터형" },
+                    { text: "④ 직접 해보는 체험 🎢", type: "액티비티 러버형" }
+                ]
+            },
+            {
+                q: "Q3. 여행 중 가장 많이 하는 행동은?",
+                options: [
+                    { text: "① 맛집 후기를 찾아본다 📱", type: "맛집 탐험형" },
+                    { text: "② 풍경 사진을 찍는다 📸", type: "감성 작가형" },
+                    { text: "③ 다음 장소 시간을 확인한다 ⏰", type: "일정 마스터형" },
+                    { text: "④ 체험 활동에 참여한다 🧗", type: "액티비티 러버형" }
+                ]
+            },
+            {
+                q: "Q4. 더 가보고 싶은 장소는?",
+                options: [
+                    { text: "① 시장과 먹거리 거리 🍡", type: "맛집 탐험형" },
+                    { text: "② 야경 명소와 감성 거리 🌃", type: "감성 작가형" },
+                    { text: "③ 유명 관광지와 투어 코스 🗺️", type: "일정 마스터형" },
+                    { text: "④ 놀이공원과 체험 공간 🎠", type: "액티비티 러버형" }
+                ]
+            },
+            {
+                q: "Q5. 여행 예산을 더 쓰고 싶은 곳은?",
+                options: [
+                    { text: "① 음식과 디저트 🍰", type: "맛집 탐험형" },
+                    { text: "② 사진 찍을 소품이나 굿즈 🎀", type: "감성 작가형" },
+                    { text: "③ 이동과 숙소 🚄", type: "일정 마스터형" },
+                    { text: "④ 체험과 액티비티 🎟️", type: "액티비티 러버형" }
+                ]
+            },
+            {
+                q: "Q6. 여행 중 예상치 못한 상황이 생긴다면?",
+                options: [
+                    { text: "① 새로운 맛집을 찾는 재미가 생긴다 🍜", type: "맛집 탐험형" },
+                    { text: "② 우연히 발견한 장소 사진부터 찍는다 📸", type: "감성 작가형" },
+                    { text: "③ 바로 일정을 다시 정리한다 📖", type: "일정 마스터형" },
+                    { text: "④ 새로운 체험처럼 즐긴다 🎢", type: "액티비티 러버형" }
+                ]
+            }
+        ];
+
+        /* [1단계 보존 — 결과 유형 데이터 일절 수정 금지] */
+        const RESULT_DATA = {
+            "맛집 탐험형": {
+                emoji: "🍜",
+                desc: "여행에서 맛있는 음식과 새로운 간식을 찾는 것을 좋아하는 타입입니다.",
+                places: "시장 거리, 야시장, 먹거리 골목, 디저트 카페",
+                keywords: ["먹방", "맛집", "간식", "시장투어"]
+            },
+            "감성 작가형": {
+                emoji: "📸",
+                desc: "예쁜 풍경과 감성적인 장소를 좋아하는 타입입니다. 사진을 찍고 추억을 남기는 활동을 즐깁니다.",
+                places: "야경 명소, 감성 카페, 바다 풍경, 포토존 거리",
+                keywords: ["감성", "사진", "풍경", "인생샷"]
+            },
+            "일정 마스터형": {
+                emoji: "📖",
+                desc: "여행 계획을 꼼꼼하게 세우는 타입입니다. 효율적으로 움직일 때 만족감을 느낍니다.",
+                places: "도심 여행, 투어 코스, 박물관, 문화 공간",
+                keywords: ["계획형", "동선", "정리", "효율"]
+            },
+            "액티비티 러버형": {
+                emoji: "🎡",
+                desc: "직접 체험하고 움직이는 것을 좋아하는 타입입니다. 가만히 보기보다 몸으로 즐기는 여행을 더 재미있게 느낍니다.",
+                places: "놀이공원, 체험 공간, 액티비티 존, 테마파크",
+                keywords: ["체험", "활동", "액티비티", "에너지"]
+            }
+        };
+
+        // SPA 화면 제어: 시작하기
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('question-screen').style.display = 'flex';
+            currentIdx = 0;
+            renderQuestion();
+        }
+
+        // 현재 인덱스에 맞춰 질문 카드를 빌드하고 렌더링하는 함수
+        function renderQuestion() {
+            const screen = document.getElementById('question-screen');
+            // 0.25초 좌우 슬라이드 효과 느낌 유지를 위한 불투명도 리셋
+            screen.style.opacity = 0;
+            
+            // 이전 화살표 버튼 visibility 처리 (Q1에서는 hidden)
+            const prevBtn = document.getElementById('prev-btn');
+            if (currentIdx === 0) {
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                prevBtn.style.visibility = 'visible';
+            }
+
+            // 상단 진행률 바 업데이트 (Q1/6 형태 및 게이지 바)
+            document.getElementById('progress-text').innerText = `Q${currentIdx + 1}/6`;
+            document.getElementById('progress-bar-fill').style.width = `${((currentIdx + 1) / 6) * 100}%`;
+
+            const currentData = QUIZ_QUESTIONS[currentIdx];
+            
+            // [모바일 안전 세트 3] 같은 질문 라디오 버튼은 동일한 name 속성그룹 유지 및 구조화
+            let html = `<div class="question-text">${currentData.q}</div><br>`;
+            html += `<div class="options">`;
+            currentData.options.forEach((opt, i) => {
+                const isChecked = userAnswers[currentIdx] === opt.type ? 'checked' : '';
+                const selectedClass = userAnswers[currentIdx] === opt.type ? 'selected' : '';
+                
+                html += `
+                    <div class="option-card ${selectedClass}" onclick="selectOption(this, ${i}, '${opt.type}')">
+                        <input type="radio" name="q_group" value="${opt.type}" ${isChecked} onclick="event.stopPropagation(); selectOption(this.parentElement, ${i}, '${opt.type}')">
+                        <label style="cursor:pointer; width:100%;">${opt.text}</label>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            document.getElementById('dynamic-question-area').innerHTML = html;
+
+            // 메인 버튼 라벨 조건 매핑 반영
+            const mainBtn = document.getElementById('next-submit-btn');
+            if (currentIdx === 5) {
+                // 🚨 마지막 질문 메인 버튼 고정 라벨 반영
+                mainBtn.innerText = "📊 나의 여행 스타일 알아보기";
+            } else {
+                // 🚨 일반 질문 메인 버튼 고정 라벨 반영
+                mainBtn.innerText = "다음 질문으로 ➡️";
+            }
+
+            setTimeout(() => {
+                screen.style.opacity = 1;
+            }, 50);
+        }
+
+        // 선택지 카드 클릭 시 UI 하이라이트 및 값 기록 함수
+        function selectOption(cardElem, optionIdx, typeValue) {
+            // 해당 그룹 안의 모든 카드를 클래스 초기화
+            const cards = document.querySelectorAll('.option-card');
+            cards.forEach(c => c.classList.remove('selected'));
+            
+            // 클릭된 카드 하이라이트 및 내부 실제 라디오 체크 활성화
+            cardElem.classList.add('selected');
+            cardElem.querySelector('input[type="radio"]').checked = true;
+
+            // 유저 답변 배열에 데이터 보관
+            userAnswers[currentIdx] = typeValue;
+        }
+
+        // 이전 버튼 액션
+        function goPrev() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        // 다음 질문 또는 결과 확인 분기 제어 함수
+        function goNext() {
+            // 모든 문항 응답 검사 (현재 문항 미응답 체크)
+            if (!userAnswers[currentIdx]) {
+                alert("답변을 선택해 주세요.");
+                return;
+            }
+
+            if (currentIdx < 5) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+
+        /* [1단계 보존 — 점수 계산 및 동점 우선순위 로직 정밀 보존] */
+        function calculateResult() {
+            const scores = {
+                "맛집 탐험형": 0,
+                "감성 작가형": 0,
+                "일정 마스터형": 0,
+                "액티비티 러버형": 0
+            };
+
+            // 저장된 응답 가치 데이터 집계
+            userAnswers.forEach(ans => {
+                if(ans) scores[ans] += 1;
+            });
+
+            // 동점 시 우선순위 ①맛집 -> ②감성 -> ③일정 -> ④액티비티 순서 매핑 보존
+            const priorityOrder = ["맛집 탐험형", "감성 작가형", "일정 마스터형", "액티비티 러버형"];
+            let highestType = priorityOrder[0];
+            let maxScore = scores[highestType];
+
+            for (let i = 1; i < priorityOrder.length; i++) {
+                const currentType = priorityOrder[i];
+                if (scores[currentType] > maxScore) {
+                    maxScore = scores[currentType];
+                    highestType = currentType;
+                }
+            }
+
+            // 결과 노출 컴포넌트 렌더링 개시
+            const data = RESULT_DATA[highestType];
+            
+            document.getElementById('result-emoji').innerText = data.emoji; // ② 유형 이모지 문자 출력
+            document.getElementById('result-name').innerText = highestType; // ③ 유형명 (28px bold)
+            document.getElementById('result-desc').innerText = "어떤 스타일일까?: " + data.desc; // ⑤ 줄 전체 출력
+            document.getElementById('result-places').innerText = "📍 추천 장소: " + data.places; // ⑥ 쉼표 그대로 줄 전체 출력
+
+            // ⑦ 강점 키워드 해시태그 칩 형태 동적 빌드
+            const keywordContainer = document.getElementById('result-keywords');
+            keywordContainer.innerHTML = "";
+            data.keywords.forEach(word => {
+                const chip = document.createElement('span');
+                chip.className = "keyword-chip";
+                chip.innerText = "#" + word;
+                keywordContainer.appendChild(chip);
+            });
+
+            // ⑧ 💡 실천제안 (라벨 준수 및 getRandomSuggestion 재호출 로직 보존)
+            const randomSuggestion = getRandomSuggestion(highestType);
+            document.getElementById('result-suggestion').innerText = "💡 실천제안: " + randomSuggestion;
+
+            // SPA 화면 스위칭
+            document.getElementById('question-screen').style.display = 'none';
+            document.getElementById('prev-btn').style.visibility = 'hidden'; // 결과 화면에서는 상단 이전 화살표 미노출
+            document.getElementById('result-screen').style.display = 'flex';
+        }
+
+        /* ⑨ [🔄 다시 하기] 버튼: reload 없이 상태값 초기화 후 첫 화면 스위칭 */
+        function resetQuiz() {
+            currentIdx = 0;
+            userAnswers = [null, null, null, null, null, null];
+            
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+            
+            const cardElement = document.querySelector('.app-card');
+            if (cardElement) {
+                cardElement.scrollTop = 0; // 카드 내부 스크롤 초기화
+            }
+        }
+    </script>
+</body>
+</html>

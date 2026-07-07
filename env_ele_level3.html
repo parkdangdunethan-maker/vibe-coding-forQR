@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌍 나의 지구 수호대 유형 찾기</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+      /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       [CSS 커스터마이징 변수]
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+      :root {
+        --primary-color: #10b981;
+        --primary-hover: #059669;
+        --primary-light: #d1fae5;
+        --bg-color: #f0fdf4;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --card-border: #e5e7eb;
+        --accent-bg: #fef9c3;
+        --accent-border: #facc15;
+      }
+
+      /* [모바일 안전 규칙 2] 초기화 및 가독성 설정 */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        word-break: keep-all;
+        line-height: 1.6;
+        letter-spacing: -0.2px;
+        background: linear-gradient(
+          135deg,
+          #a8edea 0%,
+          #c2f0c2 40%,
+          #d4fc79 100%
+        );
+        background-attachment: fixed;
+        font-family: "Gowun Dodum", sans-serif;
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* 🚨🚨 카드 박스 절대 고정 규칙 준수 🚨🚨 */
+      .app-card {
+        width: 100%;
+        max-width: 420px;
+        height: 580px;
+        padding: 24px 20px;
+        border-radius: 24px;
+        box-shadow:
+          0 20px 50px rgba(16, 185, 129, 0.2),
+          0 4px 12px rgba(16, 185, 129, 0.08);
+        margin: 0 auto;
+        background: linear-gradient(180deg, #ffffff 0%, #f6fdf8 100%);
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+      }
+
+      .app-card::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      /* 🚨 flex 레이아웃 — 화면별 공통 베이스 (2단계 베이스 완전 보존) */
+      #start-screen,
+      #question-screen {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        justify-content: flex-start;
+      }
+
+      .slide-container {
+        transition:
+          transform 0.25s ease-in-out,
+          opacity 0.25s ease-in-out;
+      }
+
+      /* 🚨 3단계 신규 화면 CSS — 정중앙 배치 규격 */
+      #loading-screen,
+      #character-intro {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      /* 🚨 버튼 뭉개짐 방지 규칙 준수 */
+      .main-btn {
+        width: 100%;
+        min-height: 52px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        font-size: 18px;
+        font-weight: bold;
+        font-family: "Jua", sans-serif;
+        cursor: pointer;
+        margin-top: auto;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        letter-spacing: -0.3px;
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+        transition:
+          filter 0.2s ease,
+          box-shadow 0.2s ease,
+          transform 0.1s;
+      }
+
+      .main-btn:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 8px 22px rgba(16, 185, 129, 0.45);
+        transform: translateY(-1px);
+      }
+
+      /* [시작 화면] 스타일 */
+      .title-area {
+        text-align: center;
+        margin-top: 40px;
+      }
+      .title-area h1 {
+        font-family: "Jua", sans-serif;
+        font-size: 28px;
+        background: linear-gradient(
+          135deg,
+          #059669 0%,
+          #10b981 50%,
+          #65a30d 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+        line-height: 1.4;
+      }
+      .title-area p {
+        font-size: 15px;
+        color: #4b5563;
+        padding: 0 10px;
+        line-height: 1.7;
+      }
+
+      /* [질문 화면] 상단 진행률 및 이전 버튼 */
+      .nav-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 40px;
+        margin-bottom: 10px;
+        position: relative;
+      }
+
+      .back-btn {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        border: 1px solid var(--card-border);
+        background: white;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1);
+        transition: all 0.2s ease;
+      }
+      .back-btn:hover {
+        background: #f0fdf4;
+        transform: translateX(-2px);
+      }
+
+      .progress-container {
+        flex-grow: 1;
+        margin-left: 45px;
+        text-align: right;
+      }
+
+      .progress-text {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 6px;
+      }
+
+      .progress-bar-bg {
+        width: 100%;
+        height: 10px;
+        background-color: #e5f5ee;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #10b981 0%, #84cc16 100%);
+        width: 20%;
+        border-radius: 999px;
+        transition: width 0.4s ease-in-out;
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+      }
+
+      .question-text {
+        font-size: 17px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: var(--text-main);
+        letter-spacing: -0.3px;
+      }
+
+      /* 🚨 선택지 컨테이너 필수 gap 규격 적용 */
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      /* 선택지 카드 기본 커스텀 스타일 */
+      .option-card {
+        position: relative;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 2px solid var(--card-border);
+        flex-shrink: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: all 0.25s ease;
+        background-color: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(16, 185, 129, 0.04);
+      }
+
+      .option-card:hover {
+        border-color: var(--primary-color);
+        background-color: #f6fefa;
+      }
+
+      .option-card:has(input[type="radio"]:checked) {
+        border-color: var(--primary-color);
+        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
+      }
+
+      .option-card input[type="radio"] {
+        margin-right: 10px;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+        cursor: pointer;
+      }
+
+      .option-card span {
+        font-size: 14px;
+        color: #374151;
+        user-select: none;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ⑤ 선택 카드 ripple 인터랙션 효과 */
+      .ripple {
+        position: absolute;
+        background: rgba(16, 185, 129, 0.2);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple-animation 0.5s linear;
+        pointer-events: none;
+        z-index: 1;
+      }
+      @keyframes ripple-animation {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* 3단계 신규 인터랙션 - 분석중 텍스트 및 애니메이션 */
+      .loading-title {
+        font-size: 28px;
+        font-weight: bold;
+        font-family: "Jua", sans-serif;
+        background: linear-gradient(135deg, #10b981 0%, #65a30d 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .dots::after {
+        content: "";
+        animation: dot-blink 1.5s infinite step-start;
+      }
+      @keyframes dot-blink {
+        0% {
+          content: "";
+        }
+        33% {
+          content: ".";
+        }
+        66% {
+          content: "..";
+        }
+        100% {
+          content: "...";
+        }
+      }
+
+      /* 3단계 신규 인터랙션 - 인트로 화면 요소 및 페이드인 */
+      .intro-txt-1 {
+        font-size: 18px;
+        color: #6b7280;
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+      }
+      .intro-txt-2 {
+        font-family: "Jua", sans-serif;
+        font-size: 28px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition:
+          opacity 0.4s ease-out,
+          transform 0.4s ease-out;
+        letter-spacing: -0.5px;
+      }
+      .intro-char-img {
+        max-width: 100%;
+        height: auto;
+        opacity: 0;
+        transform: scale(0.5);
+        transition:
+          opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+          transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 8px 16px rgba(16, 185, 129, 0.25));
+      }
+
+      /* 🚨 [결과 화면 정렬] */
+      #result-screen {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out;
+      }
+      #result-screen::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      .result-header-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: var(--text-muted);
+        text-align: center;
+      }
+
+      /* ① 캐릭터 이미지 규격 세팅 및 ② idle 흔들림 애니메이션 효과 */
+      .final-char-img {
+        width: 130px;
+        max-width: 130px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        animation: wobbleBig 1.8s ease-in-out infinite;
+        filter: drop-shadow(0 8px 16px rgba(16, 185, 129, 0.2));
+      }
+      .fallback-emoji-box {
+        font-size: 85px;
+        line-height: 1;
+        margin: 5px 0;
+        text-align: center;
+        animation: wobbleBig 1.8s ease-in-out infinite;
+      }
+
+      @keyframes wobbleBig {
+        0%,
+        100% {
+          transform: rotate(-10deg) scale(1);
+        }
+        25% {
+          transform: rotate(8deg) scale(1.08);
+        }
+        50% {
+          transform: rotate(-8deg) scale(0.96);
+        }
+        75% {
+          transform: rotate(10deg) scale(1.08);
+        }
+      }
+
+      #result-title {
+        font-family: "Jua", sans-serif;
+        font-size: 28px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #059669 0%, #65a30d 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        letter-spacing: -0.5px;
+      }
+
+      .result-keywords {
+        font-size: 14px;
+        color: var(--primary-color);
+        font-weight: bold;
+        text-align: center;
+        background: var(--primary-light);
+        padding: 6px 14px;
+        border-radius: 999px;
+      }
+
+      /* ③ 분석 멘트 박스 스타일 */
+      #analysis-ment-box {
+        width: 100%;
+        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        color: #065f46;
+        text-align: center;
+        font-weight: bold;
+        border: 1px dashed #6ee7b7;
+        line-height: 1.7;
+      }
+
+      /* ④ 어떤 성향일까? 명세 박스 */
+      #result-description {
+        width: 100%;
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        line-height: 1.7;
+      }
+
+      /* ⑤ 💡 실천제안 강조 등장 박스 */
+      .suggestion-box {
+        width: 100%;
+        background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+        border: 1px solid var(--accent-border);
+        padding: 14px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      .suggestion-box.animate-glow {
+        animation: suggestionGlow 0.5s forwards cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      @keyframes suggestionGlow {
+        to {
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 6px 20px rgba(250, 204, 21, 0.45);
+        }
+      }
+
+      .suggestion-box span {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+        color: #a16207;
+        font-size: 14px;
+      }
+
+      #result-suggestion {
+        color: #1f2937;
+        font-weight: 500;
+        line-height: 1.6;
+      }
+
+      /* ④ 정보 카드 stagger fade-in 인터랙션 효과를 위한 클래스 */
+      .stagger-item {
+        opacity: 0;
+        transform: translateY(10px);
+        transition:
+          opacity 0.4s ease-out,
+          transform 0.4s ease-out;
+      }
+      .stagger-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* 하단 카피라이트 푸터 규격 준수 */
+      footer {
+        margin-top: 20px;
+        font-size: 11px;
+        color: #ffffff;
+        text-align: center;
+        opacity: 0.85;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-card">
+      <div id="start-screen">
+        <div class="title-area">
+          <h1>🌍 나의 지구 수호대<br />유형 찾기</h1>
+          <p>
+            내가 생각하는 가장 중요한 환경 가치는 무엇일까요? 아래의 질문에
+            답하고 나의 지구 수호대 유형을 알아보아요!
+          </p>
+        </div>
+        <button type="button" class="main-btn" onclick="startQuiz()">
+          🚀 나의 지구 수호대 유형 알아보기
+        </button>
+      </div>
+
+      <div id="question-screen" style="display: none" class="slide-container">
+        <div class="nav-header">
+          <button
+            type="button"
+            id="back-btn"
+            class="back-btn"
+            onclick="goPrev()"
+          >
+            ⬅️
+          </button>
+          <div class="progress-container">
+            <div id="progress-text" class="progress-text">Q1 / 5</div>
+            <div class="progress-bar-bg">
+              <div id="progress-bar-fill" class="progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <form id="quiz-form" onsubmit="return false;">
+          <div id="dynamic-question-area"></div>
+        </form>
+
+        <button
+          type="button"
+          id="next-submit-btn"
+          class="main-btn"
+          onclick="goNext()"
+        >
+          다음 질문으로 ➡️
+        </button>
+      </div>
+
+      <div id="loading-screen" style="display: none">
+        <div class="loading-title">분석중<span class="dots"></span></div>
+      </div>
+
+      <div id="character-intro" style="display: none; gap: 16px">
+        <div id="intro-txt-1" class="intro-txt-1">당신은...</div>
+        <div id="intro-txt-2" class="intro-txt-2"></div>
+        <img
+          id="intro-char-img"
+          class="intro-char-img"
+          src=""
+          alt="Character"
+        />
+        <div
+          id="intro-fallback-emoji"
+          class="fallback-emoji-box"
+          style="display: none"
+        ></div>
+      </div>
+
+      <div id="result-screen" style="display: none">
+        <div class="result-header-title">📊 나의 지구 수호대 유형 결과</div>
+
+        <div
+          style="
+            width: 130px;
+            height: auto;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <img
+            id="result-char-img"
+            class="final-char-img"
+            src=""
+            alt="Character"
+            onerror="handleImageError()"
+          />
+          <div
+            id="result-fallback-emoji"
+            class="fallback-emoji-box"
+            style="display: none"
+          ></div>
+        </div>
+
+        <h3 id="result-title" class="stagger-item"></h3>
+        <div id="result-keywords" class="result-keywords stagger-item"></div>
+
+        <div id="analysis-ment-box" class="stagger-item"></div>
+
+        <div id="result-description" class="stagger-item"></div>
+
+        <div id="suggestion-box-element" class="suggestion-box">
+          <span>💡 실천제안</span>
+          <div id="result-suggestion"></div>
+        </div>
+
+        <button type="button" class="main-btn" onclick="resetQuiz()">
+          🔄 다시 하기
+        </button>
+      </div>
+    </div>
+
+    <footer>AI의 도움을 받아 제작된 콘텐츠입니다.</footer>
+
+    <script>
+      // 외부 라이브러리 폭죽 표준 함수 정의체
+      function safeConfetti(opts) {
+        if (typeof confetti === "undefined") return;
+        try {
+          confetti(opts);
+        } catch (e) {}
+      }
+
+      function fireEmojiConfetti(emoji, colors) {
+        if (typeof confetti === "undefined") return;
+        try {
+          const shape = confetti.shapeFromText({ text: emoji, scalar: 4 });
+          const baseOption = {
+            particleCount: 60,
+            spread: 90,
+            startVelocity: 55,
+            ticks: 250,
+            shapes: [shape],
+            scalar: 4,
+            colors: colors,
+            gravity: 0.8,
+            drift: 0.1,
+          };
+          confetti({ ...baseOption, origin: { x: 0.1, y: 0.9 }, angle: 60 });
+          confetti({ ...baseOption, origin: { x: 0.9, y: 0.9 }, angle: 120 });
+          setTimeout(() => {
+            confetti({
+              ...baseOption,
+              particleCount: 40,
+              origin: { x: 0.5, y: 0.8 },
+              angle: 90,
+              spread: 120,
+            });
+          }, 300);
+        } catch (e) {}
+      }
+
+      // 🚨 [데이터 풀 보존] 20개 실천제안 데이터 배열 한 글자도 변경 금지
+      const SUGGESTIONS = {
+        "생활 실천가": [
+          "오늘 점심부터 잔반 제로에 도전해 보세요!",
+          "양치할 때 컵을 사용해 하루 약 6L의 물을 아껴 보세요!",
+          "안 쓰는 콘센트는 뽑아두는 작은 습관을 시작해 보세요!",
+          "텀블러를 일주일만 들고 다니는 챌린지에 도전해 보세요!",
+          "오늘 하루 분리수거 라벨을 떼고 버리는 1초 습관을 만들어 보세요!",
+        ],
+        "변화 이끔이": [
+          "친구들과 함께 학교 분리수거함 디자인을 바꿔 보세요!",
+          "우리 반에 '플라스틱 없는 날'을 제안해 보세요!",
+          "환경 캠페인 포스터를 만들어 SNS에 올려 보세요!",
+          "친구들과 환경 동아리를 만들거나 가입해 보세요!",
+          "가족 회의에서 '우리 집 친환경 규칙'을 함께 정해 보세요!",
+        ],
+        "아이디어 발명가": [
+          "재활용 마크 인식 앱 아이디어를 그림으로 그려 보세요!",
+          "태양광 충전기 키트를 직접 조립해 보세요!",
+          "탄소발자국 계산기 미니 프로젝트에 도전해 보세요!",
+          "친환경 신소재(바이오 플라스틱 등)를 조사해 발표해 보세요!",
+          "AI로 분리수거를 도와주는 아이디어를 친구에게 설명해 보세요!",
+        ],
+        "자연 지킴이": [
+          "주말에 동네 산책로를 천천히 걸으며 자연을 느껴 보세요!",
+          "베란다나 창가에 작은 화분 하나를 키워 보세요!",
+          "근처 공원이나 숲에서 '5분 자연 관찰'을 해 보세요!",
+          "계절별 동식물 관찰 일기를 써 보세요!",
+          "사라져가는 멸종위기종을 한 종 골라 깊이 공부해 보세요!",
+        ],
+      };
+
+      function getRandomSuggestion(type) {
+        const list = SUGGESTIONS[type];
+        const idx = Math.floor(Math.random() * list.length);
+        return list[idx];
+      }
+
+      // 캐릭터 리소스 매핑 데이터 정보 정의체
+      const RESULT_DATA = {
+        "생활 실천가": {
+          emoji: "🌱",
+          keywords: "#실천 #책임감 #꾸준함 #환경습관",
+          desc: "지금 당장 내가 할 수 있는 작은 행동에서 시작하는 유형이에요.<br>꾸준함과 실천력을 바탕으로 변화를 만들어낼 수 있어요.",
+          url: "https://vibe-coding-characters.vercel.app/img/env-e/practice1.png",
+          colors: ["#A8E063", "#56AB2F"],
+        },
+        "변화 이끔이": {
+          emoji: "🤝",
+          keywords: "#협력 #공감 #소통 #함께성장",
+          desc: "친구들과 함께 움직이며 변화를 만들어가야 한다고 믿는 유형이에요.<br>사람들을 연결하고 협력하는 힘이 있어요.",
+          url: "https://vibe-coding-characters.vercel.app/img/env-e/lead1.png",
+          colors: ["#FFB88C", "#DE6262"],
+        },
+        "아이디어 발명가": {
+          emoji: "💡",
+          keywords: "#창의력 #발명 #문제해결 #혁신",
+          desc: "기술과 새로운 아이디어로 환경 문제를 해결하고 싶은 유형이에요.<br>창의적인 생각으로 새로운 해결책을 만들어낼 수 있어요.",
+          url: "https://vibe-coding-characters.vercel.app/img/env-e/invent.png",
+          colors: ["#B993D6", "#8CA6DB"],
+        },
+        "자연 지킴이": {
+          emoji: "🌳",
+          keywords: "#자연사랑 #생태보호 #배려 #환경감수성",
+          desc: "자연 그대로의 가치를 소중하게 생각하는 유형이에요.<br>생명과 환경을 소중히 여기고 보호하려는 마음이 커요.",
+          url: "https://vibe-coding-characters.vercel.app/img/env-e/nature.png",
+          colors: ["#74EBD5", "#9FACE6"],
+        },
+      };
+
+      const QUESTION_DATA = [
+        {
+          id: 1,
+          title: "Q1. 학교에서 환경 캠페인을 한다면 가장 하고 싶은 것은?",
+          options: [
+            "① 텀블러 사용, 불 끄기 등 생활 속 작은 실천을 함께 알리는 캠페인",
+            "② 친구들과 함께 쓰레기를 줍고, 환경을 지키기 위한 약속을 만드는 활동",
+            "③ AI 분리수거 기계나 환경 보호를 위한 새로운 아이디어 제안하기",
+            "④ 학교 숲이나 꽃밭을 가꾸며 자연을 보호하는 활동",
+          ],
+        },
+        {
+          id: 2,
+          title:
+            "Q2. 바다에 플라스틱이 가득하다는 뉴스를 봤어. 가장 먼저 드는 생각은?",
+          options: [
+            '① "나부터 플라스틱 사용을 줄해야겠어."',
+            '② "모두가 함께 노력해야 진짜 변화가 생길 거야."',
+            '③ "플라스틱을 대신할 새로운 기술이나 발명은 없을까?"',
+            '④ "바다 생물과 자연을 지키는 일이 정말 중요해."',
+          ],
+        },
+        {
+          id: 3,
+          title: "Q3. 간식을 살 때 친환경 제품이 있다면 어떤 걸 고를 것 같아?",
+          options: [
+            "① 포장이 적어 쓰레기를 줄일 수 있는 제품",
+            "② 환경 보호 활동에 참여하는 브랜드의 제품",
+            "③ 친환경 기술이 적용된 새로운 제품",
+            "④ 자연에서 얻은 재료로 만들어 환경 부담이 적은 제품",
+          ],
+        },
+        {
+          id: 4,
+          title: "Q4. 우리 동네에 환경을 위해 딱 하나를 만든다면?",
+          options: [
+            "① 분리배출에 참여하면 보상을 받을 수 있는 기계",
+            "② 주민들이 함께 참여할 수 있는 환경 마켓이나 행사",
+            "③ AI가 쓰레기를 자동으로 분류하는 스마트 시설",
+            "④ 새와 곤충이 함께 살아갈 수 있는 작은 숲이나 생태 공간",
+          ],
+        },
+        {
+          id: 5,
+          title: "Q5. 깨끗한 지구를 만들기 위해 가장 중요한 것은?",
+          options: [
+            "① 한 사람 한 사람의 꾸준한 실천",
+            "② 모두가 함께 지키려는 약속과 협력",
+            "③ 더 나은 기술과 새로운 발명",
+            "④ 자연을 있는 그대로 소중히 여기는 마음",
+          ],
+        },
+      ];
+
+      let currentIdx = 0;
+      let userAnswers = {};
+
+      function startQuiz() {
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("question-screen").style.display = "flex";
+        currentIdx = 0;
+        renderQuestion();
+      }
+
+      function renderQuestion() {
+        const data = QUESTION_DATA[currentIdx];
+        const area = document.getElementById("dynamic-question-area");
+
+        const backBtn = document.getElementById("back-btn");
+        if (currentIdx === 0) backBtn.style.visibility = "hidden";
+        else backBtn.style.visibility = "visible";
+
+        document.getElementById("progress-text").innerText = `Q${data.id} / 5`;
+        document.getElementById("progress-bar-fill").style.width =
+          `${(data.id / 5) * 100}%`;
+
+        let html = `<div class="question-text">${data.title}</div>`;
+        html += `<div class="options">`;
+
+        for (let i = 0; i < data.options.length; i++) {
+          const checkedStr =
+            userAnswers[currentIdx] === String(i + 1) ? "checked" : "";
+          html += `
+                    <label class="option-card" onclick="triggerRipple(event, this)">
+                        <input type="radio" name="q${data.id}" value="${i + 1}" ${checkedStr} onclick="event.stopPropagation();">
+                        <span>${data.options[i]}</span>
+                    </label>
+                `;
+        }
+        html += `</div>`;
+        area.innerHTML = html;
+
+        const mainBtn = document.getElementById("next-submit-btn");
+        if (currentIdx === 4) {
+          mainBtn.innerText = "📊 나의 지구 수호대 유형 알아보기";
+        } else {
+          mainBtn.innerText = "다음 질문으로 ➡️";
+        }
+      }
+
+      // ⑤ 선택 카드 ripple 효과 구현 처리
+      function triggerRipple(event, element) {
+        const radio = element.querySelector('input[type="radio"]');
+        radio.checked = true;
+
+        const rect = element.getBoundingClientRect();
+        const circle = document.createElement("div");
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        circle.classList.add("ripple");
+        circle.style.left = `${x}px`;
+        circle.style.top = `${y}px`;
+
+        const prevRipple = element.querySelector(".ripple");
+        if (prevRipple) prevRipple.remove();
+
+        element.appendChild(circle);
+      }
+
+      function goNext() {
+        const currentQuestion = QUESTION_DATA[currentIdx];
+        const checkedOption = document.querySelector(
+          `input[name="q${currentQuestion.id}"]:checked`,
+        );
+
+        if (!checkedOption) {
+          alert("답변을 선택해 주세요.");
+          return;
+        }
+
+        userAnswers[currentIdx] = checkedOption.value;
+
+        const screen = document.getElementById("question-screen");
+        screen.style.opacity = "0";
+        screen.style.transform = "translateX(-15px)";
+
+        setTimeout(() => {
+          if (currentIdx < 4) {
+            currentIdx++;
+            renderQuestion();
+            screen.style.transform = "translateX(15px)";
+            setTimeout(() => {
+              screen.style.opacity = "1";
+              screen.style.transform = "translateX(0)";
+            }, 50);
+          } else {
+            calculateResult();
+          }
+        }, 200);
+      }
+
+      function goPrev() {
+        if (currentIdx > 0) {
+          const screen = document.getElementById("question-screen");
+          screen.style.opacity = "0";
+          screen.style.transform = "translateX(15px)";
+
+          setTimeout(() => {
+            currentIdx--;
+            renderQuestion();
+            screen.style.transform = "translateX(-15px)";
+            setTimeout(() => {
+              screen.style.opacity = "1";
+              screen.style.transform = "translateX(0)";
+            }, 50);
+          }, 200);
+        }
+      }
+
+      // 이미지 로딩 실패 시 fallback 이모지 처리 함수
+      function handleImageError() {
+        document.getElementById("result-char-img").style.display = "none";
+        document.getElementById("result-fallback-emoji").style.display =
+          "block";
+      }
+
+      // 🚨 [점수 규칙 로직 보존] 및 3단계 전체 시퀀스 타임라인 스케줄러 통합
+      function calculateResult() {
+        const scores = {
+          "생활 실천가": 0,
+          "변화 이끔이": 0,
+          "아이디어 발명가": 0,
+          "자연 지킴이": 0,
+        };
+
+        let currentWinner = "생활 실천가";
+        let maxScore = 0;
+
+        function addScore(type, amount) {
+          scores[type] += amount;
+          if (scores[type] > maxScore) {
+            maxScore = scores[type];
+            currentWinner = type;
+          }
+        }
+
+        const v1 = userAnswers[0];
+        const v2 = userAnswers[1];
+        const v3 = userAnswers[2];
+        const v4 = userAnswers[3];
+        const v5 = userAnswers[4];
+
+        if (v1 === "1") {
+          addScore("생활 실천가", 2);
+          addScore("자연 지킴이", 1);
+        } else if (v1 === "2") {
+          addScore("변화 이끔이", 2);
+          addScore("생활 실천가", 1);
+        } else if (v1 === "3") {
+          addScore("아이디어 발명가", 2);
+          addScore("변화 이끔이", 1);
+        } else if (v1 === "4") {
+          addScore("자연 지킴이", 2);
+          addScore("아이디어 발명가", 1);
+        }
+
+        if (v2 === "1") {
+          addScore("생활 실천가", 2);
+          addScore("자연 지킴이", 1);
+        } else if (v2 === "2") {
+          addScore("변화 이끔이", 2);
+          addScore("아이디어 발명가", 1);
+        } else if (v2 === "3") {
+          addScore("아이디어 발명가", 2);
+          addScore("변화 이끔이", 1);
+        } else if (v2 === "4") {
+          addScore("자연 지킴이", 2);
+          addScore("생활 실천가", 1);
+        }
+
+        if (v3 === "1") {
+          addScore("생활 실천가", 2);
+          addScore("자연 지킴이", 1);
+        } else if (v3 === "2") {
+          addScore("변화 이끔이", 2);
+          addScore("생활 실천가", 1);
+        } else if (v3 === "3") {
+          addScore("아이디어 발명가", 2);
+          addScore("변화 이끔이", 1);
+        } else if (v3 === "4") {
+          addScore("자연 지킴이", 2);
+          addScore("아이디어 발명가", 1);
+        }
+
+        if (v4 === "1") {
+          addScore("생활 실천가", 2);
+          addScore("자연 지킴이", 1);
+        } else if (v4 === "2") {
+          addScore("변화 이끔이", 2);
+          addScore("생활 실천가", 1);
+        } else if (v4 === "3") {
+          addScore("아이디어 발명가", 2);
+          addScore("변화 이끔이", 1);
+        } else if (v4 === "4") {
+          addScore("자연 지킴이", 2);
+          addScore("아이디어 발명가", 1);
+        }
+
+        if (v5 === "1") {
+          addScore("생활 실천가", 2);
+          addScore("자연 지킴이", 1);
+        } else if (v5 === "2") {
+          addScore("변화 이끔이", 2);
+          addScore("생활 실천가", 1);
+        } else if (v5 === "3") {
+          addScore("아이디어 발명가", 2);
+          addScore("변화 이끔이", 1);
+        } else if (v5 === "4") {
+          addScore("자연 지킴이", 2);
+          addScore("아이디어 발명가", 1);
+        }
+
+        const finalType = currentWinner;
+        const data = RESULT_DATA[finalType];
+
+        // 1위 및 2위 점수차 분석 연산부
+        let scoreArray = Object.keys(scores).map((key) => ({
+          name: key,
+          score: scores[key],
+        }));
+        scoreArray.sort((a, b) => b.score - a.score);
+
+        let primaryType = scoreArray[0].name;
+        let secondaryType = scoreArray[1].name;
+        let gapDiff = scores[primaryType] - scores[secondaryType];
+
+        let isTie = false;
+        // 로직상 동점 판별을 위한 카운트 점검
+        let topScoreCount = scoreArray.filter(
+          (x) => x.score === scoreArray[0].score,
+        ).length;
+        if (topScoreCount > 1) {
+          isTie = true;
+        }
+
+        let analysisMent = "";
+        if (isTie) {
+          analysisMent = `당신은 여러 매력을 함께 가진 균형형이에요.<br>그중에서도 [${finalType}] 성향이 살짝 더 강해요.`;
+        } else if (gapDiff >= 3) {
+          analysisMent = `당신은 확실한 [${finalType}]이에요!<br>이 성향이 강하게 나타났어요.`;
+        } else {
+          analysisMent = `당신은 [${finalType}] 성향이 가장 두드러지지만,<br>다른 면도 함께 가지고 있어요.`;
+        }
+
+        // =================================================================
+        // [전체 시퀀스 타임라인 스케줄러 가동]
+        // =================================================================
+
+        // 0.0s : 마지막 질문 종료 -> Loading 스크린 작동
+        document.getElementById("question-screen").style.display = "none";
+        const loadScreen = document.getElementById("loading-screen");
+        loadScreen.style.display = "flex";
+
+        // 1.5s : 인트로 화면 표시 시작
+        setTimeout(() => {
+          loadScreen.style.display = "none";
+          const introScreen = document.getElementById("character-intro");
+          introScreen.style.display = "flex";
+
+          const txt1 = document.getElementById("intro-txt-1");
+          const txt2 = document.getElementById("intro-txt-2");
+          const introImg = document.getElementById("intro-char-img");
+          const introFallback = document.getElementById("intro-fallback-emoji");
+
+          txt2.innerText = `${finalType}!`;
+          introImg.src = data.url;
+          introFallback.innerText = data.emoji;
+
+          // 인트로 이미지 로드 실패 대응 처리
+          introImg.onerror = () => {
+            introImg.style.display = "none";
+            introFallback.style.display = "block";
+          };
+
+          // 1.5s : "당신은..." 페이드인
+          txt1.style.opacity = "1";
+
+          // 1.9s : 유형명 등장
+          setTimeout(() => {
+            txt2.style.opacity = "1";
+            txt2.style.transform = "translateY(0)";
+          }, 400);
+
+          // 2.1s : 캐릭터 등장 (300px 스케일 바운스)
+          setTimeout(() => {
+            introImg.style.width = "300px";
+            introImg.style.opacity = "1";
+            introImg.style.transform = "scale(1.0)";
+            introFallback.style.opacity = "1";
+            introFallback.style.transform = "scale(1.0)";
+          }, 600);
+
+          // 2.7s : 표준 폭죽 함수 3발 발사
+          setTimeout(() => {
+            fireEmojiConfetti(data.emoji, data.colors);
+          }, 1200);
+
+          // 3.5s : 페이드아웃 및 결과화면 크로스오버 전환
+          setTimeout(() => {
+            introScreen.style.transition = "opacity 0.8s, transform 0.8s";
+            introScreen.style.opacity = "0";
+            introScreen.style.transform = "scale(0.9)";
+
+            // 결과 데이터 UI 바인딩
+            document.getElementById("result-char-img").src = data.url;
+            document.getElementById("result-char-img").style.display = "block";
+            document.getElementById("result-fallback-emoji").style.display =
+              "none";
+            document.getElementById("result-fallback-emoji").innerText =
+              data.emoji;
+
+            document.getElementById("result-title").innerText = finalType;
+            document.getElementById("result-keywords").innerText =
+              data.keywords;
+            document.getElementById("analysis-ment-box").innerHTML =
+              analysisMent;
+            document.getElementById("result-description").innerHTML = data.desc;
+            document.getElementById("result-suggestion").innerText =
+              getRandomSuggestion(finalType);
+
+            const resScreen = document.getElementById("result-screen");
+            resScreen.style.display = "flex";
+
+            // 4.3s : 최종 결과 완성 및 페이드인, stagger 요소 노출
+            setTimeout(() => {
+              introScreen.style.display = "none";
+              resScreen.style.opacity = "1";
+
+              // ④ 정보 카드 stagger 차례대로 노출 인터랙션
+              const staggers = resScreen.querySelectorAll(".stagger-item");
+              staggers.forEach((item, index) => {
+                setTimeout(() => {
+                  item.classList.add("visible");
+                }, index * 150);
+              });
+
+              // ⑤ 💡 실천제안 박스 강조 등장 효과 부여
+              setTimeout(() => {
+                document
+                  .getElementById("suggestion-box-element")
+                  .classList.add("animate-glow");
+              }, staggers.length * 150);
+            }, 400);
+          }, 2000);
+        }, 1500);
+      }
+
+      // [🔄 다시 하기] 초기화 함수
+      function resetQuiz() {
+        userAnswers = {};
+        currentIdx = 0;
+
+        document.getElementById("quiz-form").reset();
+
+        // 3단계 애니메이션 상태 클래스 및 흔적 리셋
+        document
+          .getElementById("suggestion-box-element")
+          .classList.remove("animate-glow");
+        const staggers = document.querySelectorAll(".stagger-item");
+        staggers.forEach((item) => item.classList.remove("visible"));
+
+        const introTxt1 = document.getElementById("intro-txt-1");
+        const introTxt2 = document.getElementById("intro-txt-2");
+        const introImg = document.getElementById("intro-char-img");
+        const introFallback = document.getElementById("intro-fallback-emoji");
+
+        introTxt1.style.opacity = "0";
+        introTxt2.style.opacity = "0";
+        introTxt2.style.transform = "translateY(-20px)";
+        introImg.style.opacity = "0";
+        introImg.style.transform = "scale(0.5)";
+        introImg.style.display = "block";
+        introFallback.style.opacity = "0";
+        introFallback.style.transform = "scale(0.5)";
+        introFallback.style.display = "none";
+
+        const introScreen = document.getElementById("character-intro");
+        introScreen.style.opacity = "1";
+        introScreen.style.transform = "scale(1)";
+
+        document.getElementById("result-screen").style.opacity = "0";
+        document.getElementById("result-screen").style.display = "none";
+        document.getElementById("start-screen").style.display = "flex";
+      }
+    </script>
+  </body>
+</html>

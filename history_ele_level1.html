@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- [모바일 안전 4종 세트 1번] 모바일 기기 화면에 맞추는 viewport 메타 태그 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ 나와 닮은 역사 속 인물 알아보기</title>
+    <style>
+        /* [모바일 안전 4종 세트 2번] 최소한의 구조 및 모바일 방어용 CSS 설정 */
+        * {
+            box-sizing: border-box; /* 패딩과 테두리를 너비에 포함시켜 화면 깨짐 방지 */
+        }
+        body {
+            max-width: 100%;       /* 가로 너비가 화면을 넘지 않도록 제한 */
+            overflow-x: hidden;    /* 가로 스크롤바가 생기는 것을 방지 */
+            word-break: keep-all;  /* 한글 단어가 중간에서 끊기지 않고 줄바꿈되도록 설정 */
+            font-family: sans-serif;
+            padding: 10px;
+            margin: 0;
+        }
+        
+        /* 초등학생 학습용 주석: 기본 기능 작동 확인을 위한 최소한의 영역 구분 스타일 */
+        .question-group {
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        .options-group label {
+            display: block;
+            margin: 5px 0;
+        }
+        .result-card {
+            margin-top: 30px;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. 제목 + 설명 영역 -->
+    <header>
+        <h1>🏛️ 나와 닮은 역사 속 인물 알아보기</h1>
+        <p>내 안에는 어떤 역사 속 인물의 모습이 숨어 있을까요? 아래의 질문에 답하고 나와 닮은 역사 인물을 찾아보아요!</p>
+    </header>
+
+    <hr>
+
+    <!-- 2. Q1~Q5 문항 영역 (세로로 모두 표시) -->
+    <!-- [모바일 안전 4종 세트 3번] 같은 질문의 라디오 버튼은 동일한 name 속성으로 그룹화 -->
+    <main>
+        <form id="quizForm">
+            <!-- Q1 -->
+            <div class="question-group">
+                <h3>Q1. 아래 체험학습 장소 중 제일 가고 싶은 곳은?</h3>
+                <div class="options-group">
+                    <label><input type="radio" name="q1" value="A"> ① 나라를 지킨 장군들의 전시관</label>
+                    <label><input type="radio" name="q1" value="B"> ② 사람들의 생활 모습을 볼 수 있는 마을 체험관</label>
+                    <label><input type="radio" name="q1" value="C"> ③ 발명품과 과학 기술을 체험하는 공간</label>
+                    <label><input type="radio" name="q1" value="D"> ④ 그림과 작품을 전시한 예술관</label>
+                </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="question-group">
+                <h3>Q2. 모둠 활동 중 친구들이 의견을 정하지 못하고 있다면?</h3>
+                <div class="options-group">
+                    <label><input type="radio" name="q2" value="A"> ① 먼저 방향을 제안하고 역할을 나눈다</label>
+                    <label><input type="radio" name="q2" value="B"> ② 친구들의 의견을 하나씩 듣고 분위기를 조율한다</label>
+                    <label><input type="radio" name="q2" value="C"> ③ 장단점을 비교해 가장 좋은 방법을 찾는다</label>
+                    <label><input type="radio" name="q2" value="D"> ④ 새로운 아이디어를 내어 활동을 더 재미있게 만든다</label>
+                </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="question-group">
+                <h3>Q3. 학교 축제를 준비한다면 내가 가장 해보고 싶은 역할은?</h3>
+                <div class="options-group">
+                    <label><input type="radio" name="q3" value="A"> ① 무대 진행이나 대표 발표 역할</label>
+                    <label><input type="radio" name="q3" value="B"> ② 친구들을 돕고 함께 준비하는 역할</label>
+                    <label><input type="radio" name="q3" value="C"> ③ 계획표를 만들고 준비 과정을 정리하는 역할</label>
+                    <label><input type="radio" name="q3" value="D"> ④ 포스터, 글, 그림 등으로 축제를 표현하는 역할</label>
+                </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="question-group">
+                <h3>Q4. 내가 더 멋지다고 느끼는 사람은?</h3>
+                <div class="options-group">
+                    <label><input type="radio" name="q4" value="A"> ① 어려운 상황에서도 책임감 있게 행동하는 사람</label>
+                    <label><input type="radio" name="q4" value="B"> ② 다른 사람을 따뜻하게 도와주는 사람</label>
+                    <label><input type="radio" name="q4" value="C"> ③ 새로운 방법으로 문제를 해결하는 사람</label>
+                    <label><input type="radio" name="q4" value="D"> ④ 자신의 생각을 멋지게 표현하는 사람</label>
+                </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="question-group">
+                <h3>Q5. 역사 속 인물과 하루를 보낼 수 있다면?</h3>
+                <div class="options-group">
+                    <label><input type="radio" name="q5" value="A"> ① 나라와 공동체를 위해 어떤 선택을 했는지 듣기</label>
+                    <label><input type="radio" name="q5" value="B"> ② 사람들을 어떻게 도왔는지 배우기</label>
+                    <label><input type="radio" name="q5" value="C"> ③ 새로운 발명과 아이디어를 함께 고민해 보기</label>
+                    <label><input type="radio" name="q5" value="D"> ④ 글이나 그림으로 생각을 표현하는 방법 배우기</label>
+                </div>
+            </div>
+
+            <!-- 3. 맨 아래 결과 확인 버튼 -->
+            <div style="margin: 30px 0;">
+                <button type="button" id="submitBtn" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">📊 나와 닮은 역사 인물 알아보기</button>
+            </div>
+        </form>
+
+        <!-- 4. 결과 영역 (버튼 클릭 시 여기에 생성되어 표시됨) -->
+        <div id="resultArea"></div>
+    </main>
+
+    <hr>
+
+    <!-- [푸터] AI 도움 명시 -->
+    <footer>
+        <p style="font-size: 12px; color: #666; text-align: center;">AI의 도움을 받아 제작된 콘텐츠입니다.</p>
+    </footer>
+
+    <!-- 자바스크립트 기능 구현 -->
+    <script>
+        /* ----------------------------------------------------------------------
+         * [20개 실천제안 풀 — JS 배열 객체]
+         * ----------------------------------------------------------------------
+         * [학습 포인트 주석]
+         * 1. 객체(Object)와 배열(Array)의 차이:
+         * - 큰 틀인 SUGGESTIONS는 중괄호 {}를 사용한 '객체'입니다. 키(Key)와 값(Value)으로 데이터를 저장합니다.
+         * - 각 키에 연결된 데이터는 대괄호 []를 사용한 '배열'입니다. 여러 개의 문자열 데이터를 순서대로 담고 있습니다.
+         * 2. 학생 실습 가이드:
+         * - 새로운 실천 제안을 추가하고 싶다면, 각 유형의 대괄호 [ ] 안에 쉼표(,)를 찍고 
+         * "원하는 문장"을 추가해 보세요! 예: "새로운 제안 추가!"
+         * ---------------------------------------------------------------------- */
+        const SUGGESTIONS = {
+          "A. 용기 있는 나라 지킴이형": [
+            "유관순·안중근·계백 장군 중 한 명을 골라 영웅 이야기를 친구에게 들려주는 발표에 도전해 보세요!",
+            "내가 가장 존경하는 역사 속 영웅 한 명을 골라 위인전을 만들어 보세요!",
+            "학교에서 '나라를 지킨 사람들' 주제로 미니 전시회를 기획해 보세요!",
+            "우리 반의 안전 지킴이가 되어 친구들을 돕는 미션에 도전해 보세요!",
+            "역사 속 명연설(예: 유관순)을 따라 읽고 친구들 앞에서 발표해 보세요!",
+          ],
+          "B. 배려하고 나누는 공존형": [
+            "방정환 선생님처럼 친구의 마음을 살피고 응원하는 한 줄 메시지를 전해 보세요!",
+            "허준 이야기를 읽고 '우리 반의 작은 도우미' 활동을 시작해 보세요!",
+            "친구의 어려움을 함께 해결한 경험을 일기로 정리해 보세요!",
+            "역사 속 협력 이야기를 골라 친구들과 역할극으로 표현해 보세요!",
+            "가족과 이웃을 돕는 '나의 배려 미션' 1가지를 실천해 보세요!",
+          ],
+          "C. 지혜로운 혁신형": [
+            "장영실의 발명품 한 가지를 골라 작동 원리를 그림으로 정리해 보세요!",
+            "정약용처럼 '우리 생활을 바꿀 아이디어'를 노트에 적어 보세요!",
+            "역사 속 발명품을 비교해 '내가 만들고 싶은 발명품'을 설계해 보세요!",
+            "학교나 동네에서 불편한 점을 찾아 해결 아이디어를 친구에게 제안해 보세요!",
+            "내가 만든 발명 아이디어를 미니 발표 자료로 정리해 보세요!",
+          ],
+          "D. 생각을 표현하는 예술형": [
+            "김홍도의 풍속화처럼 우리 반 친구들의 모습을 그림으로 그려 보세요!",
+            "허난설헌의 시를 따라 쓰고 나만의 짧은 시를 지어 보세요!",
+            "김정희(추사)처럼 나만의 글씨체로 마음을 담은 짧은 글을 써 보세요!",
+            "역사 속 예술가 한 명을 골라 작품 소개 카드를 만들어 보세요!",
+            "내가 좋아하는 역사 이야기를 만화나 짧은 글로 표현해 보세요!",
+          ],
+        };
+
+        /* [학습 포인트 주석]
+         * - 함수(Function)와 반환값(Return Value):
+         * 함수는 특정 임무를 수행하는 코드 상자입니다. 전달받은 type(유형)을 사용해 무작위 제안 1개를 찾아 외부로 보내줍니다(return).
+         * - Math.random()과 Math.floor():
+         * Math.random()은 0 이상 1 미만의 무작위 소수를 만듭니다. 여기에 배열 길이(5)를 곱하면 0.xxx ~ 4.xxx가 됩니다.
+         * Math.floor()는 소수점 아래를 버려주므로 결과적으로 0, 1, 2, 3, 4 중 하나의 정수 인덱스(idx)를 무작위로 뽑게 됩니다. */
+        function getRandomSuggestion(type) {
+          const list = SUGGESTIONS[type];
+          const idx = Math.floor(Math.random() * list.length);
+          return list[idx];
+        }
+
+        /* [전체 결과 데이터 구조 정의] */
+        const RESULT_DATA = {
+            "A": {
+                typeKey: "A. 용기 있는 나라 지킴이형",
+                emoji: "🔥",
+                title: "용기 있는 나라 지킴이형",
+                description: "어려운 상황에서도 용기를 내어 먼저 행동하는 타입이에요. 책임감을 가지고 친구들과 함께 목표를 향해 나아가는 힘이 있습니다.",
+                characters: "유관순 · 안중근 · 계백 · 권율 · 최영장군",
+                keywords: ["#용기", "#리더십", "#책임감", "#도전"]
+            },
+            "B": {
+                typeKey: "B. 배려하고 나누는 공존형",
+                emoji: "🌿",
+                title: "배려하고 나누는 공존형",
+                description: "주변 사람들의 마음을 잘 살피고 함께하는 것을 중요하게 생각하는 타입이에요. 친구들과 협력하며 따뜻한 분위기를 만드는 힘이 있습니다.",
+                characters: "방정환 · 김만덕 · 허준",
+                keywords: ["#배려", "#공감", "#협력", "#나눔"]
+            },
+            "C": {
+                typeKey: "C. 지혜로운 혁신형",
+                emoji: "🧠",
+                title: "지혜로운 혁신형",
+                description: "문제를 발견하면 이유를 살펴보고 새로운 해결 방법을 찾는 타입이에요. 관찰하고 탐구하며 더 좋은 아이디어를 만들어내는 힘이 있습니다.",
+                characters: "장영실 · 최무선 · 정약용",
+                keywords: ["#탐구", "#전략", "#발명", "#문제해결"]
+            },
+            "D": {
+                typeKey: "D. 생각을 표현하는 예술형",
+                emoji: "🎨",
+                title: "생각을 표현하는 예술형",
+                description: "그림, 글쓰기, 꾸미기처럼 나만의 방식으로 생각과 느낌을 표현하는 타입이에요. 풍부한 상상력으로 사람들의 마음을 움직일 수 있습니다.",
+                keywords: ["#표현", "#상상력", "#감성", "#창작"]
+            }
+        };
+
+        /* 버튼 클릭 이벤트 연결 */
+        document.getElementById("submitBtn").addEventListener("click", function() {
+            // 모든 문항 응답 검사
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const q3 = document.querySelector('input[name="q3"]:checked');
+            const q4 = document.querySelector('input[name="q4"]:checked');
+            const q5 = document.querySelector('input[name="q5"]:checked');
+
+            // 하나라도 체크되지 않았다면 경고창 띄우고 함수 종료
+            if (!q1 || !q2 || !q3 || !q4 || !q5) {
+                alert("답변을 선택해 주세요.");
+                return;
+            }
+
+            // 각 유형별 점수 계산 (선택 수 집계)
+            const scores = { A: 0, B: 0, C: 0, D: 0 };
+            scores[q1.value]++;
+            scores[q2.value]++;
+            scores[q3.value]++;
+            scores[q4.value]++;
+            scores[q5.value]++;
+
+            /* [학습 포인트 주석] 동점 시 우선순위(A->B->C->D) 적용 로직
+             * 처음에 변수 결정을 A로 해두고, 순서대로 비교하면서 '초과(>)'할 때만 
+             * 최고 유형을 갱신하면 값이 같을 때는 먼저 나온 유형이 유지되므로 우선순위가 지켜집니다. */
+            let finalType = "A";
+            let maxScore = scores["A"];
+
+            const typesOrder = ["A", "B", "C", "D"];
+            for (let i = 1; i < typesOrder.length; i++) {
+                let currentType = typesOrder[i];
+                if (scores[currentType] > maxScore) {
+                    maxScore = scores[currentType];
+                    finalType = currentType;
+                }
+            }
+
+            // 선택된 유형 데이터 가져오기 및 실천제안 무작위 추출
+            const data = RESULT_DATA[finalType];
+            const randomSuggestion = getRandomSuggestion(data.typeKey);
+
+            // 결과 영역 Element 가져오기
+            const resultArea = document.getElementById("resultArea");
+
+            /* ----------------------------------------------------------------------
+             * [화면 구성 - 9단계 순서 준수 생성 (누락 금지)]
+             * ---------------------------------------------------------------------- */
+            resultArea.innerHTML = `
+                <div class="result-card" style="border: 1px solid #ccc; margin-top: 20px; padding: 15px;">
+                    <!-- ① 📊 나와 닮은 역사 인물 결과 (카드 상단 타이틀) -->
+                    <h2 style="margin-top: 0;">📊 나와 닮은 역사 인물 결과</h2>
+                    
+                    <!-- ② 유형 이모지 (80~100px, 큰 글씨) -->
+                    <div style="font-size: 80px; text-align: center; margin: 10px 0;">${data.emoji}</div>
+                    
+                    <!-- ③ 유형명 (28px bold) -->
+                    <div style="font-size: 28px; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.typeKey}</div>
+                    
+                    <!-- ④ (2단계는 생략 — 3단계에서 분석 멘트 박스 추가됨) -->
+                    <!-- 주석 지침대로 ④번 자리는 비워두거나 생략하고 다음 단계로 진행 -->
+
+                    <!-- ⑤ 어떤 성향일까? (회색 박스, padding 12px 14px) -->
+                    <div style="background-color: #f0f0f0; padding: 12px 14px; margin-bottom: 15px; border-radius: 4px;">
+                        <strong>어떤 성향일까?:</strong> ${data.description}
+                    </div>
+                    
+                    <!-- ⑥ 나와 닮은 역사 인물 (베이지·세피아 톤 박스 — 🏛️ 아이콘, border-left 4px solid #b08968) -->
+                    <div style="background-color: #fdfaf6; padding: 12px 14px; margin-bottom: 15px; border-left: 4px solid #b08968; border-radius: 4px;">
+                        🏛️ 나와 닮은 역사 인물: ${data.characters}
+                    </div>
+                    
+                    <!-- ⑦ 강점 키워드 (해시태그 칩 — # 기호 포함, 4개 모두 출력) -->
+                    <div style="margin-bottom: 15px;">
+                        ${data.keywords.map(kw => `<span style="display: inline-block; background-color: #e1f5fe; padding: 4px 8px; margin-right: 5px; border-radius: 4px; font-size: 14px;">${kw}</span>`).join('')}
+                    </div>
+                    
+                    <!-- ⑧ 💡 실천제안 (강조 박스 — 노란/연두 배경 + 테두리) -->
+                    <div style="background-color: #f9fbe7; border: 1px solid #d4e157; padding: 12px 14px; margin-bottom: 20px; border-radius: 4px;">
+                        <strong>💡 실천제안:</strong> ${randomSuggestion}
+                    </div>
+                    
+                    <!-- ⑨ [🔄 다시 하기] 버튼 -->
+                    <div style="text-align: center;">
+                        <button type="button" id="resetBtn" style="padding: 8px 16px; font-size: 14px; cursor: pointer;">🔄 다시 하기</button>
+                    </div>
+                </div>
+            `;
+
+            /* ----------------------------------------------------------------------
+             * [기능 - 다시 하기 버튼 세부 기능 구현]
+             * ---------------------------------------------------------------------- */
+            document.getElementById("resetBtn").addEventListener("click", function() {
+                // 라디오 버튼 선택값 초기화
+                document.getElementById("quizForm").reset();
+                // 결과 영역 비우기 (점수 및 결과 초기화 효과)
+                document.getElementById("resultArea").innerHTML = "";
+                // 페이지 맨 위로 스크롤 이동
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 결과 화면으로 부드럽게 스크롤 이동
+            resultArea.scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

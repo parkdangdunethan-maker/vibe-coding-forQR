@@ -1,1146 +1,930 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 내가 생각하는 최고의 K-콘텐츠는?</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
 
-  <!-- 모바일 화면에서 글자가 너무 작거나 화면이 깨지지 않도록 하는 viewport 설정입니다. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-  <title>🎤 내가 생각하는 최고의 K-컨텐츠는?</title>
+    <style>
+        /* [학생 커스터마이징 슬롯] */
+        :root {
+            --primary-color: #ff4757;
+            --primary-hover: #ff6b81;
+            --bg-color: #f1f2f6;
+            --card-bg: #ffffff;
+            --text-dark: #2f3542;
+            --text-muted: #747d8c;
+            --border-color: #e5e5e5;
+            --chip-bg: #ffeaa7;
+            --chip-text: #d63031;
+        }
 
-  <!-- Google Fonts는 허용된 외부 폰트입니다. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+        /* [모바일 안전 세트 2] 최소 CSS 및 전체 기본화면 초기화 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <style>
-    /* 
-      ================================
-      학생 커스터마이징 슬롯
-      ================================
-      [분위기] 밝고 신나는 K-컬처 앱 느낌
-      [색감] 보라, 핑크, 노랑 계열
-      [폰트] 제목은 Jua, 본문은 Gowun Dodum
-      [추가 요청] 배경 그라데이션, 카드형 선택지, 진행률 바
-    */
+        body {
+            max-width: 100%;
+            overflow-x: hidden; /* 가로 스크롤 절대 방지 */
+            word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            letter-spacing: -0.2px;
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    /* 모바일 안전을 위한 최소 CSS입니다. */
-    * {
-      box-sizing: border-box;
-    }
+        /* 🚨🚨 [카드 박스 절대 고정 규칙] - 크기 및 패딩 절대 고정 (2단계 동일 보존) */
+        .app-card {
+            width: 100%;
+            max-width: 420px;
+            height: 580px;                  /* 🚨 모든 화면 동일 */
+            padding: 24px 20px;             /* 🚨 모든 화면 동일 */
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            background: var(--card-bg);
+            position: relative;             /* 좌상단 이전 버튼 위치 기준 */
+            overflow-x: hidden;             /* 🚨 가로 스크롤 무조건 차단 */
+            overflow-y: auto;               /* 🚨 세로 스크롤은 가능하되 스크롤바만 숨김 */
+            scrollbar-width: none;          /* Firefox: 스크롤바 숨김 */
+            -ms-overflow-style: none;       /* IE/Edge(구버전): 스크롤바 숨김 */
+            display: flex;                  /* 내부 화면 정렬용 */
+            flex-direction: column;
+        }
 
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-      word-break: keep-all;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      letter-spacing: -0.2px;
-      font-family: "Gowun Dodum", sans-serif;
-    }
+        .app-card::-webkit-scrollbar {
+            display: none;                  /* 스크롤바 숨김 */
+            width: 0;
+            height: 0;
+        }
 
-    img {
-      max-width: 100%;
-    }
+        /* 🚨 [flex 레이아웃] 화면별 공통 베이스 설정 */
+        #start-screen, #question-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+            justify-content: flex-start;
+        }
 
-    body {
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 15% 15%, rgba(255, 241, 118, 0.9), transparent 24%),
-        radial-gradient(circle at 85% 20%, rgba(255, 128, 171, 0.7), transparent 26%),
-        linear-gradient(160deg, #fff7fb 0%, #f1ecff 48%, #e9f8ff 100%);
-      color: #24212c;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow-x: hidden;
-      padding: 18px;
-    }
+        /* 3단계 신규 추가 화면 CSS — 정중앙 배치 요건 준수 */
+        #loading-screen, #character-intro {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;        /* 🚨 분석중·인트로는 정중앙 */
+            overflow: hidden;
+        }
 
-    .page-wrap {
-      width: 100%;
-      max-width: 460px;
-    }
+        /* 🚨 결과 화면은 콘텐츠가 많으므로 간격을 12px로 살짝 좁게 조절 (요구사항 반영) */
+        #result-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: 12px;
+            overflow-y: auto;               /* 콘텐츠 초과 시 세로 스크롤만 허용 */
+            overflow-x: hidden;              /* 🚨 가로 스크롤 절대 금지 */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        #result-screen::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
 
-    .app-card {
-      width: 100%;
-      max-width: 420px;
-      height: 580px;
-      padding: 24px 20px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      margin: 0 auto;
-      background: #ffffff;
-      position: relative;
-      overflow-x: hidden;
-      overflow-y: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      display: flex;
-      flex-direction: column;
-    }
+        /* 🚨 [버튼 뭉개짐 방지 규칙] 및 메인 버튼 하단 정착 */
+        .main-btn {
+            width: 100%;
+            min-height: 52px;               /* 🚨 height 대신 min-height 사용 */
+            flex-shrink: 0;                 /* 🚨 절대 줄어들지 않게 함 */
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;               /* 🚨 카드 하단에 자연스럽게 정착 */
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            transition: background-color 0.2s;
+        }
 
-    .app-card::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
+        /* 버튼 호버 시 카드 박스 내부 스크롤 누수를 방지하기 위해 scale 적용 금지 규칙 적용 */
+        .main-btn:hover {
+            background-color: var(--primary-hover);
+        }
 
-    #start-screen,
-    #question-screen {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 14px;
-      justify-content: flex-start;
-    }
+        /* 이전 버튼 (좌상단 화살표 원형 버튼) */
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 10;
+        }
 
-    #result-screen {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-      justify-content: flex-start;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
+        /* 진행률 영역 스타일 */
+        .progress-area {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            transition: width 0.4s ease; /* ⑥ 진행률 바 0.4s 인터랙션 조건 적용 */
+        }
 
-    #result-screen::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
+        /* 질문 텍스트 및 선택지 */
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+        .option-card {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background-color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden; /* ripple 확산 효과 상위 제한 */
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-card:hover {
+            border-color: var(--primary-color);
+            background-color: #fff5f5;
+        }
+        .option-card input[type="radio"] {
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
 
-    .hidden {
-      display: none !important;
-    }
+        /* ⑤ 선택 카드 ripple 효과 스타일 구현 */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 71, 87, 0.15);
+            transform: scale(0);
+            animation: rippleAnim 0.5s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
 
-    .title-area {
-      width: 100%;
-      text-align: center;
-      padding-top: 18px;
-    }
+        /* 시작화면 타이틀 */
+        .title-area {
+            text-align: center;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .title-area h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .title-area p {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
 
-    h1 {
-      font-family: "Jua", sans-serif;
-      font-size: 34px;
-      line-height: 1.25;
-      margin: 0 0 16px;
-      color: #4a2c88;
-    }
+        /* 3단계 로딩 점 깜빡임 애니메이션 정의 */
+        .loading-text {
+            font-size: 26px;
+            font-weight: bold;
+        }
+        .dots::after {
+            content: '';
+            animation: dotAnim 1.5s infinite;
+        }
+        @keyframes dotAnim {
+            0% { content: ''; }
+            33% { content: '.'; }
+            66% { content: '..'; }
+            100% { content: '...'; }
+        }
 
-    .title-area p {
-      margin: 0;
-      padding: 16px;
-      border-radius: 16px;
-      background: #fff8d8;
-      border: 2px solid #ffe68a;
-      color: #554400;
-      font-size: 16px;
-    }
+        /* 3단계 인트로 연출 전용 스타일 */
+        .intro-sub {
+            font-size: 18px;
+            opacity: 0;
+            animation: fadeInSimple 0.4s forwards;
+        }
+        .intro-title {
+            font-size: 28px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: dropInSimple 0.4s 0.4s forwards;
+            text-align: center;
+        }
+        .intro-img-box {
+            width: 300px;
+            height: auto;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: characterBounce 0.6s 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* ⑧ 바운스 구현 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .intro-img-box img, .intro-img-box .fallback-emoji {
+            max-width: 100%;
+            height: auto;
+        }
 
-    .start-deco {
-      width: 100%;
-      padding: 18px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #f7efff, #fff4f8);
-      border: 2px dashed #d9c4ff;
-      text-align: center;
-      font-size: 15px;
-      color: #5a4b75;
-    }
+        @keyframes fadeInSimple { to { opacity: 1; } }
+        @keyframes dropInSimple { to { opacity: 1; transform: translateY(0); } }
+        @keyframes characterBounce { to { opacity: 1; transform: scale(1); } }
 
-    .start-icons {
-      font-size: 48px;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
+        /* 결과화면 타이틀 및 정착 레이아웃 구조 */
+        .result-title {
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .result-img-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 130px;
+        }
+        .result-char-img {
+            max-width: 130px;
+            height: auto;
+            display: block;
+            /* ② 최종 캐릭터 idle 흔들림 — wobbleBig 애니메이션 조건 주입 */
+            animation: wobbleBig 1.8s ease-in-out infinite;
+        }
+        .result-fallback-emoji {
+            font-size: 90px;
+            text-align: center;
+            animation: wobbleBig 1.8s ease-in-out infinite;
+        }
 
-    .main-btn {
-      width: 100%;
-      min-height: 52px;
-      flex-shrink: 0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: auto;
-      border: 0;
-      background: linear-gradient(135deg, #7c4dff, #ff5ca8);
-      color: #ffffff;
-      font-family: "Gowun Dodum", sans-serif;
-      transition: transform 0.18s ease, background-color 0.18s ease;
-    }
+        /* ② wobbleBig Keyframe 정의 */
+        @keyframes wobbleBig {
+            0%, 100% { transform: rotate(-10deg) scale(1); }
+            25%      { transform: rotate(8deg) scale(1.08); }
+            50%      { transform: rotate(-8deg) scale(0.96); }
+            75%      { transform: rotate(10deg) scale(1.08); }
+        }
 
-    .main-btn:hover {
-      transform: translateY(-1px);
-    }
+        .result-name {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+        }
 
-    .main-btn:active {
-      transform: translateY(0);
-    }
+        /* ④ 분석 멘트 박스 스타일 추가 */
+        .analysis-box {
+            background-color: #f1f2f6;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 500;
+        }
 
-    .back-btn {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      border: 0;
-      background: #f1ecff;
-      color: #4a2c88;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      z-index: 3;
-    }
+        /* ⑤, ⑥번 회색 박스 설정 */
+        .gray-box {
+            background-color: #f5f6fa;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
 
-    .progress-area {
-      width: 100%;
-      padding-top: 26px;
-    }
+        /* ⑦번 강점 키워드 해시태그 칩 정렬 컨테이너 */
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 4px 0;
+        }
+        .keyword-chip {
+            background-color: var(--chip-bg);
+            color: var(--chip-text);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-    .progress-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      font-weight: bold;
-      color: #4a2c88;
-      margin-bottom: 8px;
-    }
+        /* ⑧ 💡 실천제안 박스 강조 등장 (scale 0.9->1.0 + glow, 0.5s 애니메이션 연출) */
+        .suggestion-box {
+            background-color: #e6ffed;
+            border: 2px dashed #28a745;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            opacity: 0;
+            animation: glowIn 0.5s ease-out forwards;
+        }
+        @keyframes glowIn {
+            from {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 rgba(40, 167, 69, 0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1.0);
+                box-shadow: 0 0 12px rgba(40, 167, 69, 0.2);
+                opacity: 1;
+            }
+        }
 
-    .progress-label {
-      font-size: 15px;
-    }
+        /* ④ 정보 카드 stagger fade-in 인터랙션 설정 */
+        .stagger-item {
+            opacity: 0;
+            animation: fadeInSimple 0.4s ease-out forwards;
+        }
 
-    .progress-arrow {
-      font-size: 20px;
-    }
+        /* 2단계 전용 슬라이드 페이드인 효과 보존 */
+        .slide-fade {
+            animation: slideFadeIn 0.25s ease-out forwards;
+        }
+        @keyframes slideFadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      border-radius: 999px;
-      background: #eee8ff;
-      overflow: hidden;
-    }
+        /* 3단계 시퀀스 전환 페이드아웃 효과 */
+        .fade-out {
+            animation: fadeOutSimple 0.4s ease-out forwards;
+        }
+        @keyframes fadeOutSimple {
+            to { opacity: 0; transform: scale(0.95); }
+        }
 
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #7c4dff, #ff5ca8, #ffd54f);
-      transition: width 0.25s ease;
-    }
-
-    .question-text {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f8f5ff;
-      border: 2px solid #e4d8ff;
-      color: #2d2442;
-      font-size: 20px;
-      font-weight: bold;
-      line-height: 1.45;
-      font-family: "Jua", sans-serif;
-    }
-
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .option-card {
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 2px solid #e5e5e5;
-      flex-shrink: 0;
-      background: #ffffff;
-      cursor: pointer;
-      transition: background-color 0.18s ease, border-color 0.18s ease;
-      font-size: 15px;
-      color: #2d2937;
-    }
-
-    .option-card:hover {
-      background-color: #fff8e1;
-      border-color: #ffd76a;
-    }
-
-    .option-card.selected {
-      background-color: #f1ecff;
-      border-color: #8d6bff;
-    }
-
-    .option-card input {
-      margin-right: 8px;
-    }
-
-    .slide-left {
-      animation: slideLeft 0.25s ease;
-    }
-
-    .slide-right {
-      animation: slideRight 0.25s ease;
-    }
-
-    @keyframes slideLeft {
-      from {
-        opacity: 0;
-        transform: translateX(22px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideRight {
-      from {
-        opacity: 0;
-        transform: translateX(-22px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .result-title {
-      margin: 0;
-      padding-top: 2px;
-      text-align: center;
-      color: #4a2c88;
-      font-family: "Jua", sans-serif;
-      font-size: 24px;
-      line-height: 1.35;
-    }
-
-    .result-emoji {
-      font-size: 90px;
-      line-height: 1.05;
-      text-align: center;
-      margin: 0;
-    }
-
-    .result-type {
-      font-size: 28px;
-      line-height: 1.25;
-      text-align: center;
-      font-weight: bold;
-      color: #2d2442;
-      margin: 0;
-      font-family: "Jua", sans-serif;
-    }
-
-    .info-box {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #f5f5f5;
-      border: 2px solid #e8e8e8;
-    }
-
-    .suggestion-box {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #fff8cc;
-      border: 2px solid #cde86b;
-    }
-
-    .box-label {
-      margin: 0 0 6px;
-      font-size: 15px;
-      font-weight: bold;
-      color: #4a2c88;
-    }
-
-    .box-text {
-      margin: 0;
-      font-size: 15px;
-      color: #332d40;
-    }
-
-    .footer-text {
-      width: 100%;
-      max-width: 420px;
-      margin: 14px auto 0;
-      text-align: center;
-      font-size: 13px;
-      color: #6f6680;
-    }
-
-    #quizForm {
-      display: none;
-    }
-
-    #resultArea {
-      display: none;
-    }
-
-    @media (max-width: 360px) {
-      body {
-        padding: 12px;
-      }
-
-      .app-card {
-        height: 580px;
-        padding: 24px 20px;
-      }
-
-      h1 {
-        font-size: 30px;
-      }
-
-      .question-text {
-        font-size: 18px;
-      }
-
-      .option-card {
-        font-size: 14px;
-        padding: 13px 14px;
-      }
-
-      .result-emoji {
-        font-size: 84px;
-      }
-
-      .result-type {
-        font-size: 25px;
-      }
-    }
-  </style>
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            opacity: 0.7; /* 요구사항 명시 */
+        }
+    </style>
 </head>
 <body>
-  <div class="page-wrap">
-    <main class="app-card">
-      <section id="start-screen">
-        <div class="title-area">
-          <!-- 페이지의 큰 제목입니다. -->
-          <h1>🎤 내가 생각하는 최고의 K-컨텐츠는?</h1>
 
-          <!-- 활동 설명입니다. -->
-          <p>나는 어떤 K-콘텐츠에 가장 끌릴까요? 아래의 질문에 답하고 나의 K-컬처 취향을 알아보아요!</p>
+    <div class="app-card">
+        
+        <div id="start-screen">
+            <div class="title-area">
+                <h1>🎤 내가 생각하는 최고의 K-콘텐츠는?</h1>
+                <p>나는 어떤 K-콘텐츠에 가장 끌릴까요? 아래의 질문에 답하고 나의 K-콘텐츠 취향을 알아보아요!</p>
+            </div>
+            <button class="main-btn" onclick="startQuiz()">🚀 나의 K-콘텐츠 취향 알아보기</button>
         </div>
 
-        <div class="start-deco">
-          <div class="start-icons">🍜 🎤 🎬 🎮</div>
-          <div>
-            6개의 질문에 답하면 나와 잘 맞는 K-컬처 취향이 나타나요.
-          </div>
+        <div id="question-screen" style="display: none;">
+            <button id="btn-back" class="back-btn" onclick="prevQuestion()">⬅️</button>
+            <div class="progress-area">
+                <span id="progress-text" class="progress-text">Q1/6</span>
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+            <div id="question-text" class="question-text"></div>
+            <form id="quiz-form" onsubmit="return false;">
+                <div id="options-container" class="options"></div>
+            </form>
+            <button id="btn-next" class="main-btn" onclick="nextQuestion()">다음 질문으로 ➡️</button>
         </div>
 
-        <button type="button" class="main-btn" onclick="startQuiz()">🚀 나의 K-컬처 취향 알아보기</button>
-      </section>
-
-      <section id="question-screen" class="hidden">
-        <button type="button" id="backButton" class="back-btn" onclick="goPrevQuestion()">←</button>
-
-        <div class="progress-area">
-          <div class="progress-top">
-            <span id="progressText" class="progress-label">Q1/6</span>
-            <span class="progress-arrow">➡️</span>
-          </div>
-          <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
-          </div>
+        <div id="loading-screen" style="display: none;">
+            <div class="loading-text">분석중<span class="dots"></span></div>
         </div>
 
-        <div id="questionText" class="question-text"></div>
-
-        <div id="optionsArea" class="options"></div>
-
-        <button type="button" id="nextButton" class="main-btn" onclick="goNextQuestion()">다음 질문으로 ➡️</button>
-      </section>
-
-      <section id="result-screen" class="hidden">
-        <h2 class="result-title">📊 나의 K-컬처 취향 결과</h2>
-
-        <div id="spaResultEmoji" class="result-emoji"></div>
-
-        <h3 id="spaResultType" class="result-type"></h3>
-
-        <div class="info-box">
-          <p class="box-label">어떤 스타일일까?</p>
-          <p id="spaResultStyle" class="box-text"></p>
+        <div id="character-intro" style="display: none;">
+            <div id="intro-sub-text" class="intro-sub">당신은...</div>
+            <div id="intro-title-text" class="intro-title"></div>
+            <div id="intro-img-container" class="intro-img-box"></div>
         </div>
 
-        <div class="suggestion-box">
-          <p class="box-label">💡 실천제안</p>
-          <p id="spaResultSuggestion" class="box-text"></p>
+        <div id="result-screen" style="display: none;">
+            <h2 class="result-title">📊 나의 K-콘텐츠 취향 결과</h2>
+            
+            <div id="result-image-area" class="result-img-container"></div>
+            
+            <div id="res-type-name" class="result-name"></div>
+            
+            <div id="res-analysis" class="analysis-box class-stagger"></div>
+            
+            <div class="gray-box class-stagger">
+                <strong>어떤 스타일일까?:</strong> <span id="res-style"></span>
+            </div>
+            
+            <div class="gray-box class-stagger">
+                <strong>추천:</strong> <span id="res-recommend"></span>
+            </div>
+            
+            <div id="res-keywords" class="keywords-container class-stagger"></div>
+            
+            <div id="res-suggestion-box" class="suggestion-box">
+                <strong>💡 실천제안:</strong> <br><span id="res-suggestion"></span>
+            </div>
+            
+            <button class="main-btn" onclick="resetQuiz()">🔄 다시 하기</button>
         </div>
 
-        <button type="button" class="main-btn" onclick="resetQuiz()">🔄 다시 하기</button>
-      </section>
+    </div>
 
-      <!-- 
-        아래 form은 1단계 HTML 뼈대를 보존하기 위한 영역입니다.
-        실제 2단계 SPA 화면은 위의 start-screen, question-screen, result-screen에서 보여 줍니다.
-      -->
-      <form id="quizForm">
-        <!-- Q1 -->
-        <section>
-          <h2>Q1. 내가 가장 먼저 소개하고 싶은 K-콘텐츠 공간은?</h2>
-
-          <!-- 같은 질문의 4지선다는 name을 똑같이 맞춰야 하나만 선택됩니다. -->
-          <label>
-            <input type="radio" name="q1" value="K-푸드 탐험형">
-            ① 냄새만 맡아도 배고픈 길거리 음식 골목 🍢
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q1" value="K-POP 에너지형">
-            ② 사람들의 함성으로 가득한 공연장 🎤
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q1" value="K-드라마 감성형">
-            ③ 드라마 속 장면 같은 감성 거리 🌃
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q1" value="K-캐릭터 몰입형">
-            ④ 캐릭터 굿즈와 게임을 만날 수 있는 공간 🎮
-          </label>
-        </section>
-
-        <!-- Q2 -->
-        <section>
-          <h2>Q2. 유튜브 알고리즘이 나를 붙잡는 영상은?</h2>
-
-          <label>
-            <input type="radio" name="q2" value="K-푸드 탐험형">
-            ① 야식 먹방 영상 🍜
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q2" value="K-POP 에너지형">
-            ② 아이돌 무대 영상 ✨
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q2" value="K-드라마 감성형">
-            ③ 밤새 드라마 몰아보기 🎬
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q2" value="K-캐릭터 몰입형">
-            ④ 게임 리뷰와 캐릭터 영상 🎮
-          </label>
-        </section>
-
-        <!-- Q3 -->
-        <section>
-          <h2>Q3. 내가 더 참기 힘든 것은?</h2>
-
-          <label>
-            <input type="radio" name="q3" value="K-푸드 탐험형">
-            ① 야식 사진 안 보기 🍗
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q3" value="K-POP 에너지형">
-            ② 챌린지 음악 안 따라 하기 🎧
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q3" value="K-드라마 감성형">
-            ③ 드라마 스포일러 당하기 😭
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q3" value="K-캐릭터 몰입형">
-            ④ 최애 캐릭터 굿즈 놓치기 🎀
-          </label>
-        </section>
-
-        <!-- Q4 -->
-        <section>
-          <h2>Q4. 친구와 서울 여행을 간다면 나는?</h2>
-
-          <label>
-            <input type="radio" name="q4" value="K-푸드 탐험형">
-            ① "여기 유명한 먹거리 거리래!" 🍡
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q4" value="K-POP 에너지형">
-            ② "여기 공연이 열리는 곳이래!" 🎤
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q4" value="K-드라마 감성형">
-            ③ "여기 드라마 촬영지래!" 📸
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q4" value="K-캐릭터 몰입형">
-            ④ "여기 캐릭터 팝업이 열린대!" 🎮
-          </label>
-        </section>
-
-        <!-- Q5 -->
-        <section>
-          <h2>Q5. 갑자기 하루 쉬는 날이 생겼다면?</h2>
-
-          <label>
-            <input type="radio" name="q5" value="K-푸드 탐험형">
-            ① 디저트 카페와 맛집 투어 🍰
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q5" value="K-POP 에너지형">
-            ② 무대 영상과 챌린지 몰아보기 🎵
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q5" value="K-드라마 감성형">
-            ③ 드라마 정주행 🎬
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q5" value="K-캐릭터 몰입형">
-            ④ 웹툰·게임 하루 종일 즐기기 🕹️
-          </label>
-        </section>
-
-        <!-- Q6 -->
-        <section>
-          <h2>Q6. 더 갖고 싶은 굿즈는?</h2>
-
-          <label>
-            <input type="radio" name="q6" value="K-푸드 탐험형">
-            ① 유명 맛집 한정 디저트 🍪
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q6" value="K-POP 에너지형">
-            ② 최애 아이돌 응원봉 🎤
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q6" value="K-드라마 감성형">
-            ③ 드라마 포토카드 📷
-          </label>
-          <br>
-
-          <label>
-            <input type="radio" name="q6" value="K-캐릭터 몰입형">
-            ④ 캐릭터 키링 🧸
-          </label>
-        </section>
-      </form>
-
-      <!-- 결과가 표시될 영역입니다. -->
-      <div id="resultArea" style="display: none;">
-        <h2>📊 나의 K-컬처 취향 결과</h2>
-
-        <div id="resultEmoji" class="result-emoji"></div>
-
-        <h3 id="resultType"></h3>
-
-        <h4>어떤 스타일일까?</h4>
-        <p id="resultStyle"></p>
-
-        <h4>추천</h4>
-        <p id="resultRecommend"></p>
-
-        <h4>💡 실천제안</h4>
-        <p id="resultSuggestion"></p>
-
-        <h4>강점 키워드</h4>
-        <p id="resultKeywords"></p>
-      </div>
-    </main>
-
-    <footer class="footer-text">
-      <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
+    <footer>
+        <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
     </footer>
-  </div>
 
-  <script>
-    /*
-      TYPES 배열은 결과 유형의 우선순위를 저장합니다.
+    <script>
+        let currentIdx = 0;
+        let userAnswers = [null, null, null, null, null, null];
+        let calculatedScores = {}; // 분석 멘트 추출을 위한 1,2위 격차 계산기 스토리지
 
-      동점이 나왔을 때는 아래 순서대로 먼저 나온 유형이 선택됩니다.
-      ① K-푸드 탐험형
-      ② K-POP 에너지형
-      ③ K-드라마 감성형
-      ④ K-캐릭터 몰입형
-    */
-    const TYPES = [
-      "K-푸드 탐험형",
-      "K-POP 에너지형",
-      "K-드라마 감성형",
-      "K-캐릭터 몰입형"
-    ];
+        /* [🚨 절대 변경 금지 - 질문 데이터 보존 규칙] */
+        const QUESTIONS = [
+            {
+                q: "Q1. 내가 가장 먼저 소개하고 싶은 K-콘텐츠 공간은?",
+                options: [
+                    "① 냄새만 맡아도 배고픈 길거리 음식 골목 🍢",
+                    "② 사람들의 함성으로 가득한 공연장 🎤",
+                    "③ 드라마 속 장면 같은 감성 거리 🌃",
+                    "④ 캐릭터 굿즈와 게임을 만날 수 있는 공간 🎮"
+                ]
+            },
+            {
+                q: "Q2. 유튜브 알고리즘이 나를 붙잡는 영상은?",
+                options: [
+                    "① 야식 먹방 영상 🍜",
+                    "② 아이돌 무대 영상 ✨",
+                    "③ 밤새 드라마 몰아보기 🎬",
+                    "④ 게임 리뷰와 캐릭터 영상 🎮"
+                ]
+            },
+            {
+                q: "Q3. 내가 더 참기 힘든 것은?",
+                options: [
+                    "① 야식 사진 안 보기 🍗",
+                    "② 챌린지 음악 안 따라 하기 🎧",
+                    "③ 드라마 스포일러 당하기 😭",
+                    "④ 최애 캐릭터 굿즈 놓치기 🎀"
+                ]
+            },
+            {
+                q: "Q4. 친구와 서울 여행을 간다면 나는?",
+                options: [
+                    "① \"여기 유명한 먹거리 거리래!\" 🍡",
+                    "② \"여기 공연이 열리는 곳이래!\" 🎤",
+                    "③ \"여기 드라마 촬영지래!\" 📸",
+                    "④ \"여기 캐릭터 팝업이 열린대!\" 🎮"
+                ]
+            },
+            {
+                q: "Q5. 갑자기 하루 쉬는 날이 생겼다면?",
+                options: [
+                    "① 디저트 카페와 맛집 투어 🍰",
+                    "② 무대 영상과 챌린지 몰아보기 🎵",
+                    "③ 드라마 정주행 🎬",
+                    "④ 웹툰·게임 하루 종일 즐기기 🕹️"
+                ]
+            },
+            {
+                q: "Q6. 더 갖고 싶은 굿즈는?",
+                options: [
+                    "① 유명 맛집 한정 디저트 🍪",
+                    "② 최애 아이돌 응원봉 🎤",
+                    "③ 드라마 포토카드 📷",
+                    "④ 캐릭터 키링 🧸"
+                ]
+            }
+        ];
 
-    /*
-      QUESTION_DATA 배열은 화면에 보여 줄 질문과 선택지를 저장합니다.
+        /* [🚨 절대 변경 금지 - SUGGESTIONS 20개 실천제안 객체 풀] */
+        const SUGGESTIONS = {
+          "K-푸드 탐험형": [
+            "우리 동네 K-푸드 맛집 지도를 직접 만들어 보세요!",
+            "한 주에 하나씩 새로운 한식·디저트를 시도하고 후기를 남겨 보세요!",
+            "K-푸드 먹방 콘텐츠를 친구들과 함께 보고 'BEST 3'를 뽑아 보세요!",
+            "지역별 K-푸드(전주·부산·광장시장)를 비교하는 콘텐츠를 만들어 보세요!",
+            "외국 친구에게 추천할 K-푸드 5선을 영어 메뉴로 정리해 보세요!",
+          ],
+          "K-POP 에너지형": [
+            "최애 아이돌 무대 영상을 보고 댄스 챌린지를 따라 해 보세요!",
+            "친구들과 K-POP 플레이리스트를 공유하는 챌린지를 열어 보세요!",
+            "내가 좋아하는 아이돌의 의상·무대 컨셉을 분석해 정리해 보세요!",
+            "K-POP 콘서트·체험관 영상을 보고 '꼭 가보고 싶은 무대'를 골라 보세요!",
+            "친구들과 무대 영상 리액션 콘텐츠를 만들어 SNS에 공유해 보세요!",
+          ],
+          "K-드라마 감성형": [
+            "최근 본 K-드라마 OST를 모아 나만의 감성 플레이리스트를 만들어 보세요!",
+            "좋아하는 드라마 명대사 5개를 골라 손글씨 카드로 만들어 보세요!",
+            "드라마 촬영지(남산·한강) 중 한 곳을 골라 미니 여행 코스를 짜 보세요!",
+            "친구들과 함께 'K-드라마 정주행 챌린지'에 도전해 보세요!",
+            "드라마 명장면을 골라 짧은 후기·감상문을 SNS에 공유해 보세요!",
+          ],
+          "K-캐릭터 몰입형": [
+            "내가 좋아하는 K-캐릭터를 활용해 굿즈 디자인 아이디어를 그려 보세요!",
+            "주말 하루를 정해 웹툰·게임 정주행 챌린지에 도전해 보세요!",
+            "K-캐릭터 팝업스토어 정보를 정리해 친구와 함께 방문 계획을 세워 보세요!",
+            "내가 좋아하는 게임의 세계관을 친구에게 설명하는 콘텐츠를 만들어 보세요!",
+            "캐릭터 코스튬·페어 행사를 조사해 위시리스트로 정리해 보세요!",
+          ],
+        };
 
-      배열은 순서가 있는 목록입니다.
-      객체는 이름표가 붙은 자료 묶음입니다.
-
-      QUESTION_DATA 안에는 질문 객체 6개가 들어 있습니다.
-    */
-    const QUESTION_DATA = [
-      {
-        title: "Q1. 내가 가장 먼저 소개하고 싶은 K-콘텐츠 공간은?",
-        options: [
-          { text: "① 냄새만 맡아도 배고픈 길거리 음식 골목 🍢", type: "K-푸드 탐험형" },
-          { text: "② 사람들의 함성으로 가득한 공연장 🎤", type: "K-POP 에너지형" },
-          { text: "③ 드라마 속 장면 같은 감성 거리 🌃", type: "K-드라마 감성형" },
-          { text: "④ 캐릭터 굿즈와 게임을 만날 수 있는 공간 🎮", type: "K-캐릭터 몰입형" }
-        ]
-      },
-      {
-        title: "Q2. 유튜브 알고리즘이 나를 붙잡는 영상은?",
-        options: [
-          { text: "① 야식 먹방 영상 🍜", type: "K-푸드 탐험형" },
-          { text: "② 아이돌 무대 영상 ✨", type: "K-POP 에너지형" },
-          { text: "③ 밤새 드라마 몰아보기 🎬", type: "K-드라마 감성형" },
-          { text: "④ 게임 리뷰와 캐릭터 영상 🎮", type: "K-캐릭터 몰입형" }
-        ]
-      },
-      {
-        title: "Q3. 내가 더 참기 힘든 것은?",
-        options: [
-          { text: "① 야식 사진 안 보기 🍗", type: "K-푸드 탐험형" },
-          { text: "② 챌린지 음악 안 따라 하기 🎧", type: "K-POP 에너지형" },
-          { text: "③ 드라마 스포일러 당하기 😭", type: "K-드라마 감성형" },
-          { text: "④ 최애 캐릭터 굿즈 놓치기 🎀", type: "K-캐릭터 몰입형" }
-        ]
-      },
-      {
-        title: "Q4. 친구와 서울 여행을 간다면 나는?",
-        options: [
-          { text: "① \"여기 유명한 먹거리 거리래!\" 🍡", type: "K-푸드 탐험형" },
-          { text: "② \"여기 공연이 열리는 곳이래!\" 🎤", type: "K-POP 에너지형" },
-          { text: "③ \"여기 드라마 촬영지래!\" 📸", type: "K-드라마 감성형" },
-          { text: "④ \"여기 캐릭터 팝업이 열린대!\" 🎮", type: "K-캐릭터 몰입형" }
-        ]
-      },
-      {
-        title: "Q5. 갑자기 하루 쉬는 날이 생겼다면?",
-        options: [
-          { text: "① 디저트 카페와 맛집 투어 🍰", type: "K-푸드 탐험형" },
-          { text: "② 무대 영상과 챌린지 몰아보기 🎵", type: "K-POP 에너지형" },
-          { text: "③ 드라마 정주행 🎬", type: "K-드라마 감성형" },
-          { text: "④ 웹툰·게임 하루 종일 즐기기 🕹️", type: "K-캐릭터 몰입형" }
-        ]
-      },
-      {
-        title: "Q6. 더 갖고 싶은 굿즈는?",
-        options: [
-          { text: "① 유명 맛집 한정 디저트 🍪", type: "K-푸드 탐험형" },
-          { text: "② 최애 아이돌 응원봉 🎤", type: "K-POP 에너지형" },
-          { text: "③ 드라마 포토카드 📷", type: "K-드라마 감성형" },
-          { text: "④ 캐릭터 키링 🧸", type: "K-캐릭터 몰입형" }
-        ]
-      }
-    ];
-
-    /*
-      RESULT_DATA 객체는 유형별 결과 내용을 저장합니다.
-
-      객체는 이름표가 붙은 큰 보관함이라고 생각하면 됩니다.
-      예를 들어 RESULT_DATA["K-푸드 탐험형"]처럼 꺼내 쓸 수 있습니다.
-    */
-    const RESULT_DATA = {
-      "K-푸드 탐험형": {
-        emoji: "🍜",
-        style: "맛있는 음식과 시장 분위기를 좋아하는 타입입니다.",
-        recommend: "먹방, 길거리 음식, 디저트 투어, 광장시장, 전주 한옥마을, 부산 먹거리 거리",
-        keywords: "#먹방 #한식 #시장 #맛집"
-      },
-      "K-POP 에너지형": {
-        emoji: "🎤",
-        style: "신나는 음악과 화려한 무대 분위기를 좋아하는 타입입니다.",
-        recommend: "아이돌, 콘서트, 댄스 챌린지, 홍대 공연 거리, K-POP 체험관",
-        keywords: "#KPOP #댄스 #무대 #에너지"
-      },
-      "K-드라마 감성형": {
-        emoji: "🎬",
-        style: "분위기 있는 장소와 감성적인 이야기를 좋아하는 타입입니다.",
-        recommend: "드라마, 영화, OST, 한강공원, 남산, 드라마 촬영지",
-        keywords: "#감성 #드라마 #풍경 #스토리"
-      },
-      "K-캐릭터 몰입형": {
-        emoji: "🎮",
-        style: "웹툰, 게임, 캐릭터처럼 몰입감 있는 콘텐츠를 좋아하는 타입입니다.",
-        recommend: "웹툰, 게임, 캐릭터 굿즈, 캐릭터 팝업스토어, 게임 박람회",
-        keywords: "#게임 #웹툰 #캐릭터 #굿즈"
-      }
-    };
-
-    /*
-      SUGGESTIONS는 객체입니다.
-      객체 안에는 4개의 배열이 들어 있습니다.
-
-      객체: 이름표가 붙은 자료 묶음
-      배열: 순서가 있는 자료 목록
-
-      예시:
-      SUGGESTIONS["K-푸드 탐험형"]은 K-푸드 탐험형의 실천제안 배열을 뜻합니다.
-
-      학생 활동 아이디어:
-      아래 배열 안에 새로운 문장을 추가하면 실천제안을 더 늘릴 수 있습니다.
-      단, 문장은 따옴표로 감싸고 쉼표를 붙여야 합니다.
-    */
-    const SUGGESTIONS = {
-      "K-푸드 탐험형": [
-        "우리 동네 K-푸드 맛집 지도를 직접 만들어 보세요!",
-        "한 주에 하나씩 새로운 한식·디저트를 시도하고 후기를 남겨 보세요!",
-        "K-푸드 먹방 콘텐츠를 친구들과 함께 보고 'BEST 3'를 뽑아 보세요!",
-        "지역별 K-푸드(전주·부산·광장시장)를 비교하는 콘텐츠를 만들어 보세요!",
-        "외국 친구에게 추천할 K-푸드 5선을 영어 메뉴로 정리해 보세요!",
-      ],
-      "K-POP 에너지형": [
-        "최애 아이돌 무대 영상을 보고 댄스 챌린지를 따라 해 보세요!",
-        "친구들과 K-POP 플레이리스트를 공유하는 챌린지를 열어 보세요!",
-        "내가 좋아하는 아이돌의 의상·무대 컨셉을 분석해 정리해 보세요!",
-        "K-POP 콘서트·체험관 영상을 보고 '꼭 가보고 싶은 무대'를 골라 보세요!",
-        "친구들과 무대 영상 리액션 콘텐츠를 만들어 SNS에 공유해 보세요!",
-      ],
-      "K-드라마 감성형": [
-        "최근 본 K-드라마 OST를 모아 나만의 감성 플레이리스트를 만들어 보세요!",
-        "좋아하는 드라마 명대사 5개를 골라 손글씨 카드로 만들어 보세요!",
-        "드라마 촬영지(남산·한강) 중 한 곳을 골라 미니 여행 코스를 짜 보세요!",
-        "친구들과 함께 'K-드라마 정주행 챌린지'에 도전해 보세요!",
-        "드라마 명장면을 골라 짧은 후기·감상문을 SNS에 공유해 보세요!",
-      ],
-      "K-캐릭터 몰입형": [
-        "내가 좋아하는 K-캐릭터를 활용해 굿즈 디자인 아이디어를 그려 보세요!",
-        "주말 하루를 정해 웹툰·게임 정주행 챌린지에 도전해 보세요!",
-        "K-캐릭터 팝업스토어 정보를 정리해 친구와 함께 방문 계획을 세워 보세요!",
-        "내가 좋아하는 게임의 세계관을 친구에게 설명하는 콘텐츠를 만들어 보세요!",
-        "캐릭터 코스튬·페어 행사를 조사해 위시리스트로 정리해 보세요!",
-      ],
-    };
-
-    /*
-      getRandomSuggestion 함수는 유형 이름을 받아서
-      해당 유형의 실천제안 중 1개를 무작위로 골라 돌려줍니다.
-
-      Math.random()은 0 이상 1 미만의 랜덤 숫자를 만듭니다.
-      Math.floor()는 소수점을 버리고 정수로 만듭니다.
-
-      예시:
-      Math.random() * list.length → 배열 길이에 맞는 랜덤 숫자 만들기
-      Math.floor(...) → 배열 번호로 쓸 수 있게 정수 만들기
-
-      return은 함수가 만든 결과값을 밖으로 보내는 명령어입니다.
-    */
-    function getRandomSuggestion(type) {
-      const list = SUGGESTIONS[type];
-      const idx = Math.floor(Math.random() * list.length);
-      return list[idx];
-    }
-
-    /*
-      currentQuestionIndex는 현재 몇 번째 질문을 보고 있는지 저장합니다.
-      배열은 0번부터 시작하기 때문에 Q1은 0, Q2는 1입니다.
-    */
-    let currentQuestionIndex = 0;
-
-    /*
-      userAnswers는 학생이 고른 답을 저장하는 배열입니다.
-      예를 들어 userAnswers[0]은 Q1에서 고른 유형입니다.
-    */
-    let userAnswers = [];
-
-    /*
-      showScreen 함수는 화면을 바꿀 때 사용합니다.
-      display를 직접 많이 바꾸는 대신 hidden 클래스를 붙였다 떼어 관리합니다.
-    */
-    function showScreen(screenId) {
-      document.getElementById("start-screen").classList.add("hidden");
-      document.getElementById("question-screen").classList.add("hidden");
-      document.getElementById("result-screen").classList.add("hidden");
-
-      document.getElementById(screenId).classList.remove("hidden");
-    }
-
-    /*
-      startQuiz 함수는 시작 화면의 버튼을 눌렀을 때 실행됩니다.
-    */
-    function startQuiz() {
-      currentQuestionIndex = 0;
-      userAnswers = [];
-      showScreen("question-screen");
-      renderQuestion("left");
-    }
-
-    /*
-      renderQuestion 함수는 현재 질문 번호에 맞는 질문과 선택지를 화면에 보여 줍니다.
-      direction 값에 따라 좌우 슬라이드 느낌을 다르게 줄 수 있습니다.
-    */
-    function renderQuestion(direction) {
-      const questionScreen = document.getElementById("question-screen");
-      const question = QUESTION_DATA[currentQuestionIndex];
-      const questionNumber = currentQuestionIndex + 1;
-      const progressPercent = (questionNumber / QUESTION_DATA.length) * 100;
-
-      questionScreen.classList.remove("slide-left");
-      questionScreen.classList.remove("slide-right");
-
-      void questionScreen.offsetWidth;
-
-      if (direction === "right") {
-        questionScreen.classList.add("slide-right");
-      } else {
-        questionScreen.classList.add("slide-left");
-      }
-
-      document.getElementById("progressText").textContent = "Q" + questionNumber + "/6";
-      document.getElementById("progressFill").style.width = progressPercent + "%";
-      document.getElementById("questionText").textContent = question.title;
-
-      if (currentQuestionIndex === 0) {
-        document.getElementById("backButton").style.visibility = "hidden";
-      } else {
-        document.getElementById("backButton").style.visibility = "visible";
-      }
-
-      if (currentQuestionIndex === QUESTION_DATA.length - 1) {
-        document.getElementById("nextButton").textContent = "📊 나의 K-컬처 취향 알아보기";
-      } else {
-        document.getElementById("nextButton").textContent = "다음 질문으로 ➡️";
-      }
-
-      const optionsArea = document.getElementById("optionsArea");
-      optionsArea.innerHTML = "";
-
-      for (let i = 0; i < question.options.length; i++) {
-        const option = question.options[i];
-
-        const label = document.createElement("label");
-        label.className = "option-card";
-
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = "q" + questionNumber;
-        input.value = option.type;
-
-        if (userAnswers[currentQuestionIndex] === option.type) {
-          input.checked = true;
-          label.classList.add("selected");
+        /* [🚨 절대 변경 금지 - getRandomSuggestion 함수] */
+        function getRandomSuggestion(type) {
+          const list = SUGGESTIONS[type];
+          const idx = Math.floor(Math.random() * list.length);
+          return list[idx];
         }
 
-        input.addEventListener("change", function () {
-          userAnswers[currentQuestionIndex] = input.value;
+        /* 3단계 이미지 URL 정보 및 유형별 컬러, 이모지 완벽 매핑 데이터 */
+        const RESULT_DATA = {
+            "K-푸드 탐험형": {
+                emoji: "🍜",
+                color: ["#FFB75E", "#ED8F03"],
+                url: "https://vibe-coding-characters.vercel.app/img/kcontent-m/kfood1.png",
+                style: "맛있는 음식과 시장 분위기를 좋아하는 타입입니다.",
+                recommend: "먹방, 길거리 음식, 디저트 투어, 광장시장, 전주 한옥마을, 부산 먹거리 거리",
+                keywords: ["#먹방", "#한식", "#시장", "#맛집"]
+            },
+            "K-POP 에너지형": {
+                emoji: "🎤",
+                color: ["#FF0099", "#493240"],
+                url: "https://vibe-coding-characters.vercel.app/img/kcontent-m/kpop1.png",
+                style: "신나는 음악과 화려한 무대 분위기를 좋아하는 타입입니다.",
+                recommend: "아이돌, 콘서트, 댄스 챌린지, 홍대 공연 거리, K-POP 체험관",
+                keywords: ["#KPOP", "#댄스", "#무대", "#에너지"]
+            },
+            "K-드라마 감성형": {
+                emoji: "🎬",
+                color: ["#7F7FD5", "#86A8E7"],
+                url: "https://vibe-coding-characters.vercel.app/img/kcontent-m/kdrama1.png",
+                style: "분위기 있는 장소와 감성적인 이야기를 좋아하는 타입입니다.",
+                recommend: "드라마, 영화, OST, 한강공원, 남산, 드라마 촬영지",
+                keywords: ["#감성", "#드라마", "#풍경", "#스토리"]
+            },
+            "K-캐릭터 몰입형": {
+                emoji: "🎮",
+                color: ["#42E695", "#3BB2B8"],
+                url: "https://vibe-coding-characters.vercel.app/img/kcontent-m/kchar1.png",
+                style: "웹툰, 게임, 캐릭터처럼 몰입감 있는 콘텐츠를 좋아하는 타입입니다.",
+                recommend: "웹툰, 게임, 캐릭터 굿즈, 캐릭터 팝업스토어, 게임 박람회",
+                keywords: ["#게임", "#웹툰", "#캐릭터", "#굿즈"]
+            }
+        };
 
-          const cards = document.querySelectorAll(".option-card");
-          for (let j = 0; j < cards.length; j++) {
-            cards[j].classList.remove("selected");
-          }
-
-          label.classList.add("selected");
-        });
-
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(option.text));
-
-        optionsArea.appendChild(label);
-      }
-    }
-
-    /*
-      goNextQuestion 함수는 다음 질문 버튼을 눌렀을 때 실행됩니다.
-      답을 고르지 않았다면 alert를 띄웁니다.
-    */
-    function goNextQuestion() {
-      const selected = document.querySelector('input[name="q' + (currentQuestionIndex + 1) + '"]:checked');
-
-      if (selected === null) {
-        alert("답변을 선택해 주세요.");
-        return;
-      }
-
-      userAnswers[currentQuestionIndex] = selected.value;
-
-      if (currentQuestionIndex < QUESTION_DATA.length - 1) {
-        currentQuestionIndex = currentQuestionIndex + 1;
-        renderQuestion("left");
-      } else {
-        showResult();
-      }
-    }
-
-    /*
-      goPrevQuestion 함수는 이전 버튼을 눌렀을 때 실행됩니다.
-      Q1에서는 버튼이 숨겨져 있으므로 실제로는 Q2부터 사용할 수 있습니다.
-    */
-    function goPrevQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex = currentQuestionIndex - 1;
-        renderQuestion("right");
-      }
-    }
-
-    /*
-      showResult 함수는 버튼을 눌렀을 때 실행됩니다.
-      1. 모든 문항에 답했는지 확인
-      2. 유형별 점수 계산
-      3. 최고 점수 유형 찾기
-      4. 결과 화면에 출력
-    */
-    function showResult() {
-      /*
-        scores 객체는 각 유형의 점수를 저장합니다.
-        처음에는 모두 0점으로 시작합니다.
-      */
-      const scores = {
-        "K-푸드 탐험형": 0,
-        "K-POP 에너지형": 0,
-        "K-드라마 감성형": 0,
-        "K-캐릭터 몰입형": 0
-      };
-
-      /*
-        for 반복문은 비슷한 일을 여러 번 할 때 사용합니다.
-        여기서는 q1부터 q6까지 차례대로 검사합니다.
-      */
-      for (let i = 1; i <= 6; i++) {
-        /*
-          document.querySelector는 HTML에서 원하는 요소를 찾는 명령어입니다.
-          input[name="q1"]:checked는 q1 중 선택된 라디오 버튼을 뜻합니다.
-        */
-        const selected = document.querySelector('input[name="q' + i + '"]:checked');
-
-        /*
-          선택하지 않은 문항이 있으면 selected 값이 null이 됩니다.
-          그럴 때는 안내창을 띄우고 함수 실행을 멈춥니다.
-        */
-        if (selected === null) {
-          alert("답변을 선택해 주세요.");
-          return;
+        /* 폭죽 안전 처리 보조 함수 구현 */
+        function safeConfetti(opts) {
+            if (typeof confetti === 'undefined') return;
+            try { confetti(opts); } catch (e) {}
         }
 
-        /*
-          라디오 버튼의 value에는 유형 이름이 들어 있습니다.
-          선택된 유형의 점수를 1점 올립니다.
-        */
-        scores[selected.value] = scores[selected.value] + 1;
-      }
-
-      /*
-        최고 점수 유형을 찾습니다.
-        동점일 때는 TYPES 배열 순서가 우선순위가 됩니다.
-      */
-      let finalType = TYPES[0];
-      let highScore = scores[finalType];
-
-      for (let i = 1; i < TYPES.length; i++) {
-        const currentType = TYPES[i];
-
-        if (scores[currentType] > highScore) {
-          finalType = currentType;
-          highScore = scores[currentType];
+        function fireEmojiConfetti(emoji, colors) {
+            if (typeof confetti === 'undefined') return;
+            try {
+                const shape = confetti.shapeFromText({ text: emoji, scalar: 4 });
+                const baseOption = {
+                    particleCount: 60, spread: 90, startVelocity: 55, ticks: 250,
+                    shapes: [shape], scalar: 4, colors: colors, gravity: 0.8, drift: 0.1
+                };
+                confetti({ ...baseOption, origin: { x: 0.1, y: 0.9 }, angle: 60 });
+                confetti({ ...baseOption, origin: { x: 0.9, y: 0.9 }, angle: 120 });
+                setTimeout(() => {
+                    confetti({ ...baseOption, particleCount: 40, origin: { x: 0.5, y: 0.8 }, angle: 90, spread: 120 });
+                }, 300);
+            } catch (e) {}
         }
-      }
 
-      /*
-        최종 유형에 맞는 결과 데이터를 꺼냅니다.
-      */
-      const result = RESULT_DATA[finalType];
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('question-screen').style.display = 'flex';
+            currentIdx = 0;
+            renderQuestion();
+        }
 
-      /*
-        textContent는 HTML 요소 안의 글자를 바꾸는 명령어입니다.
-      */
-      document.getElementById("resultEmoji").textContent = result.emoji;
-      document.getElementById("resultType").textContent = finalType;
-      document.getElementById("resultStyle").textContent = result.style;
-      document.getElementById("resultRecommend").textContent = result.recommend;
-      document.getElementById("resultSuggestion").textContent = getRandomSuggestion(finalType);
-      document.getElementById("resultKeywords").textContent = result.keywords;
+        function renderQuestion() {
+            const screen = document.getElementById('question-screen');
+            screen.classList.remove('slide-fade');
+            void screen.offsetWidth;
+            screen.classList.add('slide-fade');
 
-      /*
-        2단계 SPA 결과 화면에 같은 결과를 출력합니다.
-      */
-      document.getElementById("spaResultEmoji").textContent = result.emoji;
-      document.getElementById("spaResultType").textContent = finalType;
-      document.getElementById("spaResultStyle").textContent = result.style;
-      document.getElementById("spaResultSuggestion").textContent = getRandomSuggestion(finalType);
+            const currentQ = QUESTIONS[currentIdx];
+            document.getElementById('progress-text').innerText = `Q${currentIdx + 1}/6`;
+            document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / 6) * 100}%`;
 
-      /*
-        결과 영역과 다시 하기 버튼을 화면에 보이게 합니다.
-      */
-      document.getElementById("resultArea").style.display = "block";
+            if (currentIdx === 0) {
+                document.getElementById('btn-back').style.visibility = 'hidden';
+            } else {
+                document.getElementById('btn-back').style.visibility = 'visible';
+            }
 
-      showScreen("result-screen");
-    }
+            document.getElementById('question-text').innerText = currentQ.q;
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
 
-    /*
-      resetQuiz 함수는 다시 하기 버튼을 눌렀을 때 실행됩니다.
-      선택값, 점수, 결과 화면을 초기화합니다.
+            currentQ.options.forEach((opt, idx) => {
+                const optValue = idx + 1;
+                const card = document.createElement('label');
+                card.className = 'option-card';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'kContentQuiz';
+                radio.value = optValue;
+                
+                if (userAnswers[currentIdx] == optValue) {
+                    radio.checked = true;
+                }
 
-      실제 점수는 showResult 함수 안에서 새로 만들어지기 때문에
-      다시 하기 후 버튼을 누르면 처음부터 다시 계산됩니다.
-    */
-    function resetQuiz() {
-      /*
-        form.reset()은 폼 안의 선택값을 처음 상태로 되돌립니다.
-      */
-      document.getElementById("quizForm").reset();
+                // ⑤ 선택 카드 ripple 효과 스크립트 결합
+                card.addEventListener('click', function(e) {
+                    const existingRipple = card.querySelector('.ripple-effect');
+                    if (existingRipple) existingRipple.remove();
 
-      /*
-        결과 영역의 글자를 비웁니다.
-      */
-      document.getElementById("resultEmoji").textContent = "";
-      document.getElementById("resultType").textContent = "";
-      document.getElementById("resultStyle").textContent = "";
-      document.getElementById("resultRecommend").textContent = "";
-      document.getElementById("resultSuggestion").textContent = "";
-      document.getElementById("resultKeywords").textContent = "";
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple-effect';
+                    
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    card.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 500);
+                });
 
-      document.getElementById("spaResultEmoji").textContent = "";
-      document.getElementById("spaResultType").textContent = "";
-      document.getElementById("spaResultStyle").textContent = "";
-      document.getElementById("spaResultSuggestion").textContent = "";
+                card.appendChild(radio);
+                card.appendChild(document.createTextNode(opt));
+                optionsContainer.appendChild(card);
+            });
 
-      /*
-        결과 영역과 다시 하기 버튼을 다시 숨깁니다.
-      */
-      document.getElementById("resultArea").style.display = "none";
+            const nextBtn = document.getElementById('btn-next');
+            if (currentIdx === 5) {
+                nextBtn.innerText = "📊 나의 K-콘텐츠 취향 알아보기";
+            } else {
+                nextBtn.innerText = "다음 질문으로 ➡️";
+            }
+        }
 
-      currentQuestionIndex = 0;
-      userAnswers = [];
+        function nextQuestion() {
+            const selected = document.querySelector('input[name="kContentQuiz"]:checked');
+            if (!selected) {
+                alert("답변을 선택해 주세요.");
+                return;
+            }
 
-      showScreen("start-screen");
-    }
-  </script>
+            userAnswers[currentIdx] = parseInt(selected.value);
+
+            if (currentIdx < 5) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                // 3단계 통합 연출 프로세스 발동 (전체 시퀀스 타임라인 실행)
+                runAnalysisSequence();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        /* 3단계 연출 시퀀스 타임라인 비동기 제어 함수 */
+        function runAnalysisSequence() {
+            // 질문 화면 종료 및 로딩창 활성화
+            document.getElementById('question-screen').style.display = 'none';
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'flex';
+
+            // 점수 및 유형 순위 미리 산출
+            const resultDataTuple = getCalculatedTypeData();
+            const highestType = resultDataTuple.type;
+            const data = RESULT_DATA[highestType];
+
+            // 1.5s 로딩 경과 후 인트로 화면으로 변환
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                const introScreen = document.getElementById('character-intro');
+                introScreen.style.display = 'flex';
+
+                // 인트로 내용물 초기 바인딩
+                document.getElementById('intro-title-text').innerText = `${highestType}!`;
+                
+                const introImgContainer = document.getElementById('intro-img-container');
+                introImgContainer.innerHTML = '';
+                
+                const mainImg = document.createElement('img');
+                mainImg.src = data.url;
+                mainImg.alt = highestType;
+                mainImg.onerror = function() {
+                    introImgContainer.innerHTML = `<span style="font-size:100px;">${data.emoji}</span>`;
+                };
+                introImgContainer.appendChild(mainImg);
+
+                // 2.7s 시점 (인트로 진입 후 1.2초 뒤) 폭죽 연출 가동
+                setTimeout(() => {
+                    fireEmojiConfetti(data.emoji, data.color);
+                }, 1200);
+
+                // 3.5s 시점 (인트로 진입 후 2.0초 뒤) 페이드 아웃 및 결과 로드 매핑
+                setTimeout(() => {
+                    introScreen.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        introScreen.style.display = 'none';
+                        introScreen.classList.remove('fade-out');
+                        
+                        // 결과 렌더링 후 완료 출력
+                        showFinalResultScreen(highestType, data);
+                    }, 400); // 페이드 아웃 전환 대기 완료
+
+                }, 2000);
+
+            }, 1500);
+        }
+
+        /* [🚨 절대 변경 금지 - 1단계 내부 점수 연산 매핑 보존 알고리즘] */
+        function getCalculatedTypeData() {
+            let scores = {
+                "K-푸드 탐험형": 0,
+                "K-POP 에너지형": 0,
+                "K-드라마 감성형": 0,
+                "K-캐릭터 몰입형": 0
+            };
+
+            userAnswers.forEach(ans => {
+                if (ans === 1) scores["K-푸드 탐험형"]++;
+                else if (ans === 2) scores["K-POP 에너지형"]++;
+                else if (ans === 3) scores["K-드라마 감성형"]++;
+                else if (ans === 4) scores["K-캐릭터 몰입형"]++;
+            });
+
+            calculatedScores = scores; // 격차 계산을 위한 동기화
+
+            const typeOrder = ["K-푸드 탐험형", "K-POP 에너지형", "K-드라마 감성형", "K-캐릭터 몰입형"];
+            let highestType = typeOrder[0];
+            let maxScore = scores[highestType];
+
+            for (let i = 1; i < typeOrder.length; i++) {
+                const currentType = typeOrder[i];
+                if (scores[currentType] > maxScore) {
+                    maxScore = scores[currentType];
+                    highestType = currentType;
+                }
+            }
+            return { type: highestType, score: maxScore };
+        }
+
+        /* ④ 1·2위 점수 차이별 맞춤식 분석 멘트 연산 함수 */
+        function getAnalysisComment(highestType) {
+            const scores = calculatedScores;
+            // 점수 배열 정렬하여 2위 점수 추출
+            const sortedScores = Object.values(scores).sort((a, b) => b - a);
+            const maxScore = sortedScores[0];
+            const secondScore = sortedScores[1];
+            const diff = maxScore - secondScore;
+
+            // 최고점 유형이 여러 개 있는지 동점 여부 검증
+            let ties = 0;
+            Object.values(scores).forEach(s => { if (s === maxScore) ties++; });
+
+            if (ties > 1) {
+                return `당신은 여러 매력을 함께 가진 균형형이에요.<br>그중에서도 [${highestType}] 성향이 살짝 더 강해요.`;
+            } else if (diff >= 3) {
+                return `당신은 확실한 [${highestType}]이에요!<br>이 성향이 강하게 나타났어요.`;
+            } else {
+                return `당신은 [${highestType}] 성향이 가장 두드러지지만,<br>다른 면도 함께 가지고 있어요.`;
+            }
+        }
+
+        /* 최종 완성형 결과화면 매핑 및 출력 */
+        function showFinalResultScreen(highestType, data) {
+            const resScreen = document.getElementById('result-screen');
+            resScreen.style.display = 'flex';
+            resScreen.scrollTop = 0; // 스크롤 바 상단 초기화
+
+            // ② 캐릭터 이미지 세팅 및 로드 실패 에러 대응 탑재
+            const imgArea = document.getElementById('result-image-area');
+            imgArea.innerHTML = '';
+            const resImg = document.createElement('img');
+            resImg.src = data.url;
+            resImg.className = 'result-char-img';
+            resImg.alt = highestType;
+            resImg.onerror = function() {
+                imgArea.innerHTML = `<div class="result-fallback-emoji">${data.emoji}</div>`;
+            };
+            imgArea.appendChild(resImg);
+
+            // 데이터 정보 바인딩
+            document.getElementById('res-type-name').innerText = highestType;
+            
+            // ④ 분석 멘트 박스 데이터 업데이트
+            document.getElementById('res-analysis').innerHTML = getAnalysisComment(highestType);
+            
+            document.getElementById('res-style').innerText = data.style;
+            document.getElementById('res-recommend').innerText = data.recommend;
+            
+            // ⑦ 강점 해시태그 칩 로드
+            const keywordsContainer = document.getElementById('res-keywords');
+            keywordsContainer.innerHTML = '';
+            data.keywords.forEach(kw => {
+                const chip = document.createElement('span');
+                chip.className = 'keyword-chip';
+                chip.innerText = kw;
+                keywordsContainer.appendChild(chip);
+            });
+
+            // ⑧ 실천제안 갱신
+            document.getElementById('res-suggestion').innerText = getRandomSuggestion(highestType);
+
+            // ④ 정보 카드 stagger fade-in 애니메이션 딜레이 동적 부여
+            const staggerItems = resScreen.querySelectorAll('.gray-box, .keywords-container, .analysis-box');
+            staggerItems.forEach((item, idx) => {
+                item.style.animationDelay = `${idx * 0.15}s`;
+            });
+        }
+
+        /* 🔄 리로드 없는 상태 메모리 청소 및 초기화 함수 */
+        function resetQuiz() {
+            userAnswers = [null, null, null, null, null, null];
+            currentIdx = 0;
+            calculatedScores = {};
+            
+            document.getElementById('quiz-form').reset();
+            document.getElementById('result-screen').style.display = 'none';
+            
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.display = 'flex';
+        }
+    </script>
 </body>
 </html>

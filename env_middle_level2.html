@@ -1,870 +1,611 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 나의 Green Attitude 알아보기</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
 
-  <!-- 모바일 화면에서 글자가 너무 작아지지 않도록 viewport를 설정합니다. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* [모바일 안전 세트 2] 글로벌 초기화 및 가독성 설정 */
+        * {
+            box-sizing: border-box;
+            font-family: 'Gowun Dodum', sans-serif;
+            letter-spacing: -0.2px;
+        }
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+            word-break: keep-all;
+            line-height: 1.6;
+            background-color: #f4f7f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-  <title>🌿 나의 Green Attitude 알아보기</title>
+        /* 🚨 [카드 박스 절대 고정 규칙] 모든 화면에서 동일한 크기 유지 */
+        .app-card {
+            width: 100%;
+            max-width: 420px;
+            height: 580px;                  /* 🚨 모든 화면 동일 고정 */
+            padding: 24px 20px;              /* 🚨 모든 화면 동일 고정 */
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            margin: 0 auto;
+            background: #ffffff;
+            position: relative;              /* 좌상단 이전 버튼 위치 기준 */
+            overflow-x: hidden;              /* 🚨 가로 스크롤 무조건 차단 */
+            overflow-y: auto;
+            scrollbar-width: none;           /* Firefox 스크롤바 숨김 */
+            display: flex;                   /* 내부 화면 정렬용 */
+            flex-direction: column;
+        }
+        .app-card::-webkit-scrollbar {
+            display: none;                   /* Chrome, Safari 스크롤바 숨김 */
+        }
 
-  <!-- Google Fonts는 예외적으로 사용 가능합니다. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+        /* 🚨 [flex 레이아웃] 화면별 공통 베이스 및 내부 전환용 컨테이너 */
+        .screen-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+            justify-content: flex-start;
+            transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+            flex-shrink: 0;
+        }
 
-  <style>
-    /* 모바일 안전을 위한 최소 CSS입니다. */
-    * {
-      box-sizing: border-box;
-    }
+        /* [화면 전환 애니메이션용 스타일] 슬라이드 효과 */
+        .screen-container.slide-left {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        .screen-container.slide-right {
+            transform: translateX(20px);
+            opacity: 0;
+        }
 
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-      word-break: keep-all;
-    }
+        /* 🚨 [버튼 뭉개짐 방지 규칙] 컨테이너 크기 변화에도 형태 고정 */
+        .main-btn {
+            width: 100%;
+            min-height: 52px;                /* 🚨 height 대신 min-height 사용 */
+            flex-shrink: 0;                  /* 🚨 절대 줄어들지 않게 */
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;                /* 🚨 카드 하단에 자연스럽게 정착 */
+            border: none;
+            background-color: #2ecc71;
+            color: #ffffff;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .main-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-1px);     /* 미세 효과만 적용하여 영역 이탈 차단 */
+        }
+        .main-btn:active {
+            transform: translateY(0);
+        }
 
-    img, video {
-      max-width: 100%;
-    }
+        /* [상단 진행률 영역 스타일] */
+        .progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            height: 36px;
+            margin-bottom: 5px;
+        }
+        /* 이전 버튼 (좌상단 화살표 원형) */
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #e5e5e5;
+            background: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background-color 0.2s;
+        }
+        .back-btn:hover {
+            background-color: #f9f9f9;
+        }
+        /* 진행바 컨테이너 */
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #eef2ef;
+            border-radius: 4px;
+            margin-left: 12px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 20%;
+            background-color: #2ecc71;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
 
-    body {
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      font-family: "Gowun Dodum", sans-serif;
-      line-height: 1.6;
-      letter-spacing: -0.2px;
-      background: linear-gradient(180deg, #ecfdf3 0%, #f7fff9 100%);
-      color: #1f3326;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+        /* [시작 화면 전용 비주얼] */
+        .title-area {
+            text-align: center;
+            padding: 40px 0 20px 0;
+        }
+        .title-area h1 {
+            font-size: 24px;
+            color: #1a3a2a;
+            margin: 0 0 16px 0;
+        }
+        .title-area p {
+            font-size: 14px;
+            color: #556b2f;
+            margin: 0;
+        }
 
-    /*
-      모든 화면을 담는 카드입니다.
-      시작 화면, 질문 화면, 결과 화면에서 같은 크기를 유지합니다.
-    */
-    .app-card {
-      width: 100%;
-      max-width: 420px;
-      height: 580px;
-      padding: 24px 20px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      margin: 0 auto;
-      background: #ffffff;
-      position: relative;
-      overflow-x: hidden;
-      overflow-y: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      display: flex;
-      flex-direction: column;
-    }
+        /* [질문 텍스트 스타일] */
+        .question-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
 
-    .app-card::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
+        /* [🚨 선택지 라디오 버튼 그룹 레이아웃] */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;                       /* 🚨 선택지가 다닥다닥 붙지 않도록 간격 필수 */
+        }
+        .option-card {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #e5e5e5;       /* 기본 테두리 */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #34495e;
+            transition: border-color 0.2s, background-color 0.2s;
+            flex-shrink: 0;                  /* 텍스트 줄바꿈 시 카드 찌그러짐 방지 */
+        }
+        .option-card input[type="radio"] {
+            margin: 0;
+            cursor: pointer;
+            accent-color: #2ecc71;           /* 모던한 라디오 포인트 컬러 */
+        }
+        /* 선택지 선택 시 디자인 스케일 대신 보더/배경 변경 적용 */
+        .option-card.selected {
+            border-color: #2ecc71;
+            background-color: #ebfaef;
+            font-weight: bold;
+        }
 
-    #start-screen,
-    #question-screen {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 14px;
-      justify-content: flex-start;
-    }
+        /* [결과 화면 레이아웃 정의] 콘텐츠 과다 시 독립 스크롤 허용 */
+        #result-screen {
+            gap: 12px;                       /* 결과화면은 콘텐츠 밀도가 높아 조금 더 좁게 조절 */
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        /* ① 유형 이모지 대형 표시 */
+        .result-emoji {
+            font-size: 85px;                 /* 80~100px 규칙 준수 */
+            text-align: center;
+            line-height: 1;
+            margin: 10px 0 0 0;
+        }
+        /* ② 유형명 */
+        .result-type {
+            font-size: 28px;                 /* 28px bold 규칙 준수 */
+            font-weight: bold;
+            text-align: center;
+            color: #1a3a2a;
+            margin: 0;
+        }
+        /* ③ 어떤 성향일까? (회색 박스) */
+        .result-description-box {
+            background-color: #f1f2f6;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #57606f;
+        }
+        /* ④ 💡 실천제안 (강조 박스 - 연두/노란 배경 + 테두리) */
+        .result-suggestion-box {
+            background-color: #fff9db;
+            border: 2px dashed #f1c40f;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #d35400;
+        }
 
-    #result-screen {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-      justify-content: flex-start;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
+        /* 유틸리티 클래스 */
+        .hidden {
+            display: none !important;
+        }
 
-    #result-screen::-webkit-scrollbar {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .title-area {
-      text-align: center;
-      padding-top: 20px;
-    }
-
-    .title-area h1 {
-      margin: 0 0 14px;
-      font-size: 30px;
-      line-height: 1.25;
-      color: #126c3a;
-    }
-
-    .title-area p {
-      margin: 0;
-      font-size: 16px;
-      color: #496152;
-    }
-
-    .custom-slot {
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 14px;
-      background: #f3fbf5;
-      border: 1px solid #d7efd9;
-      font-size: 14px;
-      color: #496152;
-    }
-
-    .custom-slot strong {
-      color: #126c3a;
-    }
-
-    .main-btn {
-      width: 100%;
-      min-height: 52px;
-      flex-shrink: 0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: auto;
-      border: none;
-      background: #198754;
-      color: #ffffff;
-      transition: background-color 0.2s ease, transform 0.2s ease;
-    }
-
-    .main-btn:hover {
-      background: #146c43;
-      transform: translateY(-1px);
-    }
-
-    .main-btn:active {
-      background: #0f5132;
-    }
-
-    .prev-btn {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      border: 1px solid #d8eadc;
-      background: #ffffff;
-      color: #126c3a;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 10;
-    }
-
-    .prev-btn:hover {
-      background: #edf8f0;
-    }
-
-    .progress-area {
-      padding-top: 34px;
-    }
-
-    .progress-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #496152;
-      font-weight: bold;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      border-radius: 99px;
-      background: #e7f3ea;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 20%;
-      border-radius: 99px;
-      background: #198754;
-      transition: width 0.25s ease;
-    }
-
-    .question-text {
-      margin: 0;
-      padding: 16px 0 4px;
-      font-size: 21px;
-      line-height: 1.45;
-      color: #1f3326;
-    }
-
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .option-card {
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 2px solid #e5e5e5;
-      flex-shrink: 0;
-      cursor: pointer;
-      background: #ffffff;
-      color: #263b2d;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .option-card:hover {
-      background: #f3fbf5;
-      border-color: #9dd9b3;
-    }
-
-    .option-card input {
-      margin-right: 8px;
-    }
-
-    .option-card.selected {
-      background: #e8f7ee;
-      border-color: #198754;
-      font-weight: bold;
-    }
-
-    .slide-left {
-      animation: slideLeft 0.25s ease;
-    }
-
-    .slide-right {
-      animation: slideRight 0.25s ease;
-    }
-
-    @keyframes slideLeft {
-      from {
-        opacity: 0;
-        transform: translateX(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideRight {
-      from {
-        opacity: 0;
-        transform: translateX(-24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .result-title {
-      margin: 0;
-      padding-top: 4px;
-      text-align: center;
-      font-size: 22px;
-      color: #126c3a;
-    }
-
-    .result-emoji {
-      font-size: 92px;
-      line-height: 1.1;
-      text-align: center;
-    }
-
-    .result-type-name {
-      margin: 0;
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #1f3326;
-    }
-
-    .result-box {
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #f5f6f5;
-      color: #37483d;
-      border: 1px solid #e2e6e2;
-      font-size: 15px;
-    }
-
-    .suggestion-box {
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #fff8d8;
-      color: #3f3a1f;
-      border: 1px solid #ecd875;
-      font-size: 15px;
-    }
-
-    .result-box strong,
-    .suggestion-box strong {
-      display: block;
-      margin-bottom: 4px;
-      color: #126c3a;
-    }
-
-    footer {
-      width: 100%;
-      max-width: 420px;
-      margin-top: 14px;
-      text-align: center;
-      font-size: 13px;
-      color: #5c7464;
-    }
-
-    @media (max-width: 380px) {
-      body {
-        padding: 12px;
-      }
-
-      .title-area h1 {
-        font-size: 26px;
-      }
-
-      .question-text {
-        font-size: 19px;
-      }
-
-      .option-card {
-        padding: 12px 14px;
-        font-size: 15px;
-      }
-    }
-  </style>
+        /* 하단 푸터 디자인 */
+        footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #bdc3c7;
+            text-align: center;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="app-card">
-    <!-- 시작 화면입니다. -->
-    <section id="start-screen">
-      <div class="title-area">
-        <h1>🌿 나의 Green Attitude 알아보기</h1>
-        <p>
-          내가 생각하는 가장 중요한 환경 가치와 태도는 무엇일까요?
-          아래의 질문에 답하고 나의 환경 실천 성향을 알아보아요!
-        </p>
 
+    <div class="app-card">
 
-      <button type="button" class="main-btn" id="startButton">🚀 나의 환경 실천 성향 알아보기</button>
-    </section>
-
-    <!-- 질문 화면입니다. -->
-    <section id="question-screen" class="hidden">
-      <button type="button" class="prev-btn" id="prevButton">←</button>
-
-      <div class="progress-area">
-        <div class="progress-top">
-          <span id="progressText">Q1/5</span>
-          <span>🌿</span>
+        <div id="start-screen" class="screen-container">
+            <div class="title-area">
+                <h1>🌿 나의 Green Attitude 알아보기</h1>
+                <p>내가 생각하는 가장 중요한 환경 가치와 태도는 무엇일까요? 아래의 질문에 답하고 나의 환경 실천 성향을 알아보아요!</p>
+            </div>
+            <button class="main-btn" onclick="startQuiz()">🚀 나의 환경 실천 성향 알아보기</button>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
+
+        <div id="question-screen" class="screen-container hidden">
+            <div class="progress-header">
+                <button type="button" id="prevBtn" class="back-btn" onclick="prevQuestion()">←</button>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <span id="progressText" class="progress-text">1/5</span>
+            </div>
+
+            <form id="quizForm" onsubmit="return false;">
+                <div class="quiz-group" id="group1">
+                    <div class="question-text">Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?</div>
+                    <div class="options">
+                        <label class="option-card"><input type="radio" name="q1" value="1" onclick="selectOption(this)"> ① 일회용품 사용을 줄이는 생활 실천 캠페인</label>
+                        <label class="option-card"><input type="radio" name="q1" value="2" onclick="selectOption(this)"> ② 학생들과 함께 교내 환경 규칙을 만들고 실천하기</label>
+                        <label class="option-card"><input type="radio" name="q1" value="3" onclick="selectOption(this)"> ③ AI 기술을 활용한 친환경 관리 시스템 도입</label>
+                        <label class="option-card"><input type="radio" name="q1" value="4" onclick="selectOption(this)"> ④ 학교 주변 자연 생태를 보전하고 복원하는 활동</label>
+                    </div>
+                </div>
+
+                <div class="quiz-group hidden" id="group2">
+                    <div class="question-text">Q2. 기후 변화 뉴스를 봤을 때 가장 먼저 드는 생각은?</div>
+                    <div class="options">
+                        <label class="option-card"><input type="radio" name="q2" value="1" onclick="selectOption(this)"> ① 나부터 생활 습관을 바꿔야겠다</label>
+                        <label class="option-card"><input type="radio" name="q2" value="2" onclick="selectOption(this)"> ② 사회 전체의 협력과 책임이 중요하다</label>
+                        <label class="option-card"><input type="radio" name="q2" value="3" onclick="selectOption(this)"> ③ 새로운 친환경 기술 개발이 필요하다</label>
+                        <label class="option-card"><input type="radio" name="q2" value="4" onclick="selectOption(this)"> ④ 자연과 생태계가 더 이상 훼손되지 않아야 한다</label>
+                    </div>
+                </div>
+
+                <div class="quiz-group hidden" id="group3">
+                    <div class="question-text">Q3. 물건이나 제품을 고를 때 가장 중요하게 보는 것은?</div>
+                    <div class="options">
+                        <label class="option-card"><input type="radio" name="q3" value="1" onclick="selectOption(this)"> ① 실제로 꾸준히 사용할 수 있는가</label>
+                        <label class="option-card"><input type="radio" name="q3" value="2" onclick="selectOption(this)"> ② 사회적으로 환경 보호에 노력하는 기업인가</label>
+                        <label class="option-card"><input type="radio" name="q3" value="3" onclick="selectOption(this)"> ③ 최신 친환경 기술이 적용되었는가</label>
+                        <label class="option-card"><input type="radio" name="q3" value="4" onclick="selectOption(this)"> ④ 자연과 환경에 미치는 영향이 적은 방식으로 만들어졌는가</label>
+                    </div>
+                </div>
+
+                <div class="quiz-group hidden" id="group4">
+                    <div class="question-text">Q4. 우리 지역에 가장 필요하다고 생각하는 환경 정책은?</div>
+                    <div class="options">
+                        <label class="option-card"><input type="radio" name="q4" value="1" onclick="selectOption(this)"> ① 시민 참여형 분리배출 보상 제도</label>
+                        <label class="option-card"><input type="radio" name="q4" value="2" onclick="selectOption(this)"> ② 플라스틱 사용 줄이기, 차량 제한 등 공동체 환경 규칙</label>
+                        <label class="option-card"><input type="radio" name="q4" value="3" onclick="selectOption(this)"> ③ 스마트 친환경 도시 시스템 구축 및 확대</label>
+                        <label class="option-card"><input type="radio" name="q4" value="4" onclick="selectOption(this)"> ④ 도심 숲, 하천 등 생태 공간 확대</label>
+                    </div>
+                </div>
+
+                <div class="quiz-group hidden" id="group5">
+                    <div class="question-text">Q5. 미래 환경 문제 해결의 핵심은 무엇이라고 생각하는가?</div>
+                    <div class="options">
+                        <label class="option-card"><input type="radio" name="q5" value="1" onclick="selectOption(this)"> ① 개인의 꾸준한 실천</label>
+                        <label class="option-card"><input type="radio" name="q5" value="2" onclick="selectOption(this)"> ② 사회 전체의 협력과 제도적 변화</label>
+                        <label class="option-card"><input type="radio" name="q5" value="3" onclick="selectOption(this)"> ③ 과학기술 혁신과 새로운 발명</label>
+                        <label class="option-card"><input type="radio" name="q5" value="4" onclick="selectOption(this)"> ④ 자연과 공존하려는 태도와 철학</label>
+                    </div>
+                </div>
+            </form>
+
+            <button id="nextBtn" class="main-btn" onclick="nextQuestion()">다음 질문으로 ➡️</button>
         </div>
-      </div>
 
-      <!-- 
-        form 태그는 여러 입력 요소를 하나로 묶을 때 사용합니다.
-        여기서는 Q1~Q5의 라디오 버튼을 묶는 역할을 합니다.
-      -->
-      <form id="quizForm">
-        <h2 class="question-text" id="questionText">Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?</h2>
+        <div id="result-screen" class="screen-container hidden">
+            <h4 class="result-title">📊 나의 환경 실천 성향 결과</h4>
+            
+            <div id="resultEmoji" class="result-emoji"></div>
+            
+            <h3 id="resultType" class="result-type"></h3>
+            
+            <div class="result-description-box">
+                <strong>어떤 성향일까?:</strong> <span id="resultDescription"></span>
+            </div>
+            
+            <div class="result-suggestion-box">
+                <strong>💡 실천제안:</strong> <span id="resultSuggestion"></span>
+            </div>
 
-        <div class="options" id="optionsArea">
-          <!-- 같은 질문의 라디오 버튼은 name을 같게 해야 하나만 선택됩니다. -->
+            <button class="main-btn" onclick="resetQuiz()">🔄 다시 하기</button>
         </div>
-      </form>
 
-      <button type="button" class="main-btn" id="resultButton">다음 질문으로 ➡️</button>
-    </section>
+    </div>
 
-    <!-- 결과 화면입니다. -->
-    <section id="result-screen" class="hidden">
-      <!-- 결과가 표시될 영역입니다. 처음에는 비워 둡니다. -->
-      <div id="resultArea"></div>
-    </section>
-  </div>
+    <footer>AI의 도움을 받아 제작된 콘텐츠입니다.</footer>
 
-  <footer>
-    <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
-  </footer>
+    <script>
+        // 전역 상태 관리 변수 추가
+        let currentIdx = 1; 
 
-  <script>
-    /*
-      QUESTIONS 배열에는 5개의 질문과 선택지가 들어 있습니다.
-      배열은 여러 개의 값을 순서대로 저장하는 자료입니다.
-      첫 번째 질문은 QUESTIONS[0], 두 번째 질문은 QUESTIONS[1]처럼 사용할 수 있습니다.
-    */
-    const QUESTIONS = [
-      {
-        title: "Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?",
-        name: "q1",
-        options: [
-          "① 일회용품 사용을 줄이는 생활 실천 캠페인",
-          "② 학생들과 함께 교내 환경 규칙을 만들고 실천하기",
-          "③ AI 기술을 활용한 친환경 관리 시스템 도입",
-          "④ 학교 주변 자연 생태를 보전하고 복원하는 활동"
-        ]
-      },
-      {
-        title: "Q2. 기후 변화 뉴스를 봤을 때 가장 먼저 드는 생각은?",
-        name: "q2",
-        options: [
-          "① 나부터 생활 습관을 바꿔야겠다",
-          "② 사회 전체의 협력과 책임이 중요하다",
-          "③ 새로운 친환경 기술 개발이 필요하다",
-          "④ 자연과 생태계가 더 이상 훼손되지 않아야 한다"
-        ]
-      },
-      {
-        title: "Q3. 물건이나 제품을 고를 때 가장 중요하게 보는 것은?",
-        name: "q3",
-        options: [
-          "① 실제로 꾸준히 사용할 수 있는가",
-          "② 사회적으로 환경 보호에 노력하는 기업인가",
-          "③ 최신 친환경 기술이 적용되었는가",
-          "④ 자연과 환경에 미치는 영향이 적은 방식으로 만들어졌는가"
-        ]
-      },
-      {
-        title: "Q4. 우리 지역에 가장 필요하다고 생각하는 환경 정책은?",
-        name: "q4",
-        options: [
-          "① 시민 참여형 분리배출 보상 제도",
-          "② 플라스틱 사용 줄이기, 차량 제한 등 공동체 환경 규칙",
-          "③ 스마트 친환경 도시 시스템 구축 및 확대",
-          "④ 도심 숲, 하천 등 생태 공간 확대"
-        ]
-      },
-      {
-        title: "Q5. 미래 환경 문제 해결의 핵심은 무엇이라고 생각하는가?",
-        name: "q5",
-        options: [
-          "① 개인의 꾸준한 실천",
-          "② 사회 전체의 협력과 제도적 변화",
-          "③ 과학기술 혁신과 새로운 발명",
-          "④ 자연과 공존하려는 태도와 철학"
-        ]
-      }
-    ];
+        /* [학습 포인트 1: 데이터 보존] 
+           1단계의 고유 데이터 세트 및 자료구조 규칙을 완전 동일하게 지킵니다. */
+        const SUGGESTIONS = {
+          "A": [
+            "오늘 점심부터 잔반 제로에 도전해봐!",
+            "양치할 때 컵 사용하면 하루 약 6L 물을 아낄 수 있어!",
+            "안 쓰는 콘센트는 뽑아두면 대기전력을 줄일 수 있어.",
+            "텀블러 들고 다니는 습관, 일주일만 해봐!",
+            "엘리베이터 대신 계단을 이용해보자.",
+            "장 볼 때 에코백을 챙기는 습관을 들여봐.",
+            "분리수거 라벨 떼는 1초가 재활용률을 크게 높여!",
+            "여름엔 에어컨 1도만 높여도 큰 절약이 돼.",
+            "샤워 시간을 5분으로 줄여보자.",
+            "음식 남기지 않을 만큼만 덜어 먹는 연습을 해봐!",
+          ],
+          "B": [
+            "친구들과 학교 분리수거함 디자인을 바꿔보자!",
+            "환경 캠페인 포스터를 만들어 SNS에 올려봐.",
+            "우리 반 '플라스틱 없는 날' 행사를 제안해봐!",
+            "동네 쓰레기 핫스팟을 지도로 만들어 공유해보자.",
+            "환경 동아리를 만들거나 가입해봐.",
+            "기후 행동 청소년 캠페인에 참여해보자.",
+            "학교 급식 잔반 줄이기 챌린지를 기획해봐!",
+            "환경 관련 책을 친구에게 추천하는 릴레이를 시작해봐.",
+            "지역 의회·시청에 환경 제안서를 보내봐.",
+            "가족 회의에서 '우리 집 친환경 규칙'을 함께 정해봐!",
+          ],
+          "C": [
+            "재활용 마크 인식 앱을 직접 만들어보자!",
+            "태양광 충전기를 직접 조립해보는 키트를 찾아봐.",
+            "AI로 분리수거를 도와주는 아이디어를 그려봐.",
+            "전기 사용량을 자동 기록하는 IoT 장치를 알아봐!",
+            "친환경 신소재(바이오 플라스틱 등)에 대해 조사해봐.",
+            "탄소발자국 계산기를 직접 코딩해보자!",
+            "에코 디자인 공모전에 작품을 출품해봐.",
+            "스마트팜 영상을 보고 우리 집 미니 버전을 시도해봐!",
+            "전기차·수소차 원리를 친구에게 설명해보자.",
+            "환경 데이터 시각화 프로젝트를 시작해봐!",
+          ],
+          "D": [
+            "주말에 동네 산책로 한 코스를 걸어보자!",
+            "베란다·창가에 작은 화분 하나를 키워봐.",
+            "근처 숲·공원에서 '5분 멍 때리기'를 해봐.",
+            "계절별 동식물 관찰 일기를 써보자!",
+            "비건 메뉴를 일주일에 한 번 시도해봐.",
+            "유기견·유기묘 보호소 봉사활동에 참여해봐.",
+            "동물원보다는 자연 보호구역 방문을 추천해!",
+            "도시 양봉, 도시 텃밭 같은 공동 프로젝트를 찾아봐.",
+            "버드피더(새 모이통)를 창가에 달아보자!",
+            "사라져가는 멸종위기종에 대해 한 종씩 공부해봐.",
+          ],
+        };
 
-    /*
-      SUGGESTIONS는 객체입니다.
-      객체는 이름표가 붙은 여러 값을 저장할 수 있습니다.
-
-      여기서는 SUGGESTIONS 객체 안에 A, B, C, D라는 이름표가 있고,
-      각 이름표 안에는 배열이 들어 있습니다.
-
-      배열은 여러 개의 값을 순서대로 저장하는 자료입니다.
-      학생이 직접 새 실천제안을 추가하고 싶다면,
-      원하는 유형의 배열 안에 문자열을 하나 더 넣어 보면 됩니다.
-    */
-    const SUGGESTIONS = {
-      "A": [
-        "등하굣길에 보이는 작은 쓰레기를 줍는 '플로깅'에 도전해 보세요!",
-        "일주일에 하루는 '플라스틱 없는 날'을 정해 실천해 보세요!",
-        "장바구니와 텀블러를 가방에 항상 챙겨 다니는 습관을 만들어 보세요!",
-        "우리 집에서 가장 많이 버리는 쓰레기 1가지를 줄이는 도전을 시작해 보세요!",
-        "사용하지 않는 콘센트는 뽑고, 안 쓰는 불은 끄는 '에너지 절약 챔피언'이 되어 보세요!",
-      ],
-      "B": [
-        "교내 환경 규칙 만들기나 캠페인 조직 등 공동체의 규칙을 바꾸는 환경 리더로 성장해 보세요!",
-        "친구들과 함께 '교내 환경 동아리'를 만들어 정기 활동을 기획해 보세요!",
-        "학교에 필요한 환경 정책을 제안하는 학생회 캠페인에 참여해 보세요!",
-        "SNS로 환경 이슈를 알리는 '디지털 환경 운동가'에 도전해 보세요!",
-        "우리 학교의 일회용품 사용 규칙을 함께 만들어 학생회에 제안해 보세요!",
-      ],
-      "C": [
-        "AI로 우리 동네 미세먼지·소음 데이터를 분석하는 미니 프로젝트를 시도해 보세요!",
-        "친환경 발명 아이디어 공모전이나 메이커 페어에 도전해 보세요!",
-        "스마트 식물 키트나 IoT 환경 센서를 만들어 보는 메이커 활동에 도전해 보세요!",
-        "친환경 신기술(전기차·태양광 등)을 조사해 친구들 앞에서 발표해 보세요!",
-        "환경 문제를 다루는 코딩 챌린지나 해커톤에 참여해 보세요!",
-      ],
-      "D": [
-        "자연을 주제로 한 글이나 그림을 SNS·블로그에 공유해 따뜻한 메시지를 전해 보세요!",
-        "학교 텃밭이나 베란다 정원을 가꾸며 작은 생명을 직접 길러 보세요!",
-        "환경 다큐멘터리를 본 후 친구들과 함께 이야기 나누는 '에코 토크 데이'를 열어 보세요!",
-        "멸종 위기 동물에 대해 깊이 조사하고 보호 캠페인에 동참해 보세요!",
-        "가까운 국립공원이나 생태 체험관을 방문해 자연을 직접 느껴 보세요!",
-      ],
-    };
-
-    /*
-      getRandomSuggestion 함수는 유형을 받아서
-      해당 유형의 실천제안 중 1개를 무작위로 돌려줍니다.
-
-      Math.random()은 0 이상 1 미만의 무작위 소수를 만듭니다.
-      Math.floor()는 소수점을 버려서 정수로 만듭니다.
-      그래서 Math.random() * list.length를 한 뒤 Math.floor()를 사용하면
-      배열에서 사용할 수 있는 무작위 번호를 만들 수 있습니다.
-
-      return은 함수가 계산한 값을 밖으로 보내는 명령어입니다.
-    */
-    function getRandomSuggestion(type) {
-      const list = SUGGESTIONS[type];
-      const idx = Math.floor(Math.random() * list.length);
-      return list[idx];
-    }
-
-    /*
-      TYPES 객체에는 각 유형의 이름, 이모지, 설명을 저장합니다.
-      결과 화면을 만들 때 이 정보를 꺼내서 사용합니다.
-    */
-    const TYPES = {
-      "A": {
-        name: "생활 실천형",
-        emoji: "🌱",
-        description: "지금 당장 할 수 있는 행동을 중요하게 생각하는 유형"
-      },
-      "B": {
-        name: "사회 변화형",
-        emoji: "🤝",
-        description: "법·제도·사회적 협력이 중요하다고 생각하는 유형"
-      },
-      "C": {
-        name: "기술 혁신형",
-        emoji: "💡",
-        description: "과학기술과 아이디어를 통해 환경 문제 해결 방법을 찾는 유형"
-      },
-      "D": {
-        name: "자연 공존형",
-        emoji: "🌳",
-        description: "인간과 자연이 함께 살아가는 방식을 중요하게 생각하는 유형"
-      }
-    };
-
-    /*
-      SCORE_MAP은 선택지 번호에 따라 어떤 유형에 점수를 줄지 정리한 객체입니다.
-
-      모든 문항 공통:
-      ① 선택 시: A 생활 실천형 +2점 / D 자연 공존형 +1점
-      ② 선택 시: B 사회 변화형 +2점 / A 생활 실천형 +1점
-      ③ 선택 시: C 기술 혁신형 +2점 / B 사회 변화형 +1점
-      ④ 선택 시: D 자연 공존형 +2점 / C 기술 혁신형 +1점
-    */
-    const SCORE_MAP = {
-      "1": [
-        { type: "A", point: 2 },
-        { type: "D", point: 1 }
-      ],
-      "2": [
-        { type: "B", point: 2 },
-        { type: "A", point: 1 }
-      ],
-      "3": [
-        { type: "C", point: 2 },
-        { type: "B", point: 1 }
-      ],
-      "4": [
-        { type: "D", point: 2 },
-        { type: "C", point: 1 }
-      ]
-    };
-
-    // 버튼과 결과 영역을 자바스크립트에서 사용할 수 있도록 가져옵니다.
-    const resultButton = document.getElementById("resultButton");
-    const resultArea = document.getElementById("resultArea");
-    const quizForm = document.getElementById("quizForm");
-
-    const startScreen = document.getElementById("start-screen");
-    const questionScreen = document.getElementById("question-screen");
-    const resultScreen = document.getElementById("result-screen");
-    const startButton = document.getElementById("startButton");
-    const prevButton = document.getElementById("prevButton");
-    const progressText = document.getElementById("progressText");
-    const progressFill = document.getElementById("progressFill");
-    const questionText = document.getElementById("questionText");
-    const optionsArea = document.getElementById("optionsArea");
-
-    /*
-      currentQuestionIndex는 현재 몇 번째 질문을 보고 있는지 저장합니다.
-      컴퓨터는 0부터 세기 때문에 Q1은 0, Q2는 1입니다.
-    */
-    let currentQuestionIndex = 0;
-
-    /*
-      selectedAnswers는 학생이 고른 답을 저장하는 객체입니다.
-      예를 들어 q1에서 2번을 고르면 selectedAnswers.q1 = "2"가 됩니다.
-    */
-    let selectedAnswers = {};
-
-    /*
-      addEventListener는 어떤 일이 일어났을 때 실행할 코드를 정하는 문법입니다.
-      여기서는 각 버튼을 클릭했을 때 필요한 함수가 실행됩니다.
-    */
-    startButton.addEventListener("click", function() {
-      startScreen.classList.add("hidden");
-      questionScreen.classList.remove("hidden");
-      currentQuestionIndex = 0;
-      renderQuestion("left");
-    });
-
-    resultButton.addEventListener("click", function() {
-      const currentQuestion = QUESTIONS[currentQuestionIndex];
-      const selected = document.querySelector('input[name="' + currentQuestion.name + '"]:checked');
-
-      if (!selected) {
-        alert("답변을 선택해 주세요.");
-        return;
-      }
-
-      selectedAnswers[currentQuestion.name] = selected.value;
-
-      if (currentQuestionIndex < QUESTIONS.length - 1) {
-        currentQuestionIndex++;
-        renderQuestion("left");
-      } else {
-        calculateResult();
-      }
-    });
-
-    prevButton.addEventListener("click", function() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuestion("right");
-      }
-    });
-
-    /*
-      renderQuestion 함수는 현재 질문 번호에 맞는 질문과 선택지를 화면에 보여 줍니다.
-      direction 값에 따라 좌우 슬라이드 느낌을 다르게 줍니다.
-    */
-    function renderQuestion(direction) {
-      const question = QUESTIONS[currentQuestionIndex];
-
-      questionText.textContent = question.title;
-      progressText.textContent = "Q" + (currentQuestionIndex + 1) + "/5";
-      progressFill.style.width = ((currentQuestionIndex + 1) / QUESTIONS.length * 100) + "%";
-
-      if (currentQuestionIndex === 0) {
-        prevButton.style.visibility = "hidden";
-      } else {
-        prevButton.style.visibility = "visible";
-      }
-
-      if (currentQuestionIndex === QUESTIONS.length - 1) {
-        resultButton.textContent = "📊 나의 환경 실천 성향 알아보기";
-      } else {
-        resultButton.textContent = "다음 질문으로 ➡️";
-      }
-
-      optionsArea.innerHTML = "";
-
-      /*
-        forEach는 배열 안의 값을 하나씩 꺼내서 실행하는 반복문입니다.
-        여기서는 선택지 4개를 차례대로 화면에 만듭니다.
-      */
-      question.options.forEach(function(optionText, index) {
-        const value = String(index + 1);
-        const label = document.createElement("label");
-
-        label.className = "option-card";
-
-        if (selectedAnswers[question.name] === value) {
-          label.classList.add("selected");
+        /* [학습 포인트 2: 랜덤 로직 원형 보존] */
+        function getRandomSuggestion(type) {
+          const list = SUGGESTIONS[type];
+          const idx = Math.floor(Math.random() * list.length);
+          return list[idx];
         }
 
-        label.innerHTML = '<input type="radio" name="' + question.name + '" value="' + value + '"> ' + optionText;
+        const TYPE_DETAILS = {
+            "A": { name: "A. 생활 실천형", emoji: "🌱", desc: "지금 당장 할 수 있는 행동을 중요하게 생각하는 유형" },
+            "B": { name: "B. 사회 변화형", emoji: "🤝", desc: "법·제도·사회적 협력이 중요하다고 생각하는 유형" },
+            "C": { name: "C. 기술 혁신형", emoji: "💡", desc: "과학기술과 아이디어를 통해 환경 문제 해결 방법을 찾는 유형" },
+            "D": { name: "D. 자연 공존형", emoji: "🌳", desc: "인간과 자연이 함께 살아가는 방식을 중요하게 생각하는 유형" }
+        };
 
-        const input = label.querySelector("input");
-
-        if (selectedAnswers[question.name] === value) {
-          input.checked = true;
+        // 앱 시작 처리
+        function startQuiz() {
+            transitionScreen('start-screen', 'question-screen', () => {
+                currentIdx = 1;
+                renderStep();
+            });
         }
 
-        input.addEventListener("change", function() {
-          const cards = optionsArea.querySelectorAll(".option-card");
-
-          cards.forEach(function(card) {
-            card.classList.remove("selected");
-          });
-
-          label.classList.add("selected");
-          selectedAnswers[question.name] = value;
-        });
-
-        optionsArea.appendChild(label);
-      });
-
-      questionScreen.classList.remove("slide-left");
-      questionScreen.classList.remove("slide-right");
-
-      /*
-        setTimeout은 아주 짧은 시간 뒤에 코드를 실행하게 해 줍니다.
-        클래스를 뺐다가 다시 넣어야 애니메이션이 다시 작동합니다.
-      */
-      setTimeout(function() {
-        if (direction === "right") {
-          questionScreen.classList.add("slide-right");
-        } else {
-          questionScreen.classList.add("slide-left");
-        }
-      }, 10);
-    }
-
-    function calculateResult() {
-      /*
-        점수를 저장할 객체입니다.
-        처음에는 모든 유형의 점수를 0점으로 시작합니다.
-      */
-      const scores = {
-        "A": 0,
-        "B": 0,
-        "C": 0,
-        "D": 0
-      };
-
-      /*
-        scoreHistory는 점수가 올라간 순서를 저장합니다.
-        동점일 때 "먼저 최고 점수에 도달한 유형"을 찾기 위해 사용합니다.
-      */
-      const scoreHistory = [];
-
-      // Q1부터 Q5까지 사용자가 고른 답을 확인합니다.
-      for (let i = 1; i <= 5; i++) {
-        const choice = selectedAnswers["q" + i];
-
-        // 선택하지 않은 문항이 있으면 경고창을 보여 주고 함수 실행을 멈춥니다.
-        if (!choice) {
-          alert("답변을 선택해 주세요.");
-          return;
+        // 라디오 클릭 인터페이스 동적 피드백 효과 처리
+        function selectOption(input) {
+            const container = input.closest('.options');
+            container.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            input.closest('.option-card').classList.add('selected');
         }
 
-        // 선택지 번호에 맞는 점수 규칙을 가져옵니다.
-        const pointList = SCORE_MAP[choice];
+        // 스텝별 화면 렌더링 동기화
+        function renderStep() {
+            // 모든 문항 그룹 숨김 후 현재 인덱스 활성화
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`group${i}`).classList.add('hidden');
+            }
+            document.getElementById(`group${currentIdx}`).classList.remove('hidden');
 
-        /*
-          forEach는 배열 안의 값을 하나씩 꺼내서 실행하는 반복문입니다.
-          예를 들어 ①을 선택하면 A에 2점, D에 1점을 차례로 더합니다.
-        */
-        pointList.forEach(function(item) {
-          scores[item.type] = scores[item.type] + item.point;
+            // 이전 화살표 분기 제어 (Q1에서 숨김)
+            const prevBtn = document.getElementById('prevBtn');
+            if(currentIdx === 1) {
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                prevBtn.style.visibility = 'visible';
+            }
 
-          scoreHistory.push({
-            type: item.type,
-            score: scores[item.type]
-          });
-        });
-      }
+            // 상단 진행바 및 인디케이터 업데이트
+            document.getElementById('progressBar').style.width = `${currentIdx * 20}%`;
+            document.getElementById('progressText').textContent = `${currentIdx}/5`;
 
-      // 최고 점수를 구합니다.
-      const maxScore = Math.max(scores.A, scores.B, scores.C, scores.D);
-
-      // 최고 점수를 받은 유형들을 배열에 모읍니다.
-      const topTypes = [];
-
-      if (scores.A === maxScore) {
-        topTypes.push("A");
-      }
-
-      if (scores.B === maxScore) {
-        topTypes.push("B");
-      }
-
-      if (scores.C === maxScore) {
-        topTypes.push("C");
-      }
-
-      if (scores.D === maxScore) {
-        topTypes.push("D");
-      }
-
-      let finalType = topTypes[0];
-
-      /*
-        동점이 있다면, 먼저 최고 점수에 도달한 유형을 고릅니다.
-        scoreHistory를 처음부터 확인하면서,
-        최고 점수에 먼저 도달한 유형을 finalType으로 정합니다.
-      */
-      if (topTypes.length > 1) {
-        for (let i = 0; i < scoreHistory.length; i++) {
-          const record = scoreHistory[i];
-
-          if (topTypes.includes(record.type) && record.score === maxScore) {
-            finalType = record.type;
-            break;
-          }
+            // 하단 메인 제어 버튼 텍스트 변경 규칙 반영
+            const nextBtn = document.getElementById('nextBtn');
+            if(currentIdx === 5) {
+                nextBtn.textContent = '📊 나의 환경 실천 성향 알아보기';
+            } else {
+                nextBtn.textContent = '다음 질문으로 ➡️';
+            }
         }
-      }
 
-      // 최종 유형의 정보와 무작위 실천제안을 가져옵니다.
-      const resultType = TYPES[finalType];
-      const suggestion = getRandomSuggestion(finalType);
+        // 이전 질문 뒤로가기
+        function prevQuestion() {
+            if(currentIdx > 1) {
+                currentIdx--;
+                renderStep();
+            }
+        }
 
-      questionScreen.classList.add("hidden");
-      resultScreen.classList.remove("hidden");
+        // 다음 스텝 제어 및 최종 결과 수집 연산
+        function nextQuestion() {
+            // 현재 문항 체크 여부 확인 검사 고정
+            const checkedOption = document.querySelector(`input[name="q${currentIdx}"]:checked`);
+            if (!checkedOption) {
+                alert("답변을 선택해 주세요.");
+                return;
+            }
 
-      /*
-        innerHTML은 HTML 내용을 자바스크립트로 넣을 때 사용합니다.
-        버튼을 누르면 같은 카드 안에서 결과 화면이 표시됩니다.
-      */
-      resultArea.innerHTML = `
-        <h2 class="result-title">📊 나의 환경 실천 성향 결과</h2>
-        <div class="result-emoji">${resultType.emoji}</div>
-        <h3 class="result-type-name">${finalType}. ${resultType.name}</h3>
-        <div class="result-box">
-          <strong>어떤 성향일까?</strong>
-          ${resultType.description}
-        </div>
-        <div class="suggestion-box">
-          <strong>💡 실천제안</strong>
-          ${suggestion}
-        </div>
-        <button type="button" class="main-btn" id="resetButton">🔄 다시 하기</button>
-      `;
+            if(currentIdx < 5) {
+                currentIdx++;
+                renderStep();
+            } else {
+                // 5번 최종 완료 시 결과 산출식 발동
+                calculateResult();
+            }
+        }
 
-      /*
-        결과 영역 안에 새로 만들어진 다시 하기 버튼을 가져옵니다.
-        다시 하기 버튼을 누르면 resetQuiz 함수가 실행됩니다.
-      */
-      const resetButton = document.getElementById("resetButton");
-      resetButton.addEventListener("click", resetQuiz);
-    }
+        // [1단계 로직 정밀 이식] 점수 계산 및 출력식 구현
+        function calculateResult() {
+            const form = document.getElementById('quizForm');
+            
+            // 모든 문항 미선택 방어 예외 검사 재확인
+            for (let i = 1; i <= 5; i++) {
+                const checkedOption = form.querySelector(`input[name="q${i}"]:checked`);
+                if (!checkedOption) {
+                    alert("답변을 선택해 주세요.");
+                    return;
+                }
+            }
 
-    function resetQuiz() {
-      /*
-        reset()은 form 안의 선택값을 처음 상태로 되돌립니다.
-        라디오 버튼 선택도 모두 해제됩니다.
-      */
-      quizForm.reset();
+            // 점수 보존 누적 사전 초기화
+            let scores = { "A": 0, "B": 0, "C": 0, "D": 0 };
+            
+            for (let i = 1; i <= 5; i++) {
+                const value = form.querySelector(`input[name="q${i}"]:checked`).value;
+                
+                if (value === "1") {
+                    scores["A"] += 2;
+                    scores["D"] += 1;
+                } else if (value === "2") {
+                    scores["B"] += 2;
+                    scores["A"] += 1;
+                } else if (value === "3") {
+                    scores["C"] += 2;
+                    scores["B"] += 1;
+                } else if (value === "4") {
+                    scores["D"] += 2;
+                    scores["C"] += 1;
+                }
+            }
 
-      // 점수와 선택값, 결과를 모두 초기화합니다.
-      selectedAnswers = {};
-      currentQuestionIndex = 0;
-      resultArea.innerHTML = "";
+            // 동점 우선 순위 규칙 적용 알고리즘 보존 (A->B->C->D 순)
+            let highestType = "A";
+            let maxScore = scores["A"];
 
-      // 새로고침 없이 시작 화면으로 돌아갑니다.
-      resultScreen.classList.add("hidden");
-      questionScreen.classList.add("hidden");
-      startScreen.classList.remove("hidden");
-    }
-  </script>
+            const typesOrder = ["A", "B", "C", "D"];
+            for (let i = 1; i < typesOrder.length; i++) {
+                const currentType = typesOrder[i];
+                if (scores[currentType] > maxScore) {
+                    maxScore = scores[currentType];
+                    highestType = currentType;
+                }
+            }
+
+            // 유형 세부 매핑 매칭
+            const detail = TYPE_DETAILS[highestType];
+            
+            document.getElementById('resultEmoji').textContent = detail.emoji;
+            document.getElementById('resultType').textContent = detail.name;
+            document.getElementById('resultDescription').textContent = detail.desc;
+            
+            // 💡 실천제안 자리에 getRandomSuggestion(최종유형) 출력 적용
+            document.getElementById('resultSuggestion').textContent = getRandomSuggestion(highestType);
+
+            // 화면 전환 연출 처리
+            transitionScreen('question-screen', 'result-screen');
+        }
+
+        // [다시 하기 복귀 제어식] 상태값 완전 리셋 연동
+        function resetQuiz() {
+            transitionScreen('result-screen', 'start-screen', () => {
+                document.getElementById('quizForm').reset();
+                
+                // 임의 설정된 클래스 스타일 피드백 일괄 청소
+                document.querySelectorAll('.option-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+
+                document.getElementById('resultEmoji').textContent = "";
+                document.getElementById('resultType').textContent = "";
+                document.getElementById('resultDescription').textContent = "";
+                document.getElementById('resultSuggestion').textContent = "";
+                currentIdx = 1;
+            });
+        }
+
+        // 화면 전환 트랜지션 처리 헬퍼 함수
+        function transitionScreen(fromId, toId, callback) {
+            const fromTarget = document.getElementById(fromId);
+            const toTarget = document.getElementById(toId);
+
+            fromTarget.classList.add('slide-left');
+            
+            setTimeout(() => {
+                fromTarget.classList.add('hidden');
+                fromTarget.classList.remove('slide-left');
+                
+                if (callback) callback();
+
+                toTarget.classList.add('slide-right');
+                toTarget.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    toTarget.classList.remove('slide-right');
+                }, 50);
+
+            }, 250); // 0.25초 연출 시간 동기화
+        }
+    </script>
 </body>
 </html>
