@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- 모바일 화면에서 글자가 너무 작거나 화면이 깨지지 않도록 하는 viewport 설정입니다. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>🎤 내가 생각하는 최고의 K-컨텐츠는?</title>
+
+  <style>
+    /* 모바일 안전을 위한 최소 CSS입니다. */
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      word-break: keep-all;
+      font-family: sans-serif;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    .result-emoji {
+      font-size: 70px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 페이지의 큰 제목입니다. -->
+  <h1>🎤 내가 생각하는 최고의 K-컨텐츠는?</h1>
+
+  <!-- 활동 설명입니다. -->
+  <p>나는 어떤 K-콘텐츠에 가장 끌릴까요? 아래의 질문에 답하고 나의 K-컬처 취향을 알아보아요!</p>
+
+  <!-- 
+    form 태그는 사용자의 입력을 모아두는 상자입니다.
+    여기서는 라디오 버튼으로 선택한 답을 JS에서 확인합니다.
+  -->
+  <form id="quizForm">
+    <!-- Q1 -->
+    <section>
+      <h2>Q1. 내가 가장 먼저 소개하고 싶은 K-콘텐츠 공간은?</h2>
+
+      <!-- 같은 질문의 4지선다는 name을 똑같이 맞춰야 하나만 선택됩니다. -->
+      <label>
+        <input type="radio" name="q1" value="K-푸드 탐험형">
+        ① 냄새만 맡아도 배고픈 길거리 음식 골목 🍢
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q1" value="K-POP 에너지형">
+        ② 사람들의 함성으로 가득한 공연장 🎤
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q1" value="K-드라마 감성형">
+        ③ 드라마 속 장면 같은 감성 거리 🌃
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q1" value="K-캐릭터 몰입형">
+        ④ 캐릭터 굿즈와 게임을 만날 수 있는 공간 🎮
+      </label>
+    </section>
+
+    <!-- Q2 -->
+    <section>
+      <h2>Q2. 유튜브 알고리즘이 나를 붙잡는 영상은?</h2>
+
+      <label>
+        <input type="radio" name="q2" value="K-푸드 탐험형">
+        ① 야식 먹방 영상 🍜
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q2" value="K-POP 에너지형">
+        ② 아이돌 무대 영상 ✨
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q2" value="K-드라마 감성형">
+        ③ 밤새 드라마 몰아보기 🎬
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q2" value="K-캐릭터 몰입형">
+        ④ 게임 리뷰와 캐릭터 영상 🎮
+      </label>
+    </section>
+
+    <!-- Q3 -->
+    <section>
+      <h2>Q3. 내가 더 참기 힘든 것은?</h2>
+
+      <label>
+        <input type="radio" name="q3" value="K-푸드 탐험형">
+        ① 야식 사진 안 보기 🍗
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q3" value="K-POP 에너지형">
+        ② 챌린지 음악 안 따라 하기 🎧
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q3" value="K-드라마 감성형">
+        ③ 드라마 스포일러 당하기 😭
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q3" value="K-캐릭터 몰입형">
+        ④ 최애 캐릭터 굿즈 놓치기 🎀
+      </label>
+    </section>
+
+    <!-- Q4 -->
+    <section>
+      <h2>Q4. 친구와 서울 여행을 간다면 나는?</h2>
+
+      <label>
+        <input type="radio" name="q4" value="K-푸드 탐험형">
+        ① "여기 유명한 먹거리 거리래!" 🍡
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q4" value="K-POP 에너지형">
+        ② "여기 공연이 열리는 곳이래!" 🎤
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q4" value="K-드라마 감성형">
+        ③ "여기 드라마 촬영지래!" 📸
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q4" value="K-캐릭터 몰입형">
+        ④ "여기 캐릭터 팝업이 열린대!" 🎮
+      </label>
+    </section>
+
+    <!-- Q5 -->
+    <section>
+      <h2>Q5. 갑자기 하루 쉬는 날이 생겼다면?</h2>
+
+      <label>
+        <input type="radio" name="q5" value="K-푸드 탐험형">
+        ① 디저트 카페와 맛집 투어 🍰
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q5" value="K-POP 에너지형">
+        ② 무대 영상과 챌린지 몰아보기 🎵
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q5" value="K-드라마 감성형">
+        ③ 드라마 정주행 🎬
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q5" value="K-캐릭터 몰입형">
+        ④ 웹툰·게임 하루 종일 즐기기 🕹️
+      </label>
+    </section>
+
+    <!-- Q6 -->
+    <section>
+      <h2>Q6. 더 갖고 싶은 굿즈는?</h2>
+
+      <label>
+        <input type="radio" name="q6" value="K-푸드 탐험형">
+        ① 유명 맛집 한정 디저트 🍪
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q6" value="K-POP 에너지형">
+        ② 최애 아이돌 응원봉 🎤
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q6" value="K-드라마 감성형">
+        ③ 드라마 포토카드 📷
+      </label>
+      <br>
+
+      <label>
+        <input type="radio" name="q6" value="K-캐릭터 몰입형">
+        ④ 캐릭터 키링 🧸
+      </label>
+    </section>
+  </form>
+
+  <!-- 결과를 계산하는 버튼입니다. -->
+  <button type="button" onclick="showResult()">📊 나의 K-컬처 취향 알아보기</button>
+
+  <!-- 다시 하기 버튼입니다. 처음에는 보이지 않고, 결과가 나온 뒤에 표시됩니다. -->
+  <button type="button" id="resetButton" onclick="resetQuiz()" style="display: none;">🔄 다시 하기</button>
+
+  <!-- 결과가 표시될 영역입니다. -->
+  <div id="resultArea" style="display: none;">
+    <h2>📊 나의 K-컬처 취향 결과</h2>
+
+    <div id="resultEmoji" class="result-emoji"></div>
+
+    <h3 id="resultType"></h3>
+
+    <h4>어떤 스타일일까?</h4>
+    <p id="resultStyle"></p>
+
+    <h4>추천</h4>
+    <p id="resultRecommend"></p>
+
+    <h4>💡 실천제안</h4>
+    <p id="resultSuggestion"></p>
+
+    <h4>강점 키워드</h4>
+    <p id="resultKeywords"></p>
+  </div>
+
+  <footer>
+    <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
+  </footer>
+
+  <script>
+    /*
+      TYPES 배열은 결과 유형의 우선순위를 저장합니다.
+
+      동점이 나왔을 때는 아래 순서대로 먼저 나온 유형이 선택됩니다.
+      ① K-푸드 탐험형
+      ② K-POP 에너지형
+      ③ K-드라마 감성형
+      ④ K-캐릭터 몰입형
+    */
+    const TYPES = [
+      "K-푸드 탐험형",
+      "K-POP 에너지형",
+      "K-드라마 감성형",
+      "K-캐릭터 몰입형"
+    ];
+
+    /*
+      RESULT_DATA 객체는 유형별 결과 내용을 저장합니다.
+
+      객체는 이름표가 붙은 큰 보관함이라고 생각하면 됩니다.
+      예를 들어 RESULT_DATA["K-푸드 탐험형"]처럼 꺼내 쓸 수 있습니다.
+    */
+    const RESULT_DATA = {
+      "K-푸드 탐험형": {
+        emoji: "🍜",
+        style: "맛있는 음식과 시장 분위기를 좋아하는 타입입니다.",
+        recommend: "먹방, 길거리 음식, 디저트 투어, 광장시장, 전주 한옥마을, 부산 먹거리 거리",
+        keywords: "#먹방 #한식 #시장 #맛집"
+      },
+      "K-POP 에너지형": {
+        emoji: "🎤",
+        style: "신나는 음악과 화려한 무대 분위기를 좋아하는 타입입니다.",
+        recommend: "아이돌, 콘서트, 댄스 챌린지, 홍대 공연 거리, K-POP 체험관",
+        keywords: "#KPOP #댄스 #무대 #에너지"
+      },
+      "K-드라마 감성형": {
+        emoji: "🎬",
+        style: "분위기 있는 장소와 감성적인 이야기를 좋아하는 타입입니다.",
+        recommend: "드라마, 영화, OST, 한강공원, 남산, 드라마 촬영지",
+        keywords: "#감성 #드라마 #풍경 #스토리"
+      },
+      "K-캐릭터 몰입형": {
+        emoji: "🎮",
+        style: "웹툰, 게임, 캐릭터처럼 몰입감 있는 콘텐츠를 좋아하는 타입입니다.",
+        recommend: "웹툰, 게임, 캐릭터 굿즈, 캐릭터 팝업스토어, 게임 박람회",
+        keywords: "#게임 #웹툰 #캐릭터 #굿즈"
+      }
+    };
+
+    /*
+      SUGGESTIONS는 객체입니다.
+      객체 안에는 4개의 배열이 들어 있습니다.
+
+      객체: 이름표가 붙은 자료 묶음
+      배열: 순서가 있는 자료 목록
+
+      예시:
+      SUGGESTIONS["K-푸드 탐험형"]은 K-푸드 탐험형의 실천제안 배열을 뜻합니다.
+
+      학생 활동 아이디어:
+      아래 배열 안에 새로운 문장을 추가하면 실천제안을 더 늘릴 수 있습니다.
+      단, 문장은 따옴표로 감싸고 쉼표를 붙여야 합니다.
+    */
+    const SUGGESTIONS = {
+      "K-푸드 탐험형": [
+        "우리 동네 K-푸드 맛집 지도를 직접 만들어 보세요!",
+        "한 주에 하나씩 새로운 한식·디저트를 시도하고 후기를 남겨 보세요!",
+        "K-푸드 먹방 콘텐츠를 친구들과 함께 보고 'BEST 3'를 뽑아 보세요!",
+        "지역별 K-푸드(전주·부산·광장시장)를 비교하는 콘텐츠를 만들어 보세요!",
+        "외국 친구에게 추천할 K-푸드 5선을 영어 메뉴로 정리해 보세요!",
+      ],
+      "K-POP 에너지형": [
+        "최애 아이돌 무대 영상을 보고 댄스 챌린지를 따라 해 보세요!",
+        "친구들과 K-POP 플레이리스트를 공유하는 챌린지를 열어 보세요!",
+        "내가 좋아하는 아이돌의 의상·무대 컨셉을 분석해 정리해 보세요!",
+        "K-POP 콘서트·체험관 영상을 보고 '꼭 가보고 싶은 무대'를 골라 보세요!",
+        "친구들과 무대 영상 리액션 콘텐츠를 만들어 SNS에 공유해 보세요!",
+      ],
+      "K-드라마 감성형": [
+        "최근 본 K-드라마 OST를 모아 나만의 감성 플레이리스트를 만들어 보세요!",
+        "좋아하는 드라마 명대사 5개를 골라 손글씨 카드로 만들어 보세요!",
+        "드라마 촬영지(남산·한강) 중 한 곳을 골라 미니 여행 코스를 짜 보세요!",
+        "친구들과 함께 'K-드라마 정주행 챌린지'에 도전해 보세요!",
+        "드라마 명장면을 골라 짧은 후기·감상문을 SNS에 공유해 보세요!",
+      ],
+      "K-캐릭터 몰입형": [
+        "내가 좋아하는 K-캐릭터를 활용해 굿즈 디자인 아이디어를 그려 보세요!",
+        "주말 하루를 정해 웹툰·게임 정주행 챌린지에 도전해 보세요!",
+        "K-캐릭터 팝업스토어 정보를 정리해 친구와 함께 방문 계획을 세워 보세요!",
+        "내가 좋아하는 게임의 세계관을 친구에게 설명하는 콘텐츠를 만들어 보세요!",
+        "캐릭터 코스튬·페어 행사를 조사해 위시리스트로 정리해 보세요!",
+      ],
+    };
+
+    /*
+      getRandomSuggestion 함수는 유형 이름을 받아서
+      해당 유형의 실천제안 중 1개를 무작위로 골라 돌려줍니다.
+
+      Math.random()은 0 이상 1 미만의 랜덤 숫자를 만듭니다.
+      Math.floor()는 소수점을 버리고 정수로 만듭니다.
+
+      예시:
+      Math.random() * list.length → 배열 길이에 맞는 랜덤 숫자 만들기
+      Math.floor(...) → 배열 번호로 쓸 수 있게 정수 만들기
+
+      return은 함수가 만든 결과값을 밖으로 보내는 명령어입니다.
+    */
+    function getRandomSuggestion(type) {
+      const list = SUGGESTIONS[type];
+      const idx = Math.floor(Math.random() * list.length);
+      return list[idx];
+    }
+
+    /*
+      showResult 함수는 버튼을 눌렀을 때 실행됩니다.
+      1. 모든 문항에 답했는지 확인
+      2. 유형별 점수 계산
+      3. 최고 점수 유형 찾기
+      4. 결과 화면에 출력
+    */
+    function showResult() {
+      /*
+        scores 객체는 각 유형의 점수를 저장합니다.
+        처음에는 모두 0점으로 시작합니다.
+      */
+      const scores = {
+        "K-푸드 탐험형": 0,
+        "K-POP 에너지형": 0,
+        "K-드라마 감성형": 0,
+        "K-캐릭터 몰입형": 0
+      };
+
+      /*
+        for 반복문은 비슷한 일을 여러 번 할 때 사용합니다.
+        여기서는 q1부터 q6까지 차례대로 검사합니다.
+      */
+      for (let i = 1; i <= 6; i++) {
+        /*
+          document.querySelector는 HTML에서 원하는 요소를 찾는 명령어입니다.
+          input[name="q1"]:checked는 q1 중 선택된 라디오 버튼을 뜻합니다.
+        */
+        const selected = document.querySelector('input[name="q' + i + '"]:checked');
+
+        /*
+          선택하지 않은 문항이 있으면 selected 값이 null이 됩니다.
+          그럴 때는 안내창을 띄우고 함수 실행을 멈춥니다.
+        */
+        if (selected === null) {
+          alert("답변을 선택해 주세요.");
+          return;
+        }
+
+        /*
+          라디오 버튼의 value에는 유형 이름이 들어 있습니다.
+          선택된 유형의 점수를 1점 올립니다.
+        */
+        scores[selected.value] = scores[selected.value] + 1;
+      }
+
+      /*
+        최고 점수 유형을 찾습니다.
+        동점일 때는 TYPES 배열 순서가 우선순위가 됩니다.
+      */
+      let finalType = TYPES[0];
+      let highScore = scores[finalType];
+
+      for (let i = 1; i < TYPES.length; i++) {
+        const currentType = TYPES[i];
+
+        if (scores[currentType] > highScore) {
+          finalType = currentType;
+          highScore = scores[currentType];
+        }
+      }
+
+      /*
+        최종 유형에 맞는 결과 데이터를 꺼냅니다.
+      */
+      const result = RESULT_DATA[finalType];
+
+      /*
+        textContent는 HTML 요소 안의 글자를 바꾸는 명령어입니다.
+      */
+      document.getElementById("resultEmoji").textContent = result.emoji;
+      document.getElementById("resultType").textContent = finalType;
+      document.getElementById("resultStyle").textContent = result.style;
+      document.getElementById("resultRecommend").textContent = result.recommend;
+      document.getElementById("resultSuggestion").textContent = getRandomSuggestion(finalType);
+      document.getElementById("resultKeywords").textContent = result.keywords;
+
+      /*
+        결과 영역과 다시 하기 버튼을 화면에 보이게 합니다.
+      */
+      document.getElementById("resultArea").style.display = "block";
+      document.getElementById("resetButton").style.display = "inline-block";
+    }
+
+    /*
+      resetQuiz 함수는 다시 하기 버튼을 눌렀을 때 실행됩니다.
+      선택값, 점수, 결과 화면을 초기화합니다.
+
+      실제 점수는 showResult 함수 안에서 새로 만들어지기 때문에
+      다시 하기 후 버튼을 누르면 처음부터 다시 계산됩니다.
+    */
+    function resetQuiz() {
+      /*
+        form.reset()은 폼 안의 선택값을 처음 상태로 되돌립니다.
+      */
+      document.getElementById("quizForm").reset();
+
+      /*
+        결과 영역의 글자를 비웁니다.
+      */
+      document.getElementById("resultEmoji").textContent = "";
+      document.getElementById("resultType").textContent = "";
+      document.getElementById("resultStyle").textContent = "";
+      document.getElementById("resultRecommend").textContent = "";
+      document.getElementById("resultSuggestion").textContent = "";
+      document.getElementById("resultKeywords").textContent = "";
+
+      /*
+        결과 영역과 다시 하기 버튼을 다시 숨깁니다.
+      */
+      document.getElementById("resultArea").style.display = "none";
+      document.getElementById("resetButton").style.display = "none";
+    }
+  </script>
+</body>
+</html>

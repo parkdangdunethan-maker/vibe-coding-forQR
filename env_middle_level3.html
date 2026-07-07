@@ -6,7 +6,15 @@
   <!-- 모바일 화면에서 글자가 너무 작아지지 않도록 viewport를 설정합니다. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>🌿 나의 Green Attitude 알아보기</title>
+  <title>🌍 나의 지구 수호대 유형 찾기</title>
+
+  <!-- Google Fonts는 예외적으로 사용 가능합니다. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+  <!-- 3단계 폭죽 효과용 라이브러리입니다. 로드에 실패해도 앱은 정상 작동합니다. -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
     /* 모바일 안전을 위한 최소 CSS입니다. */
@@ -24,91 +32,693 @@
       max-width: 100%;
     }
 
-    /* 결과 이모지는 문제 조건에 맞게 크게 보여 줍니다. */
-    .result-emoji {
-      font-size: 70px;
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: "Gowun Dodum", sans-serif;
+      line-height: 1.6;
+      letter-spacing: -0.2px;
+      background: linear-gradient(180deg, #e9fff2 0%, #f8fffb 100%);
+      color: #1f3326;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /*
+      모든 화면을 담는 카드입니다.
+      시작 화면, 질문 화면, 로딩 화면, 캐릭터 인트로 화면, 결과 화면에서 같은 크기를 유지합니다.
+    */
+    .app-card {
+      width: 100%;
+      max-width: 420px;
+      height: 580px;
+      padding: 24px 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin: 0 auto;
+      background: #ffffff;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-card::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    #start-screen,
+    #question-screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+      justify-content: flex-start;
+    }
+
+    #loading-screen,
+    #character-intro {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #result-screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 12px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    #result-screen::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    #result-screen.show-result {
+      opacity: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .title-area {
+      text-align: center;
+      padding-top: 20px;
+    }
+
+    .title-area h1 {
+      margin: 0 0 14px;
+      font-size: 30px;
+      line-height: 1.25;
+      color: #168347;
+    }
+
+    .title-area p {
+      margin: 0;
+      font-size: 16px;
+      color: #496152;
+    }
+
+    .custom-slot {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f1fbf5;
+      border: 1px solid #d7efd9;
+      font-size: 14px;
+      color: #496152;
+    }
+
+    .custom-slot strong {
+      color: #168347;
+    }
+
+    .main-btn {
+      width: 100%;
+      min-height: 52px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: auto;
+      border: none;
+      background: #198754;
+      color: #ffffff;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .main-btn:hover {
+      background: #146c43;
+    }
+
+    .main-btn:active {
+      background: #0f5132;
+    }
+
+    .prev-btn {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      border: 1px solid #d8eadc;
+      background: #ffffff;
+      color: #126c3a;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .prev-btn:hover {
+      background: #edf8f0;
+      border-color: #9dd9b3;
+    }
+
+    .progress-area {
+      padding-top: 34px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #496152;
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 99px;
+      background: #e7f3ea;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 20%;
+      border-radius: 99px;
+      background: #198754;
+      transition: width 0.4s ease;
+    }
+
+    .question-text {
+      margin: 0;
+      padding: 16px 0 4px;
+      font-size: 21px;
+      line-height: 1.45;
+      color: #1f3326;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-card {
+      position: relative;
+      overflow: hidden;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid #e5e5e5;
+      flex-shrink: 0;
+      cursor: pointer;
+      background: #ffffff;
+      color: #263b2d;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .option-card:hover {
+      background: #f3fbf5;
+      border-color: #9dd9b3;
+    }
+
+    .option-card input {
+      margin-right: 8px;
+    }
+
+    .option-card.selected {
+      background: #e8f7ee;
+      border-color: #198754;
+      font-weight: bold;
+    }
+
+    .ripple-circle {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 0.5s ease-out;
+      background: rgba(25, 135, 84, 0.22);
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .slide-left {
+      animation: slideLeft 0.25s ease;
+    }
+
+    .slide-right {
+      animation: slideRight 0.25s ease;
+    }
+
+    @keyframes slideLeft {
+      from {
+        opacity: 0;
+        transform: translateX(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideRight {
+      from {
+        opacity: 0;
+        transform: translateX(-24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .loading-text {
+      font-size: 26px;
+      font-weight: bold;
+      color: #168347;
+      text-align: center;
+    }
+
+    .intro-small-text {
+      font-size: 18px;
+      color: #496152;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .intro-type-name {
+      font-size: 28px;
+      font-weight: bold;
+      color: #168347;
+      opacity: 0;
+      transform: translateY(-24px);
+      animation: dropIn 0.6s ease forwards;
+      animation-delay: 0.4s;
+      text-align: center;
+    }
+
+    .intro-character-img {
+      width: 300px;
+      max-width: 100%;
+      height: auto;
+      opacity: 0;
+      transform: scale(0.5);
+      animation: characterBounce 0.6s ease-out forwards;
+      animation-delay: 0.6s;
+    }
+
+    .intro-character-img.shrink-to-result {
+      animation: shrinkToResult 0.8s ease forwards;
+    }
+
+    .intro-small-text.fade-out {
+      animation: fadeOut 0.8s ease forwards;
+    }
+
+    .intro-type-name.fade-out {
+      animation: fadeOut 0.8s ease forwards;
+    }
+
+    .character-intro-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .result-character-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .result-character-img {
+      width: 130px;
+      max-width: 130px;
+      height: auto;
+      display: block;
+      animation: wobbleBig 1.8s ease-in-out infinite;
+    }
+
+    .fallback-emoji {
+      font-size: 92px;
+      line-height: 1.1;
+      text-align: center;
+      animation: wobbleBig 1.8s ease-in-out infinite;
+    }
+
+    .result-type-name {
+      margin: 0;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #1f3326;
+      flex-shrink: 0;
+    }
+
+    .analysis-box {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #eef6f1;
+      color: #34483a;
+      border: 1px solid #d8eadc;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.6;
+      flex-shrink: 0;
+    }
+
+    .result-box {
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: #f5f6f5;
+      color: #37483d;
+      border: 1px solid #e2e6e2;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .suggestion-box {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fff8d8;
+      color: #3f3a1f;
+      border: 1px solid #ecd875;
+      font-size: 15px;
+      flex-shrink: 0;
+      animation: suggestionPop 0.5s ease forwards;
+    }
+
+    .result-box strong,
+    .suggestion-box strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #126c3a;
+    }
+
+    .stagger-item {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: staggerFadeIn 0.5s ease forwards;
+    }
+
+    .stagger-item:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .stagger-item:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .stagger-item:nth-child(3) {
+      animation-delay: 0.35s;
+    }
+
+    .stagger-item:nth-child(4) {
+      animation-delay: 0.5s;
+    }
+
+    .stagger-item:nth-child(5) {
+      animation-delay: 0.65s;
+    }
+
+    footer {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 14px;
+      text-align: center;
+      font-size: 12px;
+      color: #5c7464;
+      opacity: 0.7;
+    }
+
+    @keyframes wobbleBig {
+      0%, 100% { transform: rotate(-10deg) scale(1); }
+      25%      { transform: rotate(8deg) scale(1.08); }
+      50%      { transform: rotate(-8deg) scale(0.96); }
+      75%      { transform: rotate(10deg) scale(1.08); }
+    }
+
+    @keyframes suggestionPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+        box-shadow: 0 0 0 rgba(236, 216, 117, 0);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 18px rgba(236, 216, 117, 0.45);
+      }
+    }
+
+    @keyframes staggerFadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes characterBounce {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(20px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.08) translateY(-8px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes shrinkToResult {
+      0% {
+        opacity: 1;
+        width: 300px;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        width: 130px;
+        transform: translateY(-150px) scale(0.7);
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+      }
+    }
+
+    @keyframes dropIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 380px) {
+      body {
+        padding: 12px;
+      }
+
+      .title-area h1 {
+        font-size: 26px;
+      }
+
+      .question-text {
+        font-size: 19px;
+      }
+
+      .option-card {
+        padding: 12px 14px;
+        font-size: 15px;
+      }
+
+      .intro-character-img {
+        width: 280px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <!-- 제목과 설명 영역입니다. -->
-  <header>
-    <h1>🌿 나의 Green Attitude 알아보기</h1>
-    <p>
-      내가 생각하는 가장 중요한 환경 가치와 태도는 무엇일까요?
-      아래의 질문에 답하고 나의 환경 실천 성향을 알아보아요!
-    </p>
-  </header>
+  <div class="app-card">
+    <!-- 시작 화면입니다. -->
+    <section id="start-screen">
+      <div class="title-area">
+        <h1>🌍 나의 지구 수호대 유형 찾기</h1>
+        <p>
+          내가 생각하는 가장 중요한 환경 가치와 태도는 무엇일까요?
+          아래의 질문에 답하고 나의 환경 실천 성향을 알아보아요!
+        </p>
 
-  <main>
-    <!-- 
-      form 태그는 여러 입력 요소를 하나로 묶을 때 사용합니다.
-      여기서는 Q1~Q5의 라디오 버튼을 묶는 역할을 합니다.
-    -->
-    <form id="quizForm">
+        <div class="custom-slot">
+          <strong>학생 커스터마이징 슬롯</strong><br>
+          A. 분위기 / B. 메인 색감 / C. 폰트 분위기 / D. 추가 요청
+        </div>
+      </div>
 
-      <section>
-        <h2>Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?</h2>
+      <button type="button" class="main-btn" id="startButton">🚀 나의 지구 수호대 유형 알아보기</button>
+    </section>
 
-        <!-- 같은 질문의 라디오 버튼은 name을 같게 해야 하나만 선택됩니다. -->
-        <label><input type="radio" name="q1" value="1"> ① 일회용품 사용을 줄이는 생활 실천 캠페인</label><br>
-        <label><input type="radio" name="q1" value="2"> ② 학생들과 함께 교내 환경 규칙을 만들고 실천하기</label><br>
-        <label><input type="radio" name="q1" value="3"> ③ AI 기술을 활용한 친환경 관리 시스템 도입</label><br>
-        <label><input type="radio" name="q1" value="4"> ④ 학교 주변 자연 생태를 보전하고 복원하는 활동</label>
-      </section>
+    <!-- 질문 화면입니다. -->
+    <section id="question-screen" class="hidden">
+      <button type="button" class="prev-btn" id="prevButton">←</button>
 
-      <section>
-        <h2>Q2. 기후 변화 뉴스를 봤을 때 가장 먼저 드는 생각은?</h2>
+      <div class="progress-area">
+        <div class="progress-top">
+          <span id="progressText">Q1/5</span>
+          <span>🌍</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
 
-        <label><input type="radio" name="q2" value="1"> ① 나부터 생활 습관을 바꿔야겠다</label><br>
-        <label><input type="radio" name="q2" value="2"> ② 사회 전체의 협력과 책임이 중요하다</label><br>
-        <label><input type="radio" name="q2" value="3"> ③ 새로운 친환경 기술 개발이 필요하다</label><br>
-        <label><input type="radio" name="q2" value="4"> ④ 자연과 생태계가 더 이상 훼손되지 않아야 한다</label>
-      </section>
+      <!-- 
+        form 태그는 여러 입력 요소를 하나로 묶을 때 사용합니다.
+        여기서는 Q1~Q5의 라디오 버튼을 묶는 역할을 합니다.
+      -->
+      <form id="quizForm">
+        <h2 class="question-text" id="questionText">Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?</h2>
 
-      <section>
-        <h2>Q3. 물건이나 제품을 고를 때 가장 중요하게 보는 것은?</h2>
+        <div class="options" id="optionsArea">
+          <!-- 같은 질문의 라디오 버튼은 name을 같게 해야 하나만 선택됩니다. -->
+        </div>
+      </form>
 
-        <label><input type="radio" name="q3" value="1"> ① 실제로 꾸준히 사용할 수 있는가</label><br>
-        <label><input type="radio" name="q3" value="2"> ② 사회적으로 환경 보호에 노력하는 기업인가</label><br>
-        <label><input type="radio" name="q3" value="3"> ③ 최신 친환경 기술이 적용되었는가</label><br>
-        <label><input type="radio" name="q3" value="4"> ④ 자연과 환경에 미치는 영향이 적은 방식으로 만들어졌는가</label>
-      </section>
+      <button type="button" class="main-btn" id="resultButton">다음 질문으로 ➡️</button>
+    </section>
 
-      <section>
-        <h2>Q4. 우리 지역에 가장 필요하다고 생각하는 환경 정책은?</h2>
+    <!-- 3단계 추가: 분석 중 로딩 화면입니다. -->
+    <section id="loading-screen" class="hidden">
+      <div class="loading-text" id="loadingText">분석중...</div>
+    </section>
 
-        <label><input type="radio" name="q4" value="1"> ① 시민 참여형 분리배출 보상 제도</label><br>
-        <label><input type="radio" name="q4" value="2"> ② 플라스틱 사용 줄이기, 차량 제한 등 공동체 환경 규칙</label><br>
-        <label><input type="radio" name="q4" value="3"> ③ 스마트 친환경 도시 시스템 구축 및 확대</label><br>
-        <label><input type="radio" name="q4" value="4"> ④ 도심 숲, 하천 등 생태 공간 확대</label>
-      </section>
+    <!-- 3단계 추가: 캐릭터 인트로 화면입니다. -->
+    <section id="character-intro" class="hidden">
+      <div class="character-intro-inner">
+        <div class="intro-small-text" id="introSmallText">당신은...</div>
+        <div class="intro-type-name" id="introTypeName">생활 실천가!</div>
+        <img src="" alt="지구 수호대 캐릭터" class="intro-character-img" id="introCharacterImg">
+      </div>
+    </section>
 
-      <section>
-        <h2>Q5. 미래 환경 문제 해결의 핵심은 무엇이라고 생각하는가?</h2>
-
-        <label><input type="radio" name="q5" value="1"> ① 개인의 꾸준한 실천</label><br>
-        <label><input type="radio" name="q5" value="2"> ② 사회 전체의 협력과 제도적 변화</label><br>
-        <label><input type="radio" name="q5" value="3"> ③ 과학기술 혁신과 새로운 발명</label><br>
-        <label><input type="radio" name="q5" value="4"> ④ 자연과 공존하려는 태도와 철학</label>
-      </section>
-
-      <br>
-
-      <!-- type="button"은 버튼을 눌렀을 때 새로고침이 되지 않게 해 줍니다. -->
-      <button type="button" id="resultButton">📊 나의 환경 실천 성향 알아보기</button>
-    </form>
-
-    <!-- 결과가 표시될 영역입니다. 처음에는 비워 둡니다. -->
-    <section id="resultArea"></section>
-  </main>
+    <!-- 결과 화면입니다. -->
+    <section id="result-screen" class="hidden">
+      <!-- 결과가 표시될 영역입니다. 처음에는 비워 둡니다. -->
+      <div id="resultArea"></div>
+    </section>
+  </div>
 
   <footer>
     <p>AI의 도움을 받아 제작된 콘텐츠입니다.</p>
   </footer>
 
   <script>
+    /*
+      QUESTIONS 배열에는 5개의 질문과 선택지가 들어 있습니다.
+      배열은 여러 개의 값을 순서대로 저장하는 자료입니다.
+      첫 번째 질문은 QUESTIONS[0], 두 번째 질문은 QUESTIONS[1]처럼 사용할 수 있습니다.
+    */
+    const QUESTIONS = [
+      {
+        title: "Q1. 학교에서 환경 프로젝트를 진행한다면 가장 효과적이라고 생각하는 것은?",
+        name: "q1",
+        options: [
+          "① 일회용품 사용을 줄이는 생활 실천 캠페인",
+          "② 학생들과 함께 교내 환경 규칙을 만들고 실천하기",
+          "③ AI 기술을 활용한 친환경 관리 시스템 도입",
+          "④ 학교 주변 자연 생태를 보전하고 복원하는 활동"
+        ]
+      },
+      {
+        title: "Q2. 기후 변화 뉴스를 봤을 때 가장 먼저 드는 생각은?",
+        name: "q2",
+        options: [
+          "① 나부터 생활 습관을 바꿔야겠다",
+          "② 사회 전체의 협력과 책임이 중요하다",
+          "③ 새로운 친환경 기술 개발이 필요하다",
+          "④ 자연과 생태계가 더 이상 훼손되지 않아야 한다"
+        ]
+      },
+      {
+        title: "Q3. 물건이나 제품을 고를 때 가장 중요하게 보는 것은?",
+        name: "q3",
+        options: [
+          "① 실제로 꾸준히 사용할 수 있는가",
+          "② 사회적으로 환경 보호에 노력하는 기업인가",
+          "③ 최신 친환경 기술이 적용되었는가",
+          "④ 자연과 환경에 미치는 영향이 적은 방식으로 만들어졌는가"
+        ]
+      },
+      {
+        title: "Q4. 우리 지역에 가장 필요하다고 생각하는 환경 정책은?",
+        name: "q4",
+        options: [
+          "① 시민 참여형 분리배출 보상 제도",
+          "② 플라스틱 사용 줄이기, 차량 제한 등 공동체 환경 규칙",
+          "③ 스마트 친환경 도시 시스템 구축 및 확대",
+          "④ 도심 숲, 하천 등 생태 공간 확대"
+        ]
+      },
+      {
+        title: "Q5. 미래 환경 문제 해결의 핵심은 무엇이라고 생각하는가?",
+        name: "q5",
+        options: [
+          "① 개인의 꾸준한 실천",
+          "② 사회 전체의 협력과 제도적 변화",
+          "③ 과학기술 혁신과 새로운 발명",
+          "④ 자연과 공존하려는 태도와 철학"
+        ]
+      }
+    ];
+
     /*
       SUGGESTIONS는 객체입니다.
       객체는 이름표가 붙은 여러 값을 저장할 수 있습니다.
@@ -169,29 +779,37 @@
     }
 
     /*
-      TYPES 객체에는 각 유형의 이름, 이모지, 설명을 저장합니다.
-      결과 화면을 만들 때 이 정보를 꺼내서 사용합니다.
+      TYPES 객체에는 각 유형의 이름, 이모지, 설명, 캐릭터 이미지 주소, 폭죽 색을 저장합니다.
+      결과 화면과 캐릭터 인트로 화면을 만들 때 이 정보를 꺼내서 사용합니다.
     */
     const TYPES = {
       "A": {
-        name: "생활 실천형",
+        name: "생활 실천가",
         emoji: "🌱",
-        description: "지금 당장 할 수 있는 행동을 중요하게 생각하는 유형"
+        description: "지금 당장 할 수 있는 행동을 중요하게 생각하는 유형",
+        image: "https://vibe-coding-characters.vercel.app/img/env-e/practice1.png",
+        colors: ["#A8E063", "#56AB2F"]
       },
       "B": {
-        name: "사회 변화형",
+        name: "변화 이끔이",
         emoji: "🤝",
-        description: "법·제도·사회적 협력이 중요하다고 생각하는 유형"
+        description: "법·제도·사회적 협력이 중요하다고 생각하는 유형",
+        image: "https://vibe-coding-characters.vercel.app/img/env-e/lead1.png",
+        colors: ["#FFB88C", "#DE6262"]
       },
       "C": {
-        name: "기술 혁신형",
+        name: "아이디어 발명가",
         emoji: "💡",
-        description: "과학기술과 아이디어를 통해 환경 문제 해결 방법을 찾는 유형"
+        description: "과학기술과 아이디어를 통해 환경 문제 해결 방법을 찾는 유형",
+        image: "https://vibe-coding-characters.vercel.app/img/env-e/invent.png",
+        colors: ["#B993D6", "#8CA6DB"]
       },
       "D": {
-        name: "자연 공존형",
+        name: "자연 지킴이",
         emoji: "🌳",
-        description: "인간과 자연이 함께 살아가는 방식을 중요하게 생각하는 유형"
+        description: "인간과 자연이 함께 살아가는 방식을 중요하게 생각하는 유형",
+        image: "https://vibe-coding-characters.vercel.app/img/env-e/nature.png",
+        colors: ["#74EBD5", "#9FACE6"]
       }
     };
 
@@ -223,16 +841,216 @@
       ]
     };
 
+    /*
+      표준 폭죽 함수입니다.
+      confetti 라이브러리가 준비되지 않았거나 오류가 나도 앱이 멈추지 않게 합니다.
+    */
+    function safeConfetti(opts) {
+        if (typeof confetti === 'undefined') return;
+        try { confetti(opts); } catch (e) {}
+    }
+
+    function fireEmojiConfetti(emoji, colors) {
+        if (typeof confetti === 'undefined') return;
+        try {
+            const shape = confetti.shapeFromText({ text: emoji, scalar: 4 });
+            const baseOption = {
+                particleCount: 60, spread: 90, startVelocity: 55, ticks: 250,
+                shapes: [shape], scalar: 4, colors: colors, gravity: 0.8, drift: 0.1
+            };
+            confetti({ ...baseOption, origin: { x: 0.1, y: 0.9 }, angle: 60 });
+            confetti({ ...baseOption, origin: { x: 0.9, y: 0.9 }, angle: 120 });
+            setTimeout(() => {
+                confetti({ ...baseOption, particleCount: 40, origin: { x: 0.5, y: 0.8 }, angle: 90, spread: 120 });
+            }, 300);
+        } catch (e) {}
+    }
+
     // 버튼과 결과 영역을 자바스크립트에서 사용할 수 있도록 가져옵니다.
     const resultButton = document.getElementById("resultButton");
     const resultArea = document.getElementById("resultArea");
     const quizForm = document.getElementById("quizForm");
 
+    const startScreen = document.getElementById("start-screen");
+    const questionScreen = document.getElementById("question-screen");
+    const resultScreen = document.getElementById("result-screen");
+    const loadingScreen = document.getElementById("loading-screen");
+    const characterIntro = document.getElementById("character-intro");
+
+    const startButton = document.getElementById("startButton");
+    const prevButton = document.getElementById("prevButton");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const questionText = document.getElementById("questionText");
+    const optionsArea = document.getElementById("optionsArea");
+
+    const loadingText = document.getElementById("loadingText");
+    const introSmallText = document.getElementById("introSmallText");
+    const introTypeName = document.getElementById("introTypeName");
+    const introCharacterImg = document.getElementById("introCharacterImg");
+
+    /*
+      currentQuestionIndex는 현재 몇 번째 질문을 보고 있는지 저장합니다.
+      컴퓨터는 0부터 세기 때문에 Q1은 0, Q2는 1입니다.
+    */
+    let currentQuestionIndex = 0;
+
+    /*
+      selectedAnswers는 학생이 고른 답을 저장하는 객체입니다.
+      예를 들어 q1에서 2번을 고르면 selectedAnswers.q1 = "2"가 됩니다.
+    */
+    let selectedAnswers = {};
+
+    /*
+      loadingTimer는 분석중... 글자의 점 개수를 바꾸기 위해 사용합니다.
+    */
+    let loadingTimer = null;
+
     /*
       addEventListener는 어떤 일이 일어났을 때 실행할 코드를 정하는 문법입니다.
-      여기서는 결과 버튼을 클릭했을 때 calculateResult 함수가 실행됩니다.
+      여기서는 각 버튼을 클릭했을 때 필요한 함수가 실행됩니다.
     */
-    resultButton.addEventListener("click", calculateResult);
+    startButton.addEventListener("click", function() {
+      startScreen.classList.add("hidden");
+      questionScreen.classList.remove("hidden");
+      currentQuestionIndex = 0;
+      renderQuestion("left");
+    });
+
+    resultButton.addEventListener("click", function() {
+      const currentQuestion = QUESTIONS[currentQuestionIndex];
+      const selected = document.querySelector('input[name="' + currentQuestion.name + '"]:checked');
+
+      if (!selected) {
+        alert("답변을 선택해 주세요.");
+        return;
+      }
+
+      selectedAnswers[currentQuestion.name] = selected.value;
+
+      if (currentQuestionIndex < QUESTIONS.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion("left");
+      } else {
+        calculateResult();
+      }
+    });
+
+    prevButton.addEventListener("click", function() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion("right");
+      }
+    });
+
+    /*
+      renderQuestion 함수는 현재 질문 번호에 맞는 질문과 선택지를 화면에 보여 줍니다.
+      direction 값에 따라 좌우 슬라이드 느낌을 다르게 줍니다.
+    */
+    function renderQuestion(direction) {
+      const question = QUESTIONS[currentQuestionIndex];
+
+      questionText.textContent = question.title;
+      progressText.textContent = "Q" + (currentQuestionIndex + 1) + "/5";
+      progressFill.style.width = ((currentQuestionIndex + 1) / QUESTIONS.length * 100) + "%";
+
+      if (currentQuestionIndex === 0) {
+        prevButton.style.visibility = "hidden";
+      } else {
+        prevButton.style.visibility = "visible";
+      }
+
+      if (currentQuestionIndex === QUESTIONS.length - 1) {
+        resultButton.textContent = "📊 나의 지구 수호대 유형 알아보기";
+      } else {
+        resultButton.textContent = "다음 질문으로 ➡️";
+      }
+
+      optionsArea.innerHTML = "";
+
+      /*
+        forEach는 배열 안의 값을 하나씩 꺼내서 실행하는 반복문입니다.
+        여기서는 선택지 4개를 차례대로 화면에 만듭니다.
+      */
+      question.options.forEach(function(optionText, index) {
+        const value = String(index + 1);
+        const label = document.createElement("label");
+
+        label.className = "option-card";
+
+        if (selectedAnswers[question.name] === value) {
+          label.classList.add("selected");
+        }
+
+        label.innerHTML = '<input type="radio" name="' + question.name + '" value="' + value + '"> ' + optionText;
+
+        const input = label.querySelector("input");
+
+        if (selectedAnswers[question.name] === value) {
+          input.checked = true;
+        }
+
+        label.addEventListener("click", function(event) {
+          createRipple(event, label);
+        });
+
+        input.addEventListener("change", function() {
+          const cards = optionsArea.querySelectorAll(".option-card");
+
+          cards.forEach(function(card) {
+            card.classList.remove("selected");
+          });
+
+          label.classList.add("selected");
+          selectedAnswers[question.name] = value;
+        });
+
+        optionsArea.appendChild(label);
+      });
+
+      questionScreen.classList.remove("slide-left");
+      questionScreen.classList.remove("slide-right");
+
+      /*
+        setTimeout은 아주 짧은 시간 뒤에 코드를 실행하게 해 줍니다.
+        클래스를 뺐다가 다시 넣어야 애니메이션이 다시 작동합니다.
+      */
+      setTimeout(function() {
+        if (direction === "right") {
+          questionScreen.classList.add("slide-right");
+        } else {
+          questionScreen.classList.add("slide-left");
+        }
+      }, 10);
+    }
+
+    /*
+      createRipple 함수는 선택지 카드를 눌렀을 때
+      클릭한 위치에서 동그란 물결이 퍼지게 만듭니다.
+    */
+    function createRipple(event, card) {
+      const oldRipple = card.querySelector(".ripple-circle");
+
+      if (oldRipple) {
+        oldRipple.remove();
+      }
+
+      const circle = document.createElement("span");
+      const diameter = Math.max(card.clientWidth, card.clientHeight);
+      const radius = diameter / 2;
+      const rect = card.getBoundingClientRect();
+
+      circle.style.width = circle.style.height = diameter + "px";
+      circle.style.left = (event.clientX - rect.left - radius) + "px";
+      circle.style.top = (event.clientY - rect.top - radius) + "px";
+      circle.className = "ripple-circle";
+
+      card.appendChild(circle);
+
+      setTimeout(function() {
+        circle.remove();
+      }, 500);
+    }
 
     function calculateResult() {
       /*
@@ -254,16 +1072,13 @@
 
       // Q1부터 Q5까지 사용자가 고른 답을 확인합니다.
       for (let i = 1; i <= 5; i++) {
-        const selected = document.querySelector('input[name="q' + i + '"]:checked');
+        const choice = selectedAnswers["q" + i];
 
         // 선택하지 않은 문항이 있으면 경고창을 보여 주고 함수 실행을 멈춥니다.
-        if (!selected) {
+        if (!choice) {
           alert("답변을 선택해 주세요.");
           return;
         }
-
-        // 사용자가 고른 선택지 번호입니다. 예: "1", "2", "3", "4"
-        const choice = selected.value;
 
         // 선택지 번호에 맞는 점수 규칙을 가져옵니다.
         const pointList = SCORE_MAP[choice];
@@ -326,18 +1141,153 @@
       const resultType = TYPES[finalType];
       const suggestion = getRandomSuggestion(finalType);
 
+      const scoreValues = [scores.A, scores.B, scores.C, scores.D].sort(function(a, b) {
+        return b - a;
+      });
+
+      const secondScore = scoreValues[1];
+      const scoreDiff = maxScore - secondScore;
+      const isTie = topTypes.length > 1;
+      const analysisMessage = getAnalysisMessage(finalType, scoreDiff, isTie);
+
+      showResultSequence(finalType, resultType, suggestion, analysisMessage);
+    }
+
+    /*
+      getAnalysisMessage 함수는 1위와 2위 점수 차이에 따라
+      결과 화면에 보여 줄 분석 멘트를 만듭니다.
+    */
+    function getAnalysisMessage(finalType, scoreDiff, isTie) {
+      const typeName = TYPES[finalType].name;
+
+      if (isTie) {
+        return "당신은 여러 매력을 함께 가진 균형형이에요.<br>그중에서도 " + typeName + " 성향이 살짝 더 강해요.";
+      }
+
+      if (scoreDiff >= 3) {
+        return "당신은 확실한 " + typeName + "이에요!<br>이 성향이 강하게 나타났어요.";
+      }
+
+      return "당신은 " + typeName + " 성향이 가장 두드러지지만,<br>다른 면도 함께 가지고 있어요.";
+    }
+
+    /*
+      showResultSequence 함수는
+      분석 중 → 캐릭터 인트로 → 페이드아웃 → 최종 결과 화면 순서로 보여 줍니다.
+    */
+    function showResultSequence(finalType, resultType, suggestion, analysisMessage) {
+      questionScreen.classList.add("hidden");
+      loadingScreen.classList.remove("hidden");
+
+      startLoadingDots();
+
+      setTimeout(function() {
+        stopLoadingDots();
+        loadingScreen.classList.add("hidden");
+
+        introSmallText.classList.remove("fade-out");
+        introTypeName.classList.remove("fade-out");
+        introCharacterImg.classList.remove("shrink-to-result");
+
+        introTypeName.textContent = resultType.name + "!";
+        introCharacterImg.src = resultType.image;
+        introCharacterImg.alt = resultType.name + " 캐릭터";
+
+        introCharacterImg.onerror = function() {
+          introCharacterImg.style.display = "none";
+        };
+
+        characterIntro.classList.remove("hidden");
+
+        setTimeout(function() {
+          fireEmojiConfetti(resultType.emoji, resultType.colors);
+        }, 1200);
+
+        setTimeout(function() {
+          buildResult(finalType, resultType, suggestion, analysisMessage);
+
+          introSmallText.classList.add("fade-out");
+          introTypeName.classList.add("fade-out");
+          introCharacterImg.classList.add("shrink-to-result");
+
+          resultScreen.classList.remove("hidden");
+
+          setTimeout(function() {
+            resultScreen.classList.add("show-result");
+          }, 30);
+        }, 2000);
+
+        setTimeout(function() {
+          characterIntro.classList.add("hidden");
+        }, 2800);
+      }, 1500);
+    }
+
+    /*
+      startLoadingDots 함수는 분석중. 분석중.. 분석중... 문구가
+      반복해서 바뀌도록 만듭니다.
+    */
+    function startLoadingDots() {
+      let dotCount = 1;
+
+      loadingText.textContent = "분석중...";
+
+      loadingTimer = setInterval(function() {
+        dotCount++;
+
+        if (dotCount > 3) {
+          dotCount = 1;
+        }
+
+        loadingText.textContent = "분석중" + ".".repeat(dotCount);
+      }, 350);
+    }
+
+    function stopLoadingDots() {
+      if (loadingTimer) {
+        clearInterval(loadingTimer);
+        loadingTimer = null;
+      }
+    }
+
+    /*
+      buildResult 함수는 최종 결과 화면의 HTML을 만듭니다.
+      캐릭터 이미지 로드에 실패하면 fallback 이모지를 보여 줍니다.
+    */
+    function buildResult(finalType, resultType, suggestion, analysisMessage) {
       /*
         innerHTML은 HTML 내용을 자바스크립트로 넣을 때 사용합니다.
-        버튼을 누르면 같은 페이지 아래쪽에 결과가 표시됩니다.
+        버튼을 누르면 같은 카드 안에서 결과 화면이 표시됩니다.
       */
       resultArea.innerHTML = `
-        <hr>
-        <h2>📊 나의 환경 실천 성향 결과</h2>
-        <div class="result-emoji">${resultType.emoji}</div>
-        <h3>${finalType}. ${resultType.name}</h3>
-        <p><strong>어떤 성향일까?</strong>: ${resultType.description}</p>
-        <p><strong>💡 실천제안</strong>: ${suggestion}</p>
-        <button type="button" id="resetButton">🔄 다시 하기</button>
+        <div class="result-character-wrap stagger-item">
+          <img
+            src="${resultType.image}"
+            alt="${resultType.name} 캐릭터"
+            class="result-character-img"
+            id="resultCharacterImg"
+            onerror="this.style.display='none'; document.getElementById('fallbackEmoji').classList.remove('hidden');"
+          >
+          <div class="fallback-emoji hidden" id="fallbackEmoji">${resultType.emoji}</div>
+        </div>
+
+        <h3 class="result-type-name stagger-item">${resultType.name}</h3>
+
+        <div class="analysis-box stagger-item">
+          ${analysisMessage}
+        </div>
+
+        <div class="result-box stagger-item">
+          <strong>어떤 성향일까?</strong>
+          ${resultType.description}
+        </div>
+
+        <div class="suggestion-box stagger-item">
+          <strong>💡 실천제안</strong>
+          ${suggestion}
+        </div>
+
+        <button type="button" class="main-btn" id="resetButton">🔄 다시 하기</button>
       `;
 
       /*
@@ -355,8 +1305,23 @@
       */
       quizForm.reset();
 
-      // 결과 영역을 비워서 점수와 결과를 초기화합니다.
+      // 점수와 선택값, 결과를 모두 초기화합니다.
+      selectedAnswers = {};
+      currentQuestionIndex = 0;
       resultArea.innerHTML = "";
+
+      stopLoadingDots();
+
+      // 새로고침 없이 시작 화면으로 돌아갑니다.
+      loadingScreen.classList.add("hidden");
+      characterIntro.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      questionScreen.classList.add("hidden");
+      resultScreen.classList.remove("show-result");
+      startScreen.classList.remove("hidden");
+
+      introCharacterImg.style.display = "block";
+      introCharacterImg.src = "";
     }
   </script>
 </body>
