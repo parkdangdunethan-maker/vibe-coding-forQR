@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>교육 콘텐츠 HTML 모음</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f5f7fb;
+      color: #222;
+      word-break: keep-all;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+    }
+
+    .intro {
+      margin: 0;
+      color: #555;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .section {
+      margin-bottom: 42px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      margin: 0 0 18px;
+      padding-left: 12px;
+      border-left: 6px solid #4caf50;
+    }
+
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .subject-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .subject-card h3 {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
+
+    .level-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .level-link {
+      display: block;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f0f4ff;
+      color: #1f3b73;
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .level-link:hover {
+      background: #dfe8ff;
+      transform: translateY(-2px);
+    }
+
+    .elementary .level-link {
+      background: #edf8ef;
+      color: #226b35;
+    }
+
+    .elementary .level-link:hover {
+      background: #d8f0de;
+    }
+
+    .middle .level-link {
+      background: #fff4e4;
+      color: #8a5200;
+    }
+
+    .middle .level-link:hover {
+      background: #ffe6bc;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #777;
+      font-size: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .subject-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .section-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>📚 교육 콘텐츠 HTML 모음</h1>
+      <p class="intro">
+        초등·중등 학생을 위한 환경, 역사, K-콘텐츠 학습 페이지입니다.<br>
+        원하는 주제와 레벨을 선택해 학습을 시작해보세요.
+      </p>
+    </header>
+
+    <!-- 초등 콘텐츠 -->
+    <section class="section elementary">
+      <h2 class="section-title">초등 콘텐츠</h2>
+
+      <div class="subject-grid">
+        <article class="subject-card">
+          <h3>🌿 환경</h3>
+          <div class="level-list">
+            <a class="level-link" href="elementary-environment-level1.html">Level 1 바로가기</a>
+            <a class="level-link" href="elementary-environment-level2.html">Level 2 바로가기</a>
+            <a class="level-link" href="elementary-environment-level3.html">Level 3 바로가기</a>
+          </div>
+        </article>
+
+        <article class="subject-card">
+          <h3>🏛️ 역사</h3>
+          <div class="level-list">
+            <a class="level-link" href="elementary-history-level1.html">Level 1 바로가기</a>
+            <a class="level-link" href="elementary-history-level2.html">Level 2 바로가기</a>
+            <a class="level-link" href="elementary-history-level3.html">Level 3 바로가기</a>
+          </div>
+        </article>
+
+        <article class="subject-card">
+          <h3>🎬 K-콘텐츠</h3>
+          <div class="level-list">
+            <a class="level-link" href="elementary-kcontent-level1.html">Level 1 바로가기</a>
+            <a class="level-link" href="elementary-kcontent-level2.html">Level 2 바로가기</a>
+            <a class="level-link" href="elementary-kcontent-level3.html">Level 3 바로가기</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 중등 콘텐츠 -->
+    <section class="section middle">
+      <h2 class="section-title">중등 콘텐츠</h2>
+
+      <div class="subject-grid">
+        <article class="subject-card">
+          <h3>🌿 환경</h3>
+          <div class="level-list">
+            <a class="level-link" href="middle-environment-level1.html">Level 1 바로가기</a>
+            <a class="level-link" href="middle-environment-level2.html">Level 2 바로가기</a>
+            <a class="level-link" href="middle-environment-level3.html">Level 3 바로가기</a>
+          </div>
+        </article>
+
+        <article class="subject-card">
+          <h3>🏛️ 역사</h3>
+          <div class="level-list">
+            <a class="level-link" href="middle-history-level1.html">Level 1 바로가기</a>
+            <a class="level-link" href="middle-history-level2.html">Level 2 바로가기</a>
+            <a class="level-link" href="middle-history-level3.html">Level 3 바로가기</a>
+          </div>
+        </article>
+
+        <article class="subject-card">
+          <h3>🎬 K-콘텐츠</h3>
+          <div class="level-list">
+            <a class="level-link" href="middle-kcontent-level1.html">Level 1 바로가기</a>
+            <a class="level-link" href="middle-kcontent-level2.html">Level 2 바로가기</a>
+            <a class="level-link" href="middle-kcontent-level3.html">Level 3 바로가기</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      © 교육 콘텐츠 링크 모음
+    </footer>
+  </div>
+</body>
+</html>
