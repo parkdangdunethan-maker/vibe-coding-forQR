@@ -3,118 +3,242 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>교육 콘텐츠 HTML 모음</title>
+
+  <title>교육 콘텐츠 링크 모음</title>
+
   <style>
-    * { box-sizing: border-box; }
-    html, body { max-width: 100%; overflow-x: hidden; word-break: keep-all; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Arial, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      font-family: Arial, "Noto Sans KR", sans-serif;
       background:
-        radial-gradient(circle at 10% 10%, rgba(122, 202, 140, 0.20), transparent 28%),
-        radial-gradient(circle at 88% 12%, rgba(255, 194, 102, 0.22), transparent 30%),
-        linear-gradient(180deg, #f7fbff 0%, #f2f7f1 100%);
-      color: #1f2933;
+        radial-gradient(circle at top left, rgba(95, 180, 120, 0.18), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 180, 90, 0.18), transparent 36%),
+        #f6f8f5;
+      color: #1f2a24;
+      word-break: keep-all;
     }
-    .page { width: 100%; max-width: 1180px; margin: 0 auto; padding: 36px 20px 64px; }
+
+    .page {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
     header {
       text-align: center;
       margin-bottom: 34px;
-      padding: 34px 20px;
+      padding: 30px 18px;
       border-radius: 28px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 14px 34px rgba(31, 41, 51, 0.08);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
-    h1 { margin: 0 0 12px; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.04em; }
-    .intro { margin: 0; color: #52616b; line-height: 1.7; font-size: 16px; }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 34px;
+      line-height: 1.25;
+      color: #173f2a;
+    }
+
+    .intro {
+      margin: 0;
+      color: #526057;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
     .notice {
-      max-width: 760px;
       margin: 18px auto 0;
-      padding: 12px 16px;
+      max-width: 760px;
+      padding: 13px 16px;
       border-radius: 16px;
-      background: #fff8db;
-      border: 1px solid #f4d56d;
-      color: #66530a;
+      background: #eef8ef;
+      color: #295b35;
       font-size: 14px;
       line-height: 1.6;
+      border: 1px solid #d4ead7;
     }
-    .section { margin-bottom: 38px; }
+
+    .section {
+      margin-bottom: 42px;
+    }
+
     .section-title {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 0 0 16px;
+      margin: 0 0 18px;
       font-size: 24px;
-      letter-spacing: -0.03em;
+      color: #1f2a24;
     }
+
     .section-title::before {
       content: "";
+      display: inline-block;
       width: 8px;
       height: 28px;
       border-radius: 99px;
       background: #4caf50;
-      display: inline-block;
     }
+
+    .middle .section-title::before {
+      background: #ff9800;
+    }
+
     .subject-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 18px;
     }
+
     .subject-card {
-      min-height: 220px;
+      min-height: 230px;
       padding: 22px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 12px 30px rgba(31, 41, 51, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: 22px;
+      background: #ffffff;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
+      border: 1px solid #edf0ed;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
-    .subject-card h3 { margin: 0 0 16px; font-size: 21px; letter-spacing: -0.03em; }
-    .level-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .subject-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .subject-card h3 {
+      margin: 0 0 16px;
+      font-size: 21px;
+      color: #1f2a24;
+    }
+
+    .level-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .level-link {
       display: flex;
       justify-content: space-between;
       align-items: center;
       min-height: 48px;
       padding: 12px 14px;
-      border-radius: 15px;
-      background: #f0f7ff;
-      color: #1d4f7a;
+      border-radius: 14px;
       text-decoration: none;
       font-weight: 700;
-      box-shadow: inset 0 0 0 1px rgba(29, 79, 122, 0.08);
-      transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+      line-height: 1.35;
+      transition: background-color 0.18s ease, transform 0.18s ease;
     }
-    .level-link::after { content: "↗"; font-weight: 900; opacity: 0.7; }
-    .level-link:hover {
-      transform: translateY(-2px);
-      background: #e0f0ff;
-      box-shadow: inset 0 0 0 1px rgba(29, 79, 122, 0.16), 0 8px 18px rgba(31, 41, 51, 0.08);
+
+    .level-link::after {
+      content: "↗";
+      font-size: 14px;
+      opacity: 0.65;
     }
-    footer { margin-top: 36px; text-align: center; color: #667580; font-size: 14px; }
-    @media (max-width: 860px) {
-      .subject-grid { grid-template-columns: 1fr; }
-      .page { padding: 22px 14px 46px; }
-      header { padding: 26px 16px; }
+
+    .elementary .level-link {
+      background: #edf8ef;
+      color: #226b35;
+      border: 1px solid #d8eedc;
+    }
+
+    .elementary .level-link:hover {
+      background: #daf1df;
+      transform: translateX(3px);
+    }
+
+    .middle .level-link {
+      background: #fff4e4;
+      color: #865100;
+      border: 1px solid #ffe1ad;
+    }
+
+    .middle .level-link:hover {
+      background: #ffe8c4;
+      transform: translateX(3px);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 42px;
+      color: #6d766f;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .subject-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .section-title {
+        font-size: 22px;
+      }
+
+      .subject-card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page {
+        padding: 24px 14px 48px;
+      }
+
+      header {
+        padding: 24px 16px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .intro {
+        font-size: 15px;
+      }
+
+      .subject-card {
+        padding: 18px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="page">
     <header>
-      <h1>📚 교육 콘텐츠 HTML 모음</h1>
+      <h1>📚 교육 콘텐츠 링크 모음</h1>
       <p class="intro">
-        초등·중등 학생을 위한 주제별 학습 페이지입니다.<br>
-        원하는 주제와 레벨을 선택해 바로 열어보세요.
+        초등·중등 학생을 위한 인터랙티브 HTML 콘텐츠입니다.<br>
+        학년군, 주제, 레벨을 선택해 페이지로 이동하세요.
       </p>
+
       <div class="notice">
-        현재 업로드된 파일 기준으로 구성했습니다. 초등 영역에는 환경·역사·여행, 중등 영역에는 환경·역사·K-콘텐츠가 연결되어 있습니다.
+        현재 업로드된 파일 기준으로 구성했습니다.<br>
+        초등 영역에는 환경·역사·여행, 중등 영역에는 환경·역사·K-콘텐츠가 연결되어 있습니다.
       </div>
     </header>
 
     <section class="section elementary">
       <h2 class="section-title">초등 콘텐츠</h2>
+
       <div class="subject-grid">
         <article class="subject-card">
           <h3>🌿 환경</h3>
@@ -124,14 +248,16 @@
             <a class="level-link" href="env_elementary_level3.html">환경_초등_레벨 3</a>
           </div>
         </article>
+
         <article class="subject-card">
-          <h3>🏛️ 역사</h3>
+          <h3>🏺 역사</h3>
           <div class="level-list">
             <a class="level-link" href="history_elementary_level1.html">역사_초등_레벨 1</a>
             <a class="level-link" href="history_elementary_level2.html">역사_초등_레벨 2</a>
             <a class="level-link" href="history_elementary_level3.html">역사_초등_레벨 3</a>
           </div>
         </article>
+
         <article class="subject-card">
           <h3>✈️ 여행</h3>
           <div class="level-list">
@@ -142,8 +268,10 @@
         </article>
       </div>
     </section>
+
     <section class="section middle">
       <h2 class="section-title">중등 콘텐츠</h2>
+
       <div class="subject-grid">
         <article class="subject-card">
           <h3>🌿 환경</h3>
@@ -153,6 +281,7 @@
             <a class="level-link" href="env_middle_level3.html">환경_중등_레벨 3</a>
           </div>
         </article>
+
         <article class="subject-card">
           <h3>🏺 역사</h3>
           <div class="level-list">
@@ -161,6 +290,7 @@
             <a class="level-link" href="history_middle_level3.html">역사_중등_레벨 3</a>
           </div>
         </article>
+
         <article class="subject-card">
           <h3>🎬 K-콘텐츠</h3>
           <div class="level-list">
@@ -171,8 +301,9 @@
         </article>
       </div>
     </section>
+
     <footer>
-      AI의 도움을 받아 제작된 콘텐츠입니다.
+      <p>AI의 도움을 받아 제작된 교육 콘텐츠입니다.</p>
     </footer>
   </div>
 </body>
